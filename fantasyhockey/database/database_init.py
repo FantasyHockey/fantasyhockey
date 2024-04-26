@@ -265,7 +265,7 @@ class DatabaseInitializer:
         return "CREATE TABLE IF NOT EXISTS goalie_current_stats \
                 (id INT, team_id INT, year INT, game_type_id INT, league_id INT, sequence INT, games_played INT, goals INT, assists INT,\
                     games_started INT, wins INT, losses INT, ot_losses INT, shots_against INT, goals_against INT, save_percent FLOAT,\
-                    shutouts INT, timeOnIce VARCHAR (100), goals_against_average FLOAT, pim INT,\
+                    shutouts INT, time_on_ice VARCHAR (100), goals_against_average FLOAT, pim INT,\
                     FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
                     PRIMARY KEY (id, year, team_id, game_type_id, sequence)"
 
@@ -279,7 +279,7 @@ class DatabaseInitializer:
         return "CREATE TABLE IF NOT EXISTS goalie_stats \
                 (id INT, team_id INT, year INT, game_type_id INT, league_id INT, sequence INT, games_played INT, goals INT, assists INT,\
                     games_started INT, wins INT, losses INT, ot_losses INT, shots_against INT, goals_against INT, save_percent FLOAT,\
-                    shutouts INT, timeOnIce VARCHAR (100), goals_against_average FLOAT, pim INT,\
+                    shutouts INT, time_on_ice VARCHAR (100), goals_against_average FLOAT, pim INT,\
                     FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
                     PRIMARY KEY (id, year, team_id, game_type_id, sequence)"
 
@@ -287,16 +287,106 @@ class DatabaseInitializer:
         return "DROP TABLE IF EXISTS goalie_stats"
 
     def __initialize_goalie_advanced_stats(self):
-        pass
+        """
+        Initializes the goalie_advanced_stats table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS goalie_advanced_stats \
+                (id INT, year INT, team_id INT, complete_game_percent FLOAT, complete_games INT, games_played INT, games_started INT,\
+                goals_against INT, goals_against_average FLOAT, goals_for INT, goals_for_average FLOAT, incomplete_games INT, quality_start INT,\
+                quality_starts_percent FLOAT, regulation_losses INT, regulation_wins INT,\
+                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                PRIMARY KEY (id, year, team_id)"
 
     def __delete_goalie_advanced_stats(self):
-        pass
+        return "DROP TABLE IF EXISTS goalie_advanced_stats"
 
     def __initialize_goalie_youth_stats(self):
-        pass
+        """
+        Initializes the goalie_youth_stats table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS goalie_youth_stats \
+                (id INT, year INT, team_name VARCHAR(255), league_name VARCHAR(255), game_type_id INT, sequence INT, games_played INT,\
+                save_percent FLOAT, goals_against_average FLOAT, goals_against INT, wins INT, losses INT, time_on_ice VARCHAR(100),\
+                ties INT,\
+                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_name) REFERENCES teams(team_name), FOREIGN KEY (league_name) REFERENCES leagues(league_name),\
+                FOREIGN KEY (year) REFERENCES seasons(year), PRIMARY KEY (id, year, team_name, league_name, game_type_id, sequence)" 
 
     def __delete_goalie_youth_stats(self):
-        pass
+        return "DROP TABLE IF EXISTS goalie_youth_stats"
+
+# TEAM TABLES
+    def __initialize_goalie_advanced_stats_days_rest(self):
+        """
+        Initializes the goalie_advanced_stats_days_rest table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS goalie_advanced_stats_days_rest \
+                (id INT, year INT, team_id INT, games_played INT, games_played_days_rest_0 INT, games_played_days_rest_1 INT,\
+                games_played_days_rest_2 INT, games_played_days_rest_3 INT, games_played_days_rest_4 INT, games_played_days_rest_4_plus INT,\
+                games_started INT, losses INT, ot_losses INT, save_percent FLOAT, save_percent_days_rest_0 FLOAT, save_percent_days_rest_1 FLOAT,\
+                save_percent_days_rest_2 FLOAT, save_percent_days_rest_3 FLOAT, save_percent_days_rest_4 FLOAT, save_percent_days_rest_4_plus FLOAT,\
+                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                PRIMARY KEY (id, year, team_id)"
+
+    def __delete_goalie_advanced_stats_days_rest(self):
+        return "DROP TABLE IF EXISTS goalie_advanced_stats_days_rest"
+
+    def __initialize_goalie_advanced_stats_penalty_shots(self):
+        """
+        Initializes the goalie_advanced_stats_penalty_shots table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS goalie_advanced_stats_penalty_shots \
+                (id INT, year INT, team_id INT, penalty_shot_save_percent FLOAT, penalty_shot_against INT, penalty_shot_goals_against INT,\
+                penalty_shot_saves INT,\
+                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                PRIMARY KEY (id, year, team_id)"
+
+    def __delete_goalie_advanced_stats_penalty_shots(self):
+        return "DROP TABLE IF EXISTS goalie_advanced_stats_penalty_shots"
+    
+    def __initialize_goalie_advanced_stats_saves_by_strength(self):
+        """
+        Initializes the goalie_advanced_stats_saves_by_strength table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS goalie_advanced_stats_saves_by_strength \
+                (id INT, year INT, team_id INT, ev_goals_against INT, ev_save_percent FLOAT, ev_saves INT, ev_shots_against INT,\
+                pp_goals_against INT, pp_save_percent FLOAT, pp_saves INT, pp_shots_against INT, pk_goals_against INT,\
+                pk_save_percent FLOAT, pk_saves INT, pk_shots_against INT,\
+                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                PRIMARY KEY (id, year, team_id)"
+
+    def __delete_goalie_advanced_stats_saves_by_strength(self):
+        return "DROP TABLE IF EXISTS goalie_advanced_stats_saves_by_strength"
+
+    def __initialize_goalie_advanced_stats_shootout(self):
+        """
+        Initializes the goalie_advanced_stats_shootout table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS goalie_advanced_stats_shootout \
+                (id INT, year INT, team_id INT, career_shootout_games_played INT, career_shootout_goals_allowed INT, career_shootout_losses INT,\
+                career_shootout_save_percent FLOAT, career_shootout_saves INT, career_shootout_shots_against INT, career_shootout_wins INT,\
+                shootout_goals_against INT, shootout_losses INT, shootout_save_percent FLOAT, shootout_saves INT, shootout_shots_against INT,\
+                shootout_wins INT,\
+                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                PRIMARY KEY (id, year, team_id)"
+
+    def __delete_goalie_advanced_stats_shootout(self):
+        return "DROP TABLE IF EXISTS goalie_advanced_stats_shootout"
+
+    def __initialize_goalie_advanced_stats_start_relieved(self):
+        """
+        Initializes the goalie_advanced_stats_start_relieve table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS goalie_advanced_stats_start_relieved \
+                (id INT, year INT, team_id INT, games_played INT, games_relieved INT, games_relieved_goals_against INT, games_relieved_losses INT,\
+                games_relieved_ot_losses INT, games_relieved_save_percent FLOAT, games_relieved_saves INT, games_relieved_shots_against INT,\
+                games_relieved_ties INT, games_relieved_wins INT, games_started INT, games_started_goals_against INT, games_started_losses INT,\
+                games_started_ot_losses INT, games_started_save_percent FLOAT, games_started_saves INT, games_started_shots_against INT,\
+                games_started_ties INT, games_started_wins INT,\
+                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                PRIMARY KEY (id, year, team_id)"
+
+    def __delete_goalie_advanced_stats_start_relieved(self):
+        return "DROP TABLE IF EXISTS goalie_advanced_stats_start_relieved"
 
     def __initialize_teams(self):
         pass
