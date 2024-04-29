@@ -11,7 +11,6 @@ class DatabaseInitializer:
         db_operator.write(self.__initialize_database())
         db_operator.write(self.__initialize_players())
         
-
         # db_operator.write(self.__delete_players())
 
         return False
@@ -21,21 +20,20 @@ class DatabaseInitializer:
 
     def __initialize_players(self):
         return "CREATE TABLE IF NOT EXISTS players  \
-                (id INT PRIMARY KEY, team_id INT, is_active BOOLEAN),\
-                Foreign Key (team_id) References teams(id)"
+                (id INT PRIMARY KEY, team_id INT, is_active BOOLEAN, \
+                FOREIGN KEY (team_id) REFERENCES teams(id))"
 
     def __delete_players(self):
         return "DROP TABLE IF EXISTS players"
 
     def __initialize_player_details(self):
         return "CREATE TABLE IF NOT EXISTS player_details \
-                (id INT PRIMARY KEY, is_active BOOLEAN, team_id INT, first_name VARCHAR(255), last_name VARCHAR(255),\
-                jersey_number VARCHAR(255), position VARCHAR(15), headshot VARCHAR(255), hero_image VARCHAR(255),\
-                height_inches INT, weight_pounds INT, birth_date VARCHAR(50),\
-                birth_city VARCHAR(255), birth_state_province VARCHAR(255), birth_country VARCHAR(255), shoots_catches VARCHAR(5),\
-                in_top_100_all_time BOOLEAN, in_hhof BOOLEAN),\
-                Foreign Key (id) References players(id), \
-                Foreign Key (team_id) References players(team_id)"
+                (id INT PRIMARY KEY, first_name VARCHAR(255), last_name VARCHAR(255), \
+                jersey_number VARCHAR(255), position VARCHAR(15), headshot VARCHAR(255), hero_image VARCHAR(255), \
+                height_inches INT, weight_pounds INT, birth_date DATE, \
+                birth_city VARCHAR(255), birth_state_province VARCHAR(255), birth_country VARCHAR(255), shoots_catches VARCHAR(5), \
+                in_top_100_all_time BOOLEAN, in_hhof BOOLEAN, \
+                FOREIGN KEY (id) REFERENCES players(id))"
 
     def __delete_player_details(self):
         return "DROP TABLE IF EXISTS player_details"
@@ -447,8 +445,6 @@ class DatabaseInitializer:
     def __delete_games(self):
         return "DROP TABLE IF EXISTS games"
     
-    #TODO GOTTA FIGURE OUT HOW TO STORE THE GAME STUFF
-    
     def __initialize_game_boxscore(self):
         """
         Initializes the game_boxscore table in the database.
@@ -458,52 +454,214 @@ class DatabaseInitializer:
                 away_penalty_minutes INT, away_hits INT, away_blocked_shots INT, home_team_id INT, home_goals INT, home_score INT, home_shots INT,\
                 home_faceoff_percent FLOAT, home_power_play_conversion VARCHAR(25), home_penalty_minutes INT, home_hits INT, home_blocked_shots INT,\
                 "
-                
+    
+    def __delete_game_boxscore(self):
+        return "DROP TABLE IF EXISTS game_boxscore"
 
-    def __initialize_game_team_stats(self):
-        pass
+    def __initialize_game_roster(self):
+        """
+        Initializes the game_roster table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS game_roster \
+                (game_id INT, team_id INT, player_id INT, scratched BOOLEAN, starting BOOLEAN,\
+                FOREIGN KEY (game_id) REFERENCES games(id), FOREIGN KEY (team_id) REFERENCES teams(id),\
+                FOREIGN KEY (player_id) REFERENCES players(id), PRIMARY KEY (game_id, team_id, player_id)"
+    
+    def __delete_game_roster(self):
+        return "DROP TABLE IF EXISTS game_roster"
+    
+    def __initialize_game_scoreboard(self):
+        """
+        Initializes the game_scoreboard table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS game_scoreboard \
+                (game_id INT, home_score INT, away_score INT, home_shots INT, away_shots INT, time_remaining VARCHAR(25), period INT,\
+                seconds_remaining FLOAT, running BOOLEAN, in_intermission BOOLEAN,\
+                FOREIGN KEY (game_id) REFERENCES games(id), PRIMARY KEY (game_id)"
 
-    def __delete_game_team_stats(self):
-        pass
-
-    def __initialize_team_schedule(self):
-        pass
-
-    def __delete_team_schedule(self):
-        pass
+    def __delete_game_scoreboard(self):
+        return "DROP TABLE IF EXISTS game_scoreboard"
+    
+    def __initialize_referees(self):
+        """
+        Initializes the referees table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS referees \
+                (game_id INT, referee_1_name VARCHAR(255), referee_2_name VARCHAR(255), linesman_1_name VARCHAR(255), linesman_2_name VARCHAR(255),\
+                FOREIGN KEY (game_id) REFERENCES games(id), PRIMARY KEY (game_id)"
+    
+    def __delete_referees(self):
+        return "DROP TABLE IF EXISTS referees"
 
     def __initialize_game_skater_stats(self):
-        pass
-
+        """
+        Initializes the game_skater_stats table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS game_skater_stats \
+                (game_id INT, player_id INT, team_id INT, goals INT, assists INT, points INT, plus_minus INT, penalty_minutes INT,\
+                hits INT, blocks INT, power_play_goals INT, power_play_points INT, shorthanded_goals INT, shorthanded_points INT,\
+                shots INT, faceoffs VARCHAR(25), time_on_ice VARCHAR(25), power_play_time_on_ice VARCHAR(25), shorthanded_time_on_ice VARCHAR(25),\
+                FOREIGN KEY (game_id) REFERENCES games(id), FOREIGN KEY (player_id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id),\
+                PRIMARY KEY (game_id, player_id)"
+    
     def __delete_game_skater_stats(self):
-        pass
-
-    def __initialize_game_skater_advanced_stats(self):
-        pass
-
-    def __delete_game_skater_advanced_stats(self):
-        pass
-
+        return "DROP TABLE IF EXISTS game_skater_stats"
+    
     def __initialize_game_goalie_stats(self):
-        pass
-
+        """
+        Initializes the game_goalie_stats table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS game_goalie_stats \
+                (game_id INT, player_id INT, team_id INT, even_strength_shots_against VARCHAR(25), power_play_shots_against VARCHAR(25),\
+                shorthanded_shots_against VARCHAR(25), saves_shots_against VARCHAR(25), even_strength_goals_against INT, power_play_goals_against INT,\
+                shorthanded_goals_against INT, penalty_minutes INT, goals_against INT, time_on_ice VARCHAR(25),\
+                FOREIGN KEY (game_id) REFERENCES games(id), FOREIGN KEY (player_id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(id),\
+                PRIMARY KEY (game_id, player_id)"
+    
     def __delete_game_goalie_stats(self):
-        pass
+        return "DROP TABLE IF EXISTS game_goalie_stats"
+    
+    def __initialize_game_plays(self):
+        """
+        Initializes the game_plays table in the database.
+        This table holds the common details about each play.
+        """
+        return """CREATE TABLE IF NOT EXISTS game_plays (
+                    game_id INT, play_id INT, event_id INT, period_number INT, period_type VARCHAR(25), time_in_period VARCHAR(25),\
+                    time_remaining VARCHAR(25), situation_code VARCHAR(25), home_team_defending_side VARCHAR(25), type_code VARCHAR(25),\
+                    type_description_key VARCHAR(50), sort_order INT, x_coord INT, y_coord INT, zone_code VARCHAR(25), shot_type VARCHAR(50),\
+                    FOREIGN KEY (game_id) REFERENCES games(id),\
+                    PRIMARY KEY (game_id, play_id)\
+                );"""
+    
+    def __delete_game_plays(self):
+        return "DROP TABLE IF EXISTS game_plays"
 
-    def __initialize_game_goalie_advanced_stats(self):
-        pass
+    def __initialize_play_roles(self):
+        """
+        Initializes the play_roles table in the database.
+        This table links players to plays and specifies their roles in each play.
+        """
+        return """CREATE TABLE IF NOT EXISTS play_roles (
+                    game_id INT, play_id INT, player_id INT, role_code VARCHAR(50),\
+                    FOREIGN KEY (game_id, play_id) REFERENCES game_plays(game_id, play_id),\
+                    FOREIGN KEY (player_id) REFERENCES players(id),\
+                    PRIMARY KEY (game_id, play_id, player_id, role_code)\
+                );"""
+    
+    def __delete_play_roles(self):
+        return "DROP TABLE IF EXISTS play_roles"
 
-    def __delete_game_goalie_advanced_stats(self):
-        pass
+    def __initialize_play_outcomes(self):
+        """
+        Initializes the play_outcomes table in the database.
+        This table stores the outcomes specific to certain types of plays.
+        """
+        return """CREATE TABLE IF NOT EXISTS play_outcomes (
+                    game_id INT, play_id INT, away_score INT, home_score INT, duration INT, reason VARCHAR(255),\
+                    secondary_reason VARCHAR(255),\
+                    FOREIGN KEY (game_id, play_id) REFERENCES game_plays(game_id, play_id),\
+                    PRIMARY KEY (game_id, play_id)\
+                );"""
 
-    def __initialize_game_events(self):
-        pass
+    def __delete_play_outcomes(self):
+        return "DROP TABLE IF EXISTS play_outcomes"
+    
+    def __initialize_play_on_ice(self):
+        """
+        Initializes the play_on_ice table in the database.
+        This table stores the players on the ice for each play.
+        """
+        return """CREATE TABLE IF NOT EXISTS play_on_ice (
+                    game_id INT, play_id INT, player_id INT, team_id INT, home BOOLEAN, away BOOLEAN,\
+                    FOREIGN KEY (game_id, play_id) REFERENCES game_plays(game_id, play_id),\
+                    FOREIGN KEY (player_id) REFERENCES players(id),\
+                    FOREIGN KEY (team_id) REFERENCES teams(id),\
+                    PRIMARY KEY (game_id, play_id, player_id)\
+                );"""
+    
+    def __delete_play_on_ice(self):
+        return "DROP TABLE IF EXISTS play_on_ice"
+    
+    def __initialize_game_three_stars(self):
+        """
+        Initializes the game_three_stars table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS game_three_stars \
+                (game_id INT, star_1 INT, star_2 INT, star_3 INT,\
+                FOREIGN KEY (game_id) REFERENCES games(id), PRIMARY KEY (game_id)\
+                )"
+    
+    def __delete_game_three_stars(self):
+        return "DROP TABLE IF EXISTS game_three_stars"
+    
+    def __initialize_game_goals(self):
+        """
+        Initializes the game_goals table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS game_goals \
+                (game_id INT, situation_code VARCHAR(25), strength VARCHAR(25), player_id INT, highlight_clip_id BIGINT, goals_to_date INT,\
+                away_score INT, home_score INT, leadig_team_id INT, time_in_period VARCHAR(25), shot_type VARCHAR(25), goal_modifier VARCHAR(25),\
+                assist_1_player_id INT, assist_2_player_id INT,\
+                FOREIGN KEY (game_id) REFERENCES games(id), FOREIGN KEY (player_id) REFERENCES players(id),\
+                FOREIGN KEY (leading_team_id) REFERENCES teams(id), FOREIGN KEY (assist_1_player_id) REFERENCES players(id),\
+                FOREIGN KEY (assist_2_player_id) REFERENCES players(id), PRIMARY KEY (game_id, home_score, away_score)"
 
-    def __delete_game_events(self):
-        pass
-
+    def __delete_game_goals(self):
+        return "DROP TABLE IF EXISTS game_goals"
+    
     def __initialize_shift_data(self):
-        pass
-
+        """
+        Initializes the shift_data table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS shift_data \
+                (shift_id INT, game_id INT, player_id INT, detail_code INT, duration VARCHAR(25), end_time VARCHAR(25), start_time VARCHAR(25),\
+                event_description VARCHAR(25), event_details VARCHAR(25), event_number INT, period_number INT, shift_number INT, type_code INT,\
+                FOREIGN KEY (game_id) REFERENCES games(id), FOREIGN KEY (player_id) REFERENCES players(id), PRIMARY KEY (shift_id)"
+    
     def __delete_shift_data(self):
-        pass
+        return "DROP TABLE IF EXISTS shift_data"
+
+    def __initialize_schedule(self):
+        """
+        Initializes the schedule table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS schedule \
+                (game_id INT, home_team_id INT, away_team_id INT,\
+                FOREIGN KEY (game_id) REFERENCES games(id), FOREIGN KEY (home_team_id) REFERENCES teams(id),\
+                FOREIGN KEY (away_team_id) REFERENCES teams(id), PRIMARY KEY (game_id)"
+    
+    def __delete_schedule(self):
+        return "DROP TABLE IF EXISTS schedule"
+    
+# MISC
+
+    def __initialize_draft_rankings(self):
+        """
+        Initializes the draft_rankings table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS draft_rankings \
+                (year INT, player_id INT, first_name INT, last_name INT, position_code VARCHAR(5), shoots_catches VARCHAR(5), height_inches INT,\
+                weight_pounds INT, last_amateur_club VARCHAR(50), last_amateur_league VARCHAR(50), birth_date DATE, birth_city VARCHAR(50),\
+                birth_state_province VARCHAR(50), birth_country VARCHAR(50), midterm_rank INT, final_rank INT,\
+                FOREIGN KEY (player_id) REFERENCES players(id), PRIMARY KEY (year, player_id)"
+    
+    def __delete_draft_rankings(self):
+        return "DROP TABLE IF EXISTS draft_rankings"
+    
+    def __initialize_playoff_bracket(self):
+        """
+        Initializes the playoff_bracket table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS playoff_bracket \
+                (year INT, round INT, top_seed_rank INT, top_seed_wins INT, top_seed_team_id INT, series_title VARCHAR(50),\
+                bottom_seed_rank INT, bottom_seed_wins INT, bottom_seed_team_id INT, winning_team_id INT, losing_team_id INT,\
+                FOREIGN KEY (top_seed_team_id) REFERENCES teams(id), FOREIGN KEY (bottom_seed_team_id) REFERENCES teams(id),\
+                FOREIGN KEY (winning_team_id) REFERENCES teams(id), FOREIGN KEY (losing_team_id) REFERENCES teams(id),\
+                PRIMARY KEY (year, round)\
+                );"
+    
+    def __delete_playoff_bracket(self):
+        return "DROP TABLE IF EXISTS playoff_bracket"
+    
+# TODO: ADD FANTASY HOCKEY RELATED TABLES
