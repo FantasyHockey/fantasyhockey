@@ -21,7 +21,8 @@ class DatabaseInitializer:
 
     def __initialize_players(self):
         return "CREATE TABLE IF NOT EXISTS players  \
-                (id INT PRIMARY KEY, team_id INT, is_active BOOLEAN)"
+                (id INT PRIMARY KEY, team_id INT, is_active BOOLEAN),\
+                Foreign Key (team_id) References teams(id)"
 
     def __delete_players(self):
         return "DROP TABLE IF EXISTS players"
@@ -314,7 +315,6 @@ class DatabaseInitializer:
     def __delete_goalie_youth_stats(self):
         return "DROP TABLE IF EXISTS goalie_youth_stats"
 
-# TEAM TABLES
     def __initialize_goalie_advanced_stats_days_rest(self):
         """
         Initializes the goalie_advanced_stats_days_rest table in the database.
@@ -388,43 +388,79 @@ class DatabaseInitializer:
     def __delete_goalie_advanced_stats_start_relieved(self):
         return "DROP TABLE IF EXISTS goalie_advanced_stats_start_relieved"
 
+# TEAM TABLES
     def __initialize_teams(self):
-        pass
+        """
+        Initializes the teams table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS teams \
+                (id INT PRIMARY KEY, conference_name VARCHAR(25), division_name VARCHAR(25), location_name VARCHAR(25), team_name VARCHAR(50),\
+                team_abbreviation VARCHAR(5), team_logo VARCHAR(255), team_color_1 VARCHAR(255), team_color_2 VARCHAR(255))"
 
     def __delete_teams(self):
-        pass
-
-    def __initialize_leagues(self):
-        pass
-
-    def __delete_leagues(self):
-        pass
+        return "DROP TABLE IF EXISTS teams"
+    
+    def __initialize_team_stats(self):
+        """
+        Initializes the team_stats table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS team_stats \
+                (id INT, year INT, team_id INT, game_type_id INT, games_played INT, goals_against INT, goals_for INT, losses INT, ot_losses INT,\
+                points INT, shootout_losses INT, shootout_wins INT, streak_code VARCHAR(5), streak_count INT, ties INT, waiver_sequence INT,\
+                regulation_wins INT, regulation_plus_ot_wins INT, home_games_played INT, home_goals_against INT, home_goals_for INT, home_losses INT,\
+                home_ot_losses INT, home_points INT, home_regulation_wins INT, home_regulation_plus_ot_wins INT, home_ties INT, home_wins INT,\
+                last_10_games_played INT, last_10_goals_against INT, last_10_goals_for INT, last_10_losses INT, last_10_ot_losses INT,\
+                last_10_points INT, last_10_regulation_wins INT, last_10_regulation_plus_ot_wins INT, last_10_ties INT, last_10_wins INT,\
+                road_games_played INT, road_goals_against INT, road_goals_for INT,road_losses INT, road_ot_losses INT, road_points INT, road_regulation_wins INT,\
+                road_regulation_plus_ot_wins INT, road_ties INT, road_wins INT,\
+                FOREIGN KEY (id) REFERENCES teams(id), FOREIGN KEY (team_id) REFERENCES teams(id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                PRIMARY KEY (id, year, team_id, game_type_id)"
+                
+    def __delete_team_stats(self):
+        return "DROP TABLE IF EXISTS team_stats"
 
     def __initialize_seasons(self):
-        pass
+        """
+        Initializes the seasons table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS seasons \
+                (year INT PRIMARY KEY, conferences_in_use BOOLEAN, point_for_ot_loss BOOLEAN, regulation_wins BOOLEAN, row BOOLEAN,\
+                standings_start_date VARCHAR(50), standings_end_date VARCHAR(50), ties_in_use BOOLEAN, wild_card_in_use BOOLEAN,\
+                FORMAT(standings_start_date, 'YYYY-MM-DD'), FORMAT(standings_end_date, 'YYYY-MM-DD'),\
+                PRIMARY KEY (year)"
 
     def __delete_seasons(self):
-        pass
-
-    def __initialize_team_stats(self):
-        pass
-
-    def __delete_team_stats(self):
-        pass
-
-    def __initialize_team_advanced_stats(self):
-        pass
-
-    def __delete_team_advanced_stats(self):
-        pass
+        return "DROP TABLE IF EXISTS seasons"
 
     def __initialize_games(self):
-        pass
+        """
+        Initializes the games table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS games \
+                (id INT, year INT, game_type_id INT, venue_name VARCHAR(255), start_time_utc VARCHAR(50), eastern_utc_offset VARCHAR(50),\
+                venue_utc_offset VARCHAR(50), venue_time_zone VARCHAR(50), game_state VARCHAR(50), game_schedule_state VARCHAR(50),\
+                away_team_id INT, home_team_id INT, shootout_in_use BOOLEAN, regulation_periods INT, ot_in_use BOOLEAN, ties_in_use BOOLEAN,\
+                video_3_min_recap_id VARCHAR(255), video_condensed_game VARCHAR(255),\
+                FOREIGN KEY (year) REFERENCES seasons(year), FOREIGN KEY (away_team_id) REFERENCES teams(id),\
+                FOREIGN KEY (home_team_id) REFERENCES teams(id), PRIMARY KEY (id, year, game_type_id)"
 
     def __delete_games(self):
-        pass
+        return "DROP TABLE IF EXISTS games"
+    
+    #TODO GOTTA FIGURE OUT HOW TO STORE THE GAME STUFF
+    
+    def __initialize_game_boxscore(self):
+        """
+        Initializes the game_boxscore table in the database.
+        """
+        return "CREATE TABLE IF NOT EXISTS game_boxscore \
+                (game_id INT, away_team_id INT, away_goals INT, away_score INT, away_shots INT, away_faceoff_percent FLOAT, away_power_play_conversion VARCHAR(25),\
+                away_penalty_minutes INT, away_hits INT, away_blocked_shots INT, home_team_id INT, home_goals INT, home_score INT, home_shots INT,\
+                home_faceoff_percent FLOAT, home_power_play_conversion VARCHAR(25), home_penalty_minutes INT, home_hits INT, home_blocked_shots INT,\
+                "
+                
 
-    def __initialize_game__team_stats(self):
+    def __initialize_game_team_stats(self):
         pass
 
     def __delete_game_team_stats(self):
