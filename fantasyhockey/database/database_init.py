@@ -12,12 +12,12 @@ class DatabaseInitializer:
         db_operator = DatabaseOperator()
 
         db_operator.write(self.__initialize_database())
+        db_operator.write(self.__initialize_seasons())
 
         # Teams and Players
         db_operator.write(self.__initialize_teams())
         db_operator.write(self.__initialize_team_stats())
         db_operator.write(self.__initialize_players())
-        db_operator.write(self.__initialize_seasons())
 
         db_operator.write(self.__initialize_player_details())
         db_operator.write(self.__initialize_player_draft())
@@ -534,8 +534,9 @@ class DatabaseInitializer:
         Initializes the teams table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS teams\
-                (team_id INT PRIMARY KEY, conference_name VARCHAR(25), division_name VARCHAR(25), location_name VARCHAR(25), team_name VARCHAR(50),\
-                team_abbreviation VARCHAR(5), team_logo VARCHAR(255), team_color_1 VARCHAR(255), team_color_2 VARCHAR(255), is_active BOOLEAN);"
+                (team_id INT, year INT, conference_name VARCHAR(25), division_name VARCHAR(25), place_name VARCHAR(255), team_name VARCHAR(50),\
+                team_abbreviation VARCHAR(5), team_logo VARCHAR(255), team_color_1 VARCHAR(255), team_color_2 VARCHAR(255),\
+                FOREIGN KEY (year) REFERENCES seasons(year), PRIMARY KEY (team_id, year));"
 
     def __delete_teams(self):
         return "DROP TABLE IF EXISTS teams"
@@ -791,10 +792,10 @@ class DatabaseInitializer:
         Initializes the draft_rankings table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS draft_rankings \
-                (year INT, player_id INT, first_name INT, last_name INT, position_code VARCHAR(5), shoots_catches VARCHAR(5), height_inches INT,\
+                (year INT, first_name INT, last_name INT, position_code VARCHAR(5), shoots_catches VARCHAR(5), height_inches INT,\
                 weight_pounds INT, last_amateur_club VARCHAR(50), last_amateur_league VARCHAR(50), birth_date DATE, birth_city VARCHAR(50),\
                 birth_state_province VARCHAR(50), birth_country VARCHAR(50), midterm_rank INT, final_rank INT,\
-                FOREIGN KEY (player_id) REFERENCES players(id), PRIMARY KEY (year, player_id));"
+                PRIMARY KEY (year, first_name, last_name, final_rank));"
     
     def __delete_draft_rankings(self):
         return "DROP TABLE IF EXISTS draft_rankings"
