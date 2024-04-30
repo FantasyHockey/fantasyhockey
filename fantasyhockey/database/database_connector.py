@@ -37,6 +37,7 @@ class DatabaseConnector:
             connection = mysql.connector.connect(
                 host="localhost",
                 user="root",
+                password="Luke4791",
                 database="fantasyhockey"
             )
             return connection
