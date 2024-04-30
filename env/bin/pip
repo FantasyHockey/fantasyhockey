@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/lukewismer/Library/Mobile Documents/com~apple~CloudDocs/FantasyHockey/env/bin/python3" "$0" "$@"
+'''exec' "/Users/lukewismer/Library/Mobile Documents/com~apple~CloudDocs/FantasyHockey/env/bin/python3.11" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
