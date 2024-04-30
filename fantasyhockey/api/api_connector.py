@@ -16,7 +16,8 @@ class APIConnector:
         """
         Initializes the APIConnector instance.
         """
-        self.base_url = "https://api-web.nhle.com/"
+        self.base_url_1 = "https://api-web.nhle.com/"
+        self.base_url_2 = "https://api.nhle.com/stats/rest/en/"
         self.session = requests.Session()
 
     def __validate_endpoint(self, endpoint):
@@ -33,9 +34,9 @@ class APIConnector:
         bool
             True if the endpoint starts with the base URL, False otherwise.
         """
-        return endpoint.startswith(self.base_url)
+        return endpoint.startswith(self.base_url_1) or endpoint.startswith(self.base_url_2)
 
-    def get(self, endpoint):
+    def get_json(self, endpoint):
         """
         Sends a GET request to the specified API endpoint.
 

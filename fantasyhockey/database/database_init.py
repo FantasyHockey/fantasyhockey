@@ -5,16 +5,17 @@ class DatabaseInitializer:
     def __init__(self):
         pass
 
-    def start(self):
-        self.run()
-
     def run(self):
+        self.__create()
+
+    def __create(self):
         db_operator = DatabaseOperator()
 
         db_operator.write(self.__initialize_database())
 
         # Teams and Players
         db_operator.write(self.__initialize_teams())
+        db_operator.write(self.__initialize_team_stats())
         db_operator.write(self.__initialize_players())
         db_operator.write(self.__initialize_seasons())
 
@@ -79,7 +80,7 @@ class DatabaseInitializer:
 
         return False
 
-    def reset(self):
+    def __reset(self):
         db_operator = DatabaseOperator()
         
         db_operator.write(self.__delete_player_details())
@@ -140,6 +141,19 @@ class DatabaseInitializer:
         
 
         return False
+
+    def __clear_table(self, table_name):
+        """
+        Clear data in a table without dropping the table itself.
+        """
+        db_operator = DatabaseOperator()
+        try:
+            db_operator.write(f"DELETE FROM {table_name};")
+        except Exception as e:
+            print(e)
+            return False
+        return True
+
 
     def __initialize_database(self):
         return "CREATE DATABASE IF NOT EXISTS fantasyhockey"
@@ -521,7 +535,7 @@ class DatabaseInitializer:
         """
         return "CREATE TABLE IF NOT EXISTS teams\
                 (team_id INT PRIMARY KEY, conference_name VARCHAR(25), division_name VARCHAR(25), location_name VARCHAR(25), team_name VARCHAR(50),\
-                team_abbreviation VARCHAR(5), team_logo VARCHAR(255), team_color_1 VARCHAR(255), team_color_2 VARCHAR(255));"
+                team_abbreviation VARCHAR(5), team_logo VARCHAR(255), team_color_1 VARCHAR(255), team_color_2 VARCHAR(255), is_active BOOLEAN);"
 
     def __delete_teams(self):
         return "DROP TABLE IF EXISTS teams"
@@ -531,7 +545,7 @@ class DatabaseInitializer:
         Initializes the team_stats table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS team_stats\
-                (id INT, year INT, team_id INT, game_type_id INT, games_played INT, goals_against INT, goals_for INT, losses INT, ot_losses INT,\
+                (team_id INT, year INT, game_type_id INT, games_played INT, goals_against INT, goals_for INT, losses INT, ot_losses INT,\
                 points INT, shootout_losses INT, shootout_wins INT, streak_code VARCHAR(5), streak_count INT, ties INT, waiver_sequence INT,\
                 regulation_wins INT, regulation_plus_ot_wins INT, home_games_played INT, home_goals_against INT, home_goals_for INT, home_losses INT,\
                 home_ot_losses INT, home_points INT, home_regulation_wins INT, home_regulation_plus_ot_wins INT, home_ties INT, home_wins INT,\
@@ -539,8 +553,8 @@ class DatabaseInitializer:
                 last_10_points INT, last_10_regulation_wins INT, last_10_regulation_plus_ot_wins INT, last_10_ties INT, last_10_wins INT,\
                 road_games_played INT, road_goals_against INT, road_goals_for INT,road_losses INT, road_ot_losses INT, road_points INT, road_regulation_wins INT,\
                 road_regulation_plus_ot_wins INT, road_ties INT, road_wins INT,\
-                FOREIGN KEY (id) REFERENCES teams(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
-                PRIMARY KEY (id, year, team_id, game_type_id));"
+                FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                PRIMARY KEY (team_id, year, game_type_id));"
                 
     def __delete_team_stats(self):
         return "DROP TABLE IF EXISTS team_stats"
