@@ -6,12 +6,6 @@ from fantasyhockey.data_fetching.draft_rankings.fetch_draft_ranking import Fetch
 def run():
     db_initializer = DatabaseInitializer()
     db_initializer.run()
-    '''
-    update_seasons = UpdateSeasons()
-    update_seasons.update_in_db()
-    update_teams = UpdateTeams()
-    update_teams.update_in_db()
-    '''
-    fetch_draft_rankings = FetchDraftRankings()
-    fetch_draft_rankings.get_draft_rankings()
+
+
     pass

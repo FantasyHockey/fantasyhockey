@@ -6,7 +6,7 @@ class DatabaseInitializer:
         pass
 
     def run(self):
-        self.__create()
+        self.__reset()
 
     def __create(self):
         db_operator = DatabaseOperator()

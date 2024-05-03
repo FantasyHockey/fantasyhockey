@@ -28,7 +28,7 @@ class FetchSeasons:
         for season_data in data["seasons"]:
             try:
                 season = Season(season_data["id"])
-                season.set_conference_in_use(self.__parse_data(season_data, "conferencesInUse"))
+                season.set_conference_in_use(self.__parse_data(season_data, "conferencesInUsess"))
                 season.set_division_in_use(self.__parse_data(season_data, "divisionsInUse"))
                 season.set_point_for_ot_loss_in_use(self.__parse_data(season_data, "pointForOTlossInUse"))
                 season.set_regulation_wins_in_use(self.__parse_data(season_data, "regulationWinsInUse"))
