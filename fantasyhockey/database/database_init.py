@@ -420,7 +420,7 @@ class DatabaseInitializer:
         return "CREATE TABLE IF NOT EXISTS goalie_stats \
                 (id INT, team_id INT, year INT, game_type_id INT, league_id INT, sequence INT, games_played INT, goals INT, assists INT,\
                     games_started INT, wins INT, losses INT, ot_losses INT, shots_against INT, goals_against INT, save_percent FLOAT,\
-                    shutouts INT, time_on_ice VARCHAR (100), goals_against_average FLOAT, pim INT,\
+                    shutouts INT, time_on_ice VARCHAR (100), goals_against_average FLOAT, penalty_minues INT,\
                     FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
                     PRIMARY KEY (id, year, team_id, game_type_id, sequence));"
 
@@ -809,7 +809,7 @@ class DatabaseInitializer:
                 bottom_seed_rank INT, bottom_seed_wins INT, bottom_seed_team_id INT, winning_team_id INT, losing_team_id INT,\
                 FOREIGN KEY (top_seed_team_id) REFERENCES teams(team_id), FOREIGN KEY (bottom_seed_team_id) REFERENCES teams(team_id),\
                 FOREIGN KEY (winning_team_id) REFERENCES teams(team_id), FOREIGN KEY (losing_team_id) REFERENCES teams(team_id),\
-                PRIMARY KEY (year, round)\
+                PRIMARY KEY (year, round, top_seed_team_id, bottom_seed_team_id)\
                 );"
     
     def __delete_playoff_bracket(self):
