@@ -1,5 +1,5 @@
 from fantasyhockey.api.api_connector import APIConnector
-from fantasyhockey.data_fetching.seasons.season import Season
+from fantasyhockey.data_fetching.seasons.models.season import Season
 
 class FetchSeasons:
     """

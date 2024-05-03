@@ -1,5 +1,5 @@
-from fantasyhockey.data_fetching.teams.team_data import TeamData
-from fantasyhockey.data_fetching.teams.team_stats import TeamStats
+from fantasyhockey.data_fetching.teams.models.team_data import TeamData
+from fantasyhockey.data_fetching.teams.models.team_stats import TeamStats
 
 class Team:
     def __init__(self, team_id):

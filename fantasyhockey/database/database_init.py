@@ -360,7 +360,7 @@ class DatabaseInitializer:
         """
         return "CREATE TABLE IF NOT EXISTS skater_advanced_stats_goals \
                 (id INT, year INT, team_id INT, even_strength_goal_difference INT, even_strength_goals_against INT, even_strength_goals_for INT,\
-                even_strength_time_on_ice_per_Game FLOAT, games_played INT, pp_goals_for INT, pp_goals_against INT, pk_goals_for INT,\
+                even_strength_time_on_ice_per_game FLOAT, games_played INT, pp_goals_for INT, pp_goals_against INT, pk_goals_for INT,\
                 pk_goals_against INT,\
                 FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
                 PRIMARY KEY (id, year, team_id));"

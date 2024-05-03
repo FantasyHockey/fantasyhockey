@@ -1,7 +1,7 @@
 from fantasyhockey.api.api_connector import APIConnector
-from fantasyhockey.data_fetching.teams.team import Team
-from fantasyhockey.data_fetching.teams.team_data import TeamData
-from fantasyhockey.data_fetching.teams.team_stats import TeamStats
+from fantasyhockey.data_fetching.teams.models.team import Team
+from fantasyhockey.data_fetching.teams.models.team_data import TeamData
+from fantasyhockey.data_fetching.teams.models.team_stats import TeamStats
 
 class FetchTeams:
     
@@ -12,9 +12,7 @@ class FetchTeams:
         self.__ROSTER_SEASON_URL = "https://api-web.nhle.com/v1/roster-season/mtl"
         self.__TEAM_ID_URL = "https://api.nhle.com/stats/rest/en/team"
 
-        self.team_id_lookup = None
-
-    
+        self.team_id_lookup = None    
 
     def get_teams(self):
         if not self.teams:
