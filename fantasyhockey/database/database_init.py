@@ -6,7 +6,7 @@ class DatabaseInitializer:
         pass
 
     def run(self):
-        self.__create()
+        self.__reset()
 
     def __create(self):
         db_operator = DatabaseOperator()
@@ -86,6 +86,7 @@ class DatabaseInitializer:
         db_operator.write(self.__delete_player_details())
         db_operator.write(self.__delete_player_draft())
         db_operator.write(self.__delete_player_awards())
+        db_operator.write(self.__delete_team_stats())
 
         db_operator.write(self.__delete_skater_current_stats())
         db_operator.write(self.__delete_skater_stats())
