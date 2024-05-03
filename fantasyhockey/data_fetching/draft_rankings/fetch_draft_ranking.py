@@ -10,6 +10,7 @@ class FetchDraftRankings:
     get_draft_ranking()
         Fetches the draft ranking data from the NHL API and returns a list of draft ranking objects.
     """
+    
 
     def __init__(self):
         self.api_connector = APIConnector()
