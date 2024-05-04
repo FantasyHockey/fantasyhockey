@@ -20,7 +20,3 @@ class Player:
 
     def get_is_active(self):
         return self.is_active
-    
-
-
-

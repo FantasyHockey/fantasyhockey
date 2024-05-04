@@ -46,6 +46,7 @@ class UpdateSeasons:
         """
         query = "INSERT INTO seasons (year, conferences_in_use, point_for_ot_loss, regulation_wins, `row`,\
                     standings_start_date, standings_end_date, ties_in_use, wild_card_in_use) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        
         params = (season.get_year(), season.get_conference_in_use(), season.get_point_for_ot_loss_in_use(), season.get_regulation_wins_in_use(),\
                     season.get_row_in_use(), season.get_standings_start(), season.get_standings_end(), season.get_ties_in_use(), season.get_wild_card_in_use())
         return query, params
