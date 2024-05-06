@@ -42,7 +42,7 @@ class UpdateDraftRankings:
 
     def __create_query(self, player_data):
         """
-        Creates a query to insert a season into the seasons table.
+        Creates a query to insert a season into the seasons table.  
         """
         query = "INSERT INTO seasons (year, conferences_in_use, point_for_ot_loss, regulation_wins, `row`,\
                     standings_start_date, standings_end_date, ties_in_use, wild_card_in_use) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
