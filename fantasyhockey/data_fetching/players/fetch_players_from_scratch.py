@@ -11,6 +11,7 @@ class FetchPlayersFromScratch:
     def __init__(self):
         self.api_connector = APIConnector()
         self.data_parser = DataParser()
+        self.db_operator = DatabaseOperator()
         self.util = Util()
         self.__player_ids = []
         self.__players = []
@@ -26,6 +27,7 @@ class FetchPlayersFromScratch:
             self.__fetch_players_for_team(team[0], team[1])
 
         self.__player_ids = self.util.remove_duplicates(self.__player_ids)
+        
         self.__get_player_data()
     
     def __get_all_team_ids(self):
@@ -77,7 +79,10 @@ class FetchPlayersFromScratch:
             return
     
     def __get_player_data(self):
+        count = 0
         for player_id in self.__player_ids:
+            count += 1
+            print(f"Fetching player {count} of {len(self.__player_ids)}")
             json = self.api_connector.get_json(f"https://api-web.nhle.com/v1/player/{player_id}/landing")
             player = Player(player_id)
             try:
@@ -96,9 +101,9 @@ class FetchPlayersFromScratch:
                 print("Error parsing is active from player id: ", player_id)
                 continue
 
-            #self.__get_player_draft(player, json)
+            self.__get_player_draft(player, json)
             self.__get_player_awards(player, json)
-            #self.__get_player_details(player, json)
+            self.__get_player_details(player, json)
             self.__players.append(player)
 
     def __get_player_draft(self, player, json):
@@ -120,11 +125,10 @@ class FetchPlayersFromScratch:
         try:
             awards = self.data_parser.parse(json, "awards", "empty_list")
             for award in awards:
-                print("found awards for player id: ", player_id)
                 for seasons in award["seasons"]:
                     player_award = PlayerAwards(player_id)
                     player_award.set_year(self.data_parser.parse(seasons, "seasonId", "none"))
-                    player_award.set_award(self.data_parser.parse(award, "trophy", "none"))
+                    player_award.set_award(self.data_parser.double_parse(award, "trophy", "default", "none"))
                     player.add_player_award(player_award)
         except KeyError as e:
             print("Error parsing player awards from player id (likely doesn't have any awards): ", player_id)
@@ -159,7 +163,9 @@ class FetchPlayersFromScratch:
             player_details.set_in_top_100_all_time(self.data_parser.parse(json, "inTop100AllTime", "false"))
             player_details.set_in_hhof(self.data_parser.parse(json, "inHHOF", "false"))
             player.set_player_details(player_details)
-        except KeyError:
+        except KeyError as e:
             print("Error parsing player details from player id: ", player_id)
-        except ValueError:
+            print(e)
+        except ValueError as e:
             print("Error parsing player details from player id: ", player_id)
+            print(e)

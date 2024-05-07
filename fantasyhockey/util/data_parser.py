@@ -15,6 +15,8 @@ class DataParser:
             'empty_dict': Returns an empty dictionary if the key is not found in the JSON data.
             'empty_string': Returns an empty string if the key is not found in the JSON data.
             'checker': Checks if the specified key is present in the JSON data.
+            'error': Raises a KeyError if the specified key is not found.
+            'false': Returns False if the key is not found in the JSON data.
             default: Raises a ValueError if the specified version is not found.
         
         double_parse(json, key, sub_key, version=None):
@@ -24,11 +26,13 @@ class DataParser:
             'empty_dict': Returns an empty dictionary if the key is not found in the JSON data.
             'empty_string': Returns an empty string if the key is not found in the JSON data.
             'checker': Checks if the specified key is present in the JSON data.
+            'error': Raises a KeyError if the specified key is not found.
+            'false': Returns False if the key is not found in the JSON data.
             default: Raises a ValueError if the specified version is not found.
     """
 
-    def __init__(self, data):
-        self.data = data
+    def __init__(self):
+        pass
 
     def parse(self, json, key, version=None):
         """
@@ -45,7 +49,7 @@ class DataParser:
         Raises:
             ValueError: If the specified version is not found.
         """
-        if version is None:
+        if version is None or version == "error":
             return self.__parse_error(json, key)
         elif version == "empty_list":
             return self.__parse_empty_list(json, key)
@@ -57,6 +61,8 @@ class DataParser:
             return self.__parse_empty_string(json, key)
         elif version == "checker":
             return self.__parse_checker(json, key)
+        elif version == "false":
+            return self.__parse_false(json, key)
         else:
             raise ValueError(f"Version {version} not found.")
 
@@ -94,6 +100,9 @@ class DataParser:
         elif version == "checker":
             sub_json = self.__parse_empty_dict(json, key)
             return self.__parse_checker(sub_json, sub_key)
+        elif version == "false":
+            sub_json = self.__parse_empty_dict(json, key)
+            return self.__parse_false(sub_json, sub_key)
         else:
             raise ValueError(f"Version {version} not found.")
 
@@ -193,4 +202,18 @@ class DataParser:
         """
         return key in json
     
+    def __parse_false(self, json, key):
+        """
+        Parses the JSON data and returns the value associated with the specified key.
+        Returns False if the key is not found in the JSON data.
 
+        Args:
+            json (dict): The JSON data to be parsed.
+            key (str): The key to be parsed from the JSON data.
+
+        Returns:
+            The parsed value associated with the specified key, or False if the key is not found.
+        """
+        if key in json:
+            return json[key]
+        return False

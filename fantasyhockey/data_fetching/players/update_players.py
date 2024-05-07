@@ -19,10 +19,10 @@ class UpdatePlayers:
         """
         players = self.fetch_players.get_players()
         for player in players:
-            #query, params = self.__create_players_query(player)
-            #self.database_operator.write(query, params)
+            query, params = self.__create_players_query(player)
+            self.database_operator.write(query, params)
 
-            """try:
+            try:
                 player_details = player.get_player_details()
                 query, params = self.__create_player_details_query(player_details)
                 self.database_operator.write(query, params)
@@ -30,8 +30,7 @@ class UpdatePlayers:
                 print("Error writing player details to the database: ", e, "will try to update")
                 query, params = self.__update_player_details_query(player_details)
                 self.database_operator.write(query, params)
-            """
-            """
+            
             try:
                 player_draft = player.get_player_draft()
                 query, params = self.__create_player_draft_query(player_draft)
@@ -40,11 +39,9 @@ class UpdatePlayers:
                 print("Error writing player draft to the database: ", e, "will try to update")
                 query, params = self.__update_player_draft_query(player_draft)
                 self.database_operator.write(query, params)
-            """
+            
             try:
                 player_awards = player.get_player_awards()
-                print("Updating player awards")
-                print(player_awards)
                 for award in player_awards:
                     query, params = self.__create_player_awards_query(award)
                     self.database_operator.write(query, params)
