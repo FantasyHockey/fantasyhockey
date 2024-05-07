@@ -23,7 +23,7 @@ class FetchDraftRankings:
 
         if not self.draft_rankings:
             self.__fetch()
-        print(self.draft_rankings)
+        return self.draft_rankings
 
     def __fetch(self):
         data = self.api_connector.get_json("https://api-web.nhle.com/v1/draft/rankings/now")
@@ -55,4 +55,4 @@ class FetchDraftRankings:
     def __parse_data(self, json, key):
         if key in json:
             return json[key]
-        raise ValueError(f"Key {key} not found in JSON data.")
+        return None

@@ -6,7 +6,7 @@ class DatabaseInitializer:
         pass
 
     def run(self):
-        self.__reset()
+        self.__create()
 
     def __create(self):
         db_operator = DatabaseOperator()
@@ -793,7 +793,7 @@ class DatabaseInitializer:
         Initializes the draft_rankings table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS draft_rankings \
-                (year INT, first_name INT, last_name INT, position_code VARCHAR(5), shoots_catches VARCHAR(5), height_inches INT,\
+                (year INT, first_name VARCHAR(255), last_name VARCHAR(255), position_code VARCHAR(5), shoots_catches VARCHAR(5), height_inches INT,\
                 weight_pounds INT, last_amateur_club VARCHAR(50), last_amateur_league VARCHAR(50), birth_date DATE, birth_city VARCHAR(50),\
                 birth_state_province VARCHAR(50), birth_country VARCHAR(50), midterm_rank INT, final_rank INT,\
                 PRIMARY KEY (year, first_name, last_name, final_rank));"
