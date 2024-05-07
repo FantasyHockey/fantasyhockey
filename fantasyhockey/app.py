@@ -12,5 +12,5 @@ def run():
     #update_teams = UpdateTeams()
     #update_teams.update_in_db()
     update_players = UpdatePlayers()
-    update_players.update_in_db()
+    update_players.write_in_db_from_scratch()
     pass
