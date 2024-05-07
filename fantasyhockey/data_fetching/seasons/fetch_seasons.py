@@ -1,5 +1,6 @@
 from fantasyhockey.api.api_connector import APIConnector
 from fantasyhockey.data_fetching.seasons.models.season import Season
+from fantasyhockey.util.data_parser import DataParser
 
 class FetchSeasons:
     """
@@ -13,7 +14,9 @@ class FetchSeasons:
 
     def __init__(self):
         self.api_connector = APIConnector()
+        self.data_parser = DataParser()
         self.seasons = []
+
 
     def get_seasons(self):
         """
@@ -28,20 +31,15 @@ class FetchSeasons:
         for season_data in data["seasons"]:
             try:
                 season = Season(season_data["id"])
-                season.set_conference_in_use(self.__parse_data(season_data, "conferencesInUsess"))
-                season.set_division_in_use(self.__parse_data(season_data, "divisionsInUse"))
-                season.set_point_for_ot_loss_in_use(self.__parse_data(season_data, "pointForOTlossInUse"))
-                season.set_regulation_wins_in_use(self.__parse_data(season_data, "regulationWinsInUse"))
-                season.set_row_in_use(self.__parse_data(season_data, "rowInUse"))
-                season.set_standings_end(self.__parse_data(season_data, "standingsEnd"))
-                season.set_standings_start(self.__parse_data(season_data, "standingsStart"))
-                season.set_ties_in_use(self.__parse_data(season_data, "tiesInUse"))
-                season.set_wild_card_in_use(self.__parse_data(season_data, "wildcardInUse"))
+                season.set_conference_in_use(self.data_parser.parse(season_data, "conferencesInUsess", "none"))
+                season.set_division_in_use(self.data_parser.parse(season_data, "divisionsInUse", "none"))
+                season.set_point_for_ot_loss_in_use(self.data_parser.parse(season_data, "pointForOTlossInUse", "none"))
+                season.set_regulation_wins_in_use(self.data_parser.parse(season_data, "regulationWinsInUse", "none"))
+                season.set_row_in_use(self.data_parser.parse(season_data, "rowInUse", "none"))
+                season.set_standings_end(self.data_parser.parse(season_data, "standingsEnd", "none"))
+                season.set_standings_start(self.data_parser.parse(season_data, "standingsStart", "none"))
+                season.set_ties_in_use(self.data_parser.parse(season_data, "tiesInUse", "none"))
+                season.set_wild_card_in_use(self.data_parser.parse(season_data, "wildcardInUse", "none"))
                 self.seasons.append(season)
             except ValueError as e:
                 print(f"Error occurred while fetching season data (id: {season_data['id']}): {e}")
-
-    def __parse_data(self, json, key):
-        if key in json:
-            return json[key]
-        raise ValueError(f"Key {key} not found in JSON data.")

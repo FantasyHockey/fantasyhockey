@@ -20,7 +20,6 @@ class FetchDraftRankings:
         """
         Fetches the draft ranking data from the NHL API and returns a list of draft ranking objects.
         """
-
         if not self.draft_rankings:
             self.__fetch()
         return self.draft_rankings

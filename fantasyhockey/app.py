@@ -11,9 +11,5 @@ def run():
     #update_seasons.update_in_db()
     #update_teams = UpdateTeams()
     #update_teams.update_in_db()
-    #update_players = UpdatePlayers()
-    #update_players.update_in_db()
-    update_draft_rankings = UpdateDraftRankings()
-    update_draft_rankings.update_in_db()
-
+    
     pass
