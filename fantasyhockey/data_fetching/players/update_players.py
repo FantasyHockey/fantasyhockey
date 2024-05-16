@@ -179,7 +179,7 @@ class UpdatePlayers:
         return query, params
     
     def __update_player_awards_query(self, award: PlayerAwards) -> tuple:
-        query = "UPDATE player_awards SET award_name = %s, year = %s WHERE id = %s"
-        params = (award.get_award(), award.get_year(), award.get_player_id())
+        query = "UPDATE player_awards SET award_name = %s, year = %s WHERE id = %s AND award_name = %s AND year = %s"
+        params = (award.get_award(), award.get_year(), award.get_player_id(), award.get_award(), award.get_year())
         return query, params
     

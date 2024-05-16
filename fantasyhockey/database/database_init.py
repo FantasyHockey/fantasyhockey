@@ -155,7 +155,6 @@ class DatabaseInitializer:
             return False
         return True
 
-
     def __initialize_database(self):
         return "CREATE DATABASE IF NOT EXISTS fantasyhockey"
 
