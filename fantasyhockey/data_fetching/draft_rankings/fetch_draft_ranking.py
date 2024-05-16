@@ -9,7 +9,7 @@ class FetchDraftRankings:
     Methods
     -------
     get_draft_ranking()
-        Fetches the draft ranking data from the NHL API and returns a list of draft ranking objects.
+        Fetches the draft ranking data from the NHL API and returns a list of draft ranking objects
     """
     
 
