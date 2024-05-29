@@ -1,9 +1,9 @@
 
 
 class SkaterStats:
-    def __init__(self, player_id, year):
+    def __init__(self, player_id):
         self.player_id = player_id
-        self.year = year
+        self.year = None
         self.team_id = None
         self.games_played = None
         self.goals = None
@@ -15,7 +15,7 @@ class SkaterStats:
         self.ot_goals = None
         self.power_play_goals = None
         self.power_play_points = None
-        self.shootings_percentage = None
+        self.shooting_percentage = None
         self.shorthanded_goals = None
         self.shorthanded_points = None
         self.shots = None
@@ -24,14 +24,15 @@ class SkaterStats:
         self.year = None
         self.sequence = None
         self.faceoff_percentage = None
-        self.league_id = None
-        self.blocks = None
-        self.hits = None
-        self.primary_assists = None
-        self.secondary_assists = None
     
     def get_player_id(self):
         return self.player_id
+    
+    def set_year(self, year):
+        self.year = year
+
+    def get_year(self):
+        return self.year
     
     def set_team_id(self, team_id):
         self.team_id = team_id
@@ -99,11 +100,11 @@ class SkaterStats:
     def get_power_play_points(self):
         return self.power_play_points
     
-    def set_shootings_percentage(self, shootings_percentage):
-        self.shootings_percentage = shootings_percentage
+    def set_shooting_percentage(self, shooting_percentage):
+        self.shooting_percentage = shooting_percentage
 
-    def get_shootings_percentage(self):
-        return self.shootings_percentage
+    def get_shooting_percentage(self):
+        return self.shooting_percentage
     
     def set_shorthanded_goals(self, shorthanded_goals):
         self.shorthanded_goals = shorthanded_goals
@@ -152,35 +153,3 @@ class SkaterStats:
 
     def get_faceoff_percentage(self):
         return self.faceoff_percentage
-    
-    def set_league_id(self, league_id):
-        self.league_id = league_id
-
-    def get_league_id(self):
-        return self.league_id
-    
-    def set_blocks(self, blocks):
-        self.blocks = blocks
-
-    def get_blocks(self):
-        return self.blocks
-    
-    def set_hits(self, hits):
-        self.hits = hits
-
-    def get_hits(self):
-        return self.hits
-    
-    def set_primary_assists(self, primary_assists):
-        self.primary_assists = primary_assists
-
-    def get_primary_assists(self):
-        return self.primary_assists
-    
-    def set_secondary_assists(self, secondary_assists):
-        self.secondary_assists = secondary_assists
-
-    def get_secondary_assists(self):
-        return self.secondary_assists
-    
-

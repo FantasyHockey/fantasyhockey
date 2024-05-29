@@ -2,10 +2,10 @@
 
 class GoalieAdvancedStats:
 
-    def __init__(self, player_id, year, team_id):
+    def __init__(self, player_id):
         self.player_id = player_id
-        self.year = year
-        self.team_id = team_id
+        self.year = None
+        self.team_id = None
         self.complete_game_percentage = None
         self.complete_games = None
         self.games_played = None
@@ -22,6 +22,12 @@ class GoalieAdvancedStats:
 
     def get_player_id(self):
         return self.player_id
+    
+    def set_year(self, year):
+        self.year = year
+
+    def set_team_id(self, team_id):
+        self.team_id = team_id
     
     def set_complete_game_percentage(self, complete_game_percentage):
         self.complete_game_percentage = complete_game_percentage

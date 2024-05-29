@@ -2,13 +2,12 @@
 
 class GoalieStats:
 
-    def __init__(self, player_id, team_id, year, game_type_id, sequence):
+    def __init__(self, player_id):
         self.player_id = player_id
-        self.team_id = team_id
-        self.year = year
-        self.game_type_id = game_type_id
-        self.sequence = sequence
-        self.league_id = None
+        self.team_id = None
+        self.year = None
+        self.game_type_id = None
+        self.sequence = None
         self.games_played = None
         self.goals = None
         self.assists = None
@@ -27,11 +26,17 @@ class GoalieStats:
     def get_player_id(self):
         return self.player_id
     
-    def set_league_id(self, league_id):
-        self.league_id = league_id
+    def set_team_id(self, team_id):
+        self.team_id = team_id
 
-    def get_league_id(self):
-        return self.league_id
+    def set_year(self, year):
+        self.year = year
+
+    def set_game_type_id(self, game_type_id):
+        self.game_type_id = game_type_id
+
+    def set_sequence(self, sequence):
+        self.sequence = sequence
     
     def set_games_played(self, games_played):
         self.games_played = games_played

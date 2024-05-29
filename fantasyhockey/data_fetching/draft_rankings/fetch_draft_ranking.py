@@ -35,7 +35,6 @@ class FetchDraftRankings:
                if "finalRank" in player_data:
                    final_rank = player_data["finalRank"]
             
-
                ranking = DraftRanking(year, player_data["firstName"], player_data["lastName"], final_rank)
                ranking.set_position_code(self.data_parser.parse(player_data, "positionCode", 'none'))
                ranking.set_shoots_catches(self.data_parser.parse(player_data, "shootsCatches", 'none'))
