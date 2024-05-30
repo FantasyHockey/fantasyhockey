@@ -37,7 +37,7 @@ class UpdateDraftRankings:
         """
         draft_rankings = self.fetch_draft_ranking.get_draft_rankings()
         for player_data in draft_rankings:    
-            query, params = self.__create_query(player_data)
+            query, params = self.__update_query(player_data)
             self.database_operator.write(query, params)
 
     def __create_query(self, player_data):
@@ -52,11 +52,17 @@ class UpdateDraftRankings:
                     player_data.get_birth_date(), player_data.get_birth_city(), player_data.get_birth_state_province(), player_data.get_birth_country(), player_data.get_midterm_rank(), player_data.get_final_rank())
         return query, params
     
+    def __update_query(self, player_data) -> tuple:
+        query = "UPDATE draft_rankings SET year = %s, first_name = %s, last_name = %s, position_code = %s, shoots_catches = %s, height_inches = %s, weight_pounds = %s, last_amateur_club = %s, last_amateur_league = %s, birth_date = %s, \
+              birth_city = %s, birth_state_province = %s, birth_country = %s, midterm_rank = %s, final_rank = %s WHERE year = %s AND first_name = %s AND last_name = %s "
+        
+        params = (player_data.get_year(), player_data.get_first_name(),player_data.get_last_name(), player_data.get_position_code(),\
+                    player_data.get_shoots_catches(), player_data.get_height_inches(), player_data.get_weight_pounds(), player_data.get_last_amateur_club(), player_data.get_last_amateur_league(),\
+                    player_data.get_birth_date(), player_data.get_birth_city(), player_data.get_birth_state_province(), player_data.get_birth_country(), player_data.get_midterm_rank(), player_data.get_final_rank(),player_data.get_year(),player_data.get_first_name(),player_data.get_last_name())
+        return query, params
+    
 
-    def __update_query(self):
-        '''
-        Updates the draft_rankings table
-        '''
-        sql = "UPDATE draft_rankings SET first_name = 'get_first_name()', last_name = 'get_last_name()', position_code = 'get_position_code()', shoots_catches = 'get_shoots_catches()', height_inches = 'get_height_inches()'\
-            weight_pounds = 'get_weight_pounds()'WHERE address = 'get_first_name()'"
 
+    
+
+    

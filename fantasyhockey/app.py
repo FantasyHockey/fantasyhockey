@@ -6,15 +6,15 @@ from fantasyhockey.data_fetching.players.update_players import UpdatePlayers
 from fantasyhockey.data_fetching.players.update_skaters import UpdateSkaters
 from fantasyhockey.data_fetching.players.update_goalies import UpdateGoalies
 from fantasyhockey.data_fetching.games.fetch_games import FetchGames
-
+from fantasyhockey.data_fetching.draft_rankings.update_draft_ranking import UpdateDraftRankings
 def run():
     start_time = time.time()
     db_initializer = DatabaseInitializer()
     db_initializer.run()
     #update_seasons = UpdateSeasons()
     #update_seasons.update_in_db()
-    update_teams = UpdateTeams()
-    update_teams.write_in_db()
+    #update_teams = UpdateTeams()
+    #update_teams.write_in_db()
     #update_players = UpdatePlayers()
     #update_players.write_in_db_update()
     #update_skaters = UpdateSkaters()
@@ -23,6 +23,8 @@ def run():
     #update_goalies.write_in_db()
     #fetch_games = FetchGames()
     #fetch_games.get_games()
+    update_draft_rankings = UpdateDraftRankings()
+    update_draft_rankings.update_in_db()
 
     
 
