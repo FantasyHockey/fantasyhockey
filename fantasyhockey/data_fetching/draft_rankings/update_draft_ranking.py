@@ -60,3 +60,7 @@ class UpdateDraftRankings:
         sql = "UPDATE draft_rankings SET first_name = 'get_first_name()', last_name = 'get_last_name()', position_code = 'get_position_code()', shoots_catches = 'get_shoots_catches()', height_inches = 'get_height_inches()'\
             weight_pounds = 'get_weight_pounds()'WHERE address = 'get_first_name()'"
 
+    def __update_player_awards_query(self, award: PlayerAwards) -> tuple:
+        query = "UPDATE player_awards SET award_name = %s, year = %s WHERE id = %s AND award_name = %s AND year = %s"
+        params = (award.get_award(), award.get_year(), award.get_player_id(), award.get_award(), award.get_year())
+        return query, params

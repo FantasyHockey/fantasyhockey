@@ -63,23 +63,22 @@ class FetchTeams:
         Fetches and stores the team ID lookup data.
         """
         data = self.api_connector.get_json(self.__TEAM_ID_URL)
-        print(data)
 
         self.team_id_lookup = data["data"]
 
-    @obsolete
     def __fetch(self):
         """
         Fetches team data for each year and creates Team objects.
         """
         self.__get_team_id_lookup()
 
-        year_data = self.api_connector.get_json(self.__ROSTER_SEASON_URL)
+        '''year_data = self.api_connector.get_json(self.__ROSTER_SEASON_URL)
         for year in year_data:
-            self.__fetch_year_data(year)
+            self.__fetch_year_data(year)'''
+        
+        self.teams = [Team(1)]
 
         self.__parse_team_advanced_stats()
-
 
     def __parse_team_advanced_stats(self):
         for team in self.teams:
@@ -117,9 +116,8 @@ class FetchTeams:
                 if added_teams.get_team_id() != team.get_team_id():
                     self.teams.append(team)
             
-            
-        self.teams.append(Team(1))
-        print(len(self.teams))
+    def __fetch_team_data(self, year):
+        pass
 
     def __parse_team_details(self, team_id, year, team_abbrev, team_json) -> TeamData:
         """
@@ -207,11 +205,14 @@ class FetchTeams:
         team_stats.set_road_wins(self.data_parser.parse(team_json, "roadWins", "none"))
         return team_stats
 
-    def __get_team_advanced_stats_days_rest(self, team_id) -> list[TeamAdvancedStatsDaysRest]:
-        url = f"https://api.nhle.com/stats/rest/en/team/daysbetweengames?cayenneExp=teamId={team_id}"
+    def __get_team_advanced_stats_days_rest(self, team_id, start=0, stats=None) -> list[TeamAdvancedStatsDaysRest]:
+        if stats is None:
+            stats = []
+
+        url = f"https://api.nhle.com/stats/rest/en/team/daysbetweengames?start={start}&cayenneExp=teamId={team_id}"
         data = self.api_connector.get_json(url)
 
-        stats = []
+        season_count = data["total"]
         for season in data["data"]:
             team_advanced_stats_days_rest = TeamAdvancedStatsDaysRest(team_id)
             team_advanced_stats_days_rest.set_year(self.data_parser.parse(season, "seasonId", "none"))
@@ -237,7 +238,10 @@ class FetchTeams:
 
             stats.append(team_advanced_stats_days_rest)
 
-        return stats
+        if start + len(data["data"]) < season_count:
+            return self.__get_team_advanced_stats_days_rest(team_id, start + len(data["data"]), stats)
+        else:
+            return stats
 
     def __get_team_advanced_stats_corsi_fenwick(self, team_id) -> list[TeamAdvancedStatsCorsiFenwick]:
         url_counts = f"https://api.nhle.com/stats/rest/en/team/summaryshooting?cayenneExp=teamId={team_id}"
