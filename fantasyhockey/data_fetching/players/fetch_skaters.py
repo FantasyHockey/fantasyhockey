@@ -32,7 +32,6 @@ class FetchSkaters:
 
     def __fetch(self):
         self.__get_all_skaters()
-
         self.__get_skater_data()
 
     def __get_skater_data(self):

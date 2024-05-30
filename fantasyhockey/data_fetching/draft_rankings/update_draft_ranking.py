@@ -63,6 +63,13 @@ class UpdateDraftRankings:
     
 
 
+<<<<<<< HEAD
     
 
     
+=======
+    def __update_player_awards_query(self, award: PlayerAwards) -> tuple:
+        query = "UPDATE player_awards SET award_name = %s, year = %s WHERE id = %s AND award_name = %s AND year = %s"
+        params = (award.get_award(), award.get_year(), award.get_player_id(), award.get_award(), award.get_year())
+        return query, params
+>>>>>>> 2083f4ce141888766d3a5f39055d006a28b9a306
