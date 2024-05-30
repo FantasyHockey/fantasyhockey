@@ -104,6 +104,21 @@ class DatabaseInitializer:
         db_operator.write(self.__delete_player_draft())
         db_operator.write(self.__delete_player_awards())
         db_operator.write(self.__delete_team_stats())
+        db_operator.write(self.__delete_team_advanced_stats_days_rest())
+        db_operator.write(self.__delete_team_advanced_stats_misc())
+        db_operator.write(self.__delete_team_advanced_stats_penalties())
+        db_operator.write(self.__delete_team_advanced_stats_corsi_fenwick())
+        db_operator.write(self.__delete_team_advanced_stats_shot_type())
+        db_operator.write(self.__delete_team_advanced_stats_scoring_first())
+        db_operator.write(self.__delete_team_advanced_stats_goals_by_period())
+        db_operator.write(self.__delete_team_advanced_stats_leading_trailing())
+        db_operator.write(self.__delete_team_advanced_stats_powerplay_penalty_kill())
+        db_operator.write(self.__delete_team_advanced_stats_team_goal_games())
+        db_operator.write(self.__delete_team_advanced_stats_goals_by_strength())    
+        db_operator.write(self.__delete_team_advanced_stats_outshoot_outshot())
+        db_operator.write(self.__delete_team_advanced_stats_faceoff_percent())
+        
+
 
         db_operator.write(self.__delete_skater_current_stats())
         db_operator.write(self.__delete_skater_stats())
@@ -675,7 +690,7 @@ class DatabaseInitializer:
                 FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
                 PRIMARY KEY (team_id, year));"
     
-    def __delete_tean_advanced_stats_outshoot_outshot(self):
+    def __delete_team_advanced_stats_outshoot_outshot(self):
         return "DROP TABLE IF EXISTS advanced_stats_outshoot_outshot"
     
     def __initialize_team_advanced_stats_penalties(self):
@@ -730,7 +745,7 @@ class DatabaseInitializer:
                 PRIMARY KEY (team_id, year));"
 
     def __delete_team_advanced_stats_corsi_fenwick(self):
-        pass
+        return "DROP TABLE IF EXISTS team_advanced_stats_corsi_fenwick"
 
     def __initialize_team_advanced_stats_scoring_first(self):
         """
@@ -746,7 +761,7 @@ class DatabaseInitializer:
                 PRIMARY KEY (team_id, year));"
 
     def __delete_team_advanced_stats_scoring_first(self):
-        pass
+        return "DROP TABLE IF EXISTS team_advanced_stats_scoring_first"
 
     def __initialize_team_advanced_stats_shot_type(self):
         """
@@ -765,7 +780,7 @@ class DatabaseInitializer:
     
 
     def __delete_team_advanced_stats_shot_type(self):
-        pass
+        return "DROP TABLE IF EXISTS team_advanced_stats_shot_type"
 
     def __initialize_team_advanced_stats_team_goal_games(self):
         """
@@ -780,14 +795,14 @@ class DatabaseInitializer:
                 PRIMARY KEY (team_id, year));"
 
     def __delete_team_advanced_stats_team_goal_games(self):
-        pass
+        return "DROP TABLE IF EXISTS team_advanced_stats_team_goal_games"
 
     def __initialize_seasons(self):
         """
         Initializes the seasons table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS seasons\
-                (year INT, conferences_in_use BOOLEAN, point_for_ot_loss BOOLEAN, regulation_wins BOOLEAN, `row` BOOLEAN,\
+                (year INT, conferences_in_use BOOLEAN, divisions_in_use BOOLEAN, point_for_ot_loss BOOLEAN, regulation_wins BOOLEAN, `row` BOOLEAN,\
                 standings_start_date VARCHAR(50), standings_end_date VARCHAR(50), ties_in_use BOOLEAN, wild_card_in_use BOOLEAN,\
                 PRIMARY KEY (year));"
 
@@ -1017,7 +1032,7 @@ class DatabaseInitializer:
                 (year INT, first_name VARCHAR(255), last_name VARCHAR(255), position_code VARCHAR(5), shoots_catches VARCHAR(5), height_inches INT,\
                 weight_pounds INT, last_amateur_club VARCHAR(50), last_amateur_league VARCHAR(50), birth_date DATE, birth_city VARCHAR(50),\
                 birth_state_province VARCHAR(50), birth_country VARCHAR(50), midterm_rank INT, final_rank INT,\
-                PRIMARY KEY (year, first_name, last_name, final_rank));"
+                PRIMARY KEY (year, first_name, last_name, position_code));"
     
     def __delete_draft_rankings(self):
         return "DROP TABLE IF EXISTS draft_rankings"
