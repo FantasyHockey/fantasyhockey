@@ -1440,5 +1440,3 @@ class SkaterAdvancedStatsFaceoffsDatabaseMapper:
     def create_check_existence_query() -> str:
         return "SELECT 1 FROM skater_advanced_stats_faceoffs WHERE id = %s AND year = %s"
     
-
-class Team
