@@ -4,9 +4,14 @@ To run from the main entry point of app.py:
 - source env/bin/activate
 - python3 -m fantasyhockey
 
-- Create reusable serializers for the classes
+TODO:
+- Add models and maps for teams (models done, work on maps)
+- Create team updates (Gotta think about how to structure this, maybe make many subclasses that fetch for each class)
+- Create player updates
+- Create Skater and Goalie Updates
+- Create Game models 
+- Create Game updates
 
-- Go through skater stats, make sure SQL tables are efficient
-    Hits, blocks, league_id don't need to be stored in skater_stats
-
-- Update teams, seasons doesn't work
+New checklist:
+- Seasons work
+- Draft Rankings work

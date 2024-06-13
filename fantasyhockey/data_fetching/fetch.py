@@ -1,16 +1,10 @@
-<<<<<<< HEAD
-from fantasyhockey.api.api_connector import APIConnector
-from fantasyhockey.data_fetching.draft_rankings.models.draft_ranking import DraftRanking
-from fantasyhockey.util.data_parser import DataParser
-from fantasyhockey.data_fetching.serializers import SerializeDraftRanking
-
-class FetchDraftRankings:
-=======
 from abc import ABC, abstractmethod
 from fantasyhockey.api.api_connector import APIConnector
+from fantasyhockey.util.data_parser import DataParser
+from fantasyhockey.util.util import Util
 from fantasyhockey.database.database_operator import DatabaseOperator
 from fantasyhockey.data_fetching.serializers import SerializerFactory
-from fantasyhockey.data_fetching.models import Season, DraftRanking
+from fantasyhockey.data_fetching.models import *
 
 class DataFetcher(ABC):
     """
@@ -36,6 +30,7 @@ class DataFetcher(ABC):
     def __init__(self):
         self._data = []
         self._items = []
+        self._data_parser = DataParser()
         self._database_operator = DatabaseOperator()
         self._api_connector = APIConnector()
         self._serializer = SerializerFactory.get_serializer("json")
@@ -57,6 +52,32 @@ class DataFetcher(ABC):
         """
         self._get_items()
         self._get_data_by_item()
+
+    def _fetch_paginated_data(self, url, start=0, accumulated_data=None):
+        """
+        Recursively fetches paginated data from the given URL.
+
+        Args:
+            url (str): The URL to fetch data from.
+            start (int): The starting point for fetching data.
+            accumulated_data (list): The accumulated data from previous pages.
+
+        Returns:
+            list: The accumulated data from all pages.
+        """
+        if accumulated_data is None:
+            accumulated_data = []
+
+        paginated_url = f"{url}&start={start}"
+        data = self._api_connector.get_json(paginated_url)
+
+        total_count = data["total"]
+        accumulated_data.extend(data["data"])
+
+        if start + len(data["data"]) < total_count:
+            return self._fetch_paginated_data(url, start + len(data["data"]), accumulated_data)
+        else:
+            return accumulated_data
 
     @abstractmethod
     def _get_items(self):
@@ -90,11 +111,9 @@ class FetchSeasons(DataFetcher):
         self._items = self._api_connector.get_json("https://api-web.nhle.com/v1/standings-season/")["seasons"]
 
     def _get_data_by_item(self):
-        count = 0
         for season in self._items:
             try:
                 season_obj = self._serializer.deserialize(season, Season)
-                count += 1
                 self._data.append(season_obj)
             except ValueError as e:
                 print(f"Error occurred while fetching season data (id: {season['id']}): {e}")
@@ -104,7 +123,6 @@ class FetchSeasons(DataFetcher):
         pass
 
 class FetchDraftRankings(DataFetcher):
->>>>>>> a39f72b (Start of refactor)
     """
     A class to fetch the draft ranking data from the NHL API.
 
@@ -113,40 +131,6 @@ class FetchDraftRankings(DataFetcher):
     get_draft_ranking()
         Fetches the draft ranking data from the NHL API and returns a list of draft ranking objects
     """
-<<<<<<< HEAD
-    
-
-    def __init__(self):
-        self.api_connector = APIConnector()
-        self.data_parser = DataParser()
-        self.draft_rankings = []
-
-    def get_draft_rankings(self):
-        """
-        Fetches the draft ranking data from the NHL API and returns a list of draft ranking objects
-        """
-        if not self.draft_rankings:
-            self.__fetch()
-        return self.draft_rankings
-
-    def __fetch(self):
-        data = self.api_connector.get_json("https://api-web.nhle.com/v1/draft/rankings/now")
-        year = data["draftYear"]
-        for player_data in data["rankings"]:
-            try:
-                final_rank = 0
-                if "finalRank" in player_data:
-                   final_rank = player_data["finalRank"]
-                    
-                ranking = SerializeDraftRanking(player_data).__serialize()
-               
-            
-
-            except ValueError as e:
-                print(f"Error occurred while fetching draft ranking data (ranking: {player_data['firstName']}): {e}")
-
-    
-=======
 
     def __init__(self):
         super().__init__()
@@ -170,4 +154,56 @@ class FetchDraftRankings(DataFetcher):
 
     def _process_data(self, data):
         pass
->>>>>>> a39f72b (Start of refactor)
+
+class FetchTeams(DataFetcher):
+    """
+    A class to fetch the team data from the NHL API.
+
+    Methods
+    -------
+    get_teams()
+        Fetches the team data from the NHL API and returns a list of team objects
+
+    Notes
+    -------
+    The NHL API does not provide a direct endpoint to fetch team data. The team data is fetched from the standings data.
+    But I will add all of the stat data into one team data for each team.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.__TEAM_ID_URL = "https://api.nhle.com/stats/rest/en/team"
+        self.__ROSTER_SEASON_URL = "https://api-web.nhle.com/v1/roster-season/mtl"
+        self.__TEAM_URL = "https://api-web.nhle.com/v1/standings/"
+        self.team_id_lookup = None   
+
+    def _get_items(self):
+        """
+        Fetches the team data from the NHL API and returns a list of team objects
+        """
+        self._get_team_id_lookup()
+        years = self._api_connector.get_json(self.__ROSTER_SEASON_URL)
+        for year in years:
+            self._process_data(year)
+        
+
+    def _get_data_by_item(self):
+        for team in self._items:
+            try:
+                draft_ranking = self._serializer.deserialize(item, DraftRanking)
+                self._data.append(draft_ranking)
+            except ValueError as e:
+                print(f"Error occurred while fetching draft ranking data (ranking: {item['firstName']}): {e}")
+
+
+    def _process_data(self, year):
+        data = self._api_connector.get_json(self.__TEAM_URL + str(year)[4:] + "-04-18")
+        for team_json in data["standings"]:
+            self._items.append(team_json)
+
+    def _get_team_id_lookup(self):
+        """
+        Fetches and stores the team ID lookup data.
+        """
+        data = self._api_connector.get_json(self.__TEAM_ID_URL)
+        self.team_id_lookup = data["data"]

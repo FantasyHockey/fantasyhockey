@@ -63,7 +63,6 @@ class FetchTeams:
         Fetches and stores the team ID lookup data.
         """
         data = self.api_connector.get_json(self.__TEAM_ID_URL)
-
         self.team_id_lookup = data["data"]
 
     def __fetch(self):
@@ -109,8 +108,8 @@ class FetchTeams:
             
             team_id = self.__find_team_id(team_abbrev)
             team = Team(team_id)
-            #team.set_team_data(self.__parse_team_details(team_id, year, team_abbrev, team_json))
-            #team.set_team_stats(self.__parse_team_stats(team_json, team_id, year))
+            team.set_team_data(self.__parse_team_details(team_id, year, team_abbrev, team_json))
+            team.set_team_stats(self.__parse_team_stats(team_json, team_id, year))
 
             for added_teams in self.teams:
                 if added_teams.get_team_id() != team.get_team_id():

@@ -160,7 +160,7 @@ class UpdateSeasons(AbstractUpdater):
             bool: True if the season exists, False otherwise.
         """
         query = SeasonDatabaseMapper.create_check_existence_query()
-        result = self.database_operator.read(query, (season.season_id,))
+        result = self.database_operator.read(query, (season.year,))
         return bool(result)
 
     def create_insert_query(self) -> str:
