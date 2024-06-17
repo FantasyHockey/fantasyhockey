@@ -276,7 +276,7 @@ class FetchTeamAdvancedStats(DataFetcher):
         for team_id in self._items:
             team_obj = TeamAdvancedStats(team_id)
             
-            '''days_rest_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/daysbetweengames?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsDaysRest)
+            days_rest_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/daysbetweengames?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsDaysRest)
             team_obj.team_advanced_stats_days_rest = days_rest_list
 
             corsi_fenwick_counts = self._fetch_paginated_data(f"https://api.nhle.com/stats/rest/en/team/summaryshooting?cayenneExp=teamId={team_id}")
@@ -319,7 +319,7 @@ class FetchTeamAdvancedStats(DataFetcher):
             team_obj.team_advanced_stats_misc = misc_list
 
             penalties_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/penalties?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsPenalties)
-            team_obj.team_advanced_stats_penalties = penalties_list'''
+            team_obj.team_advanced_stats_penalties = penalties_list
 
             url_pk = f"https://api.nhle.com/stats/rest/en/team/penaltykill?cayenneExp=teamId={team_id}"
             url_pk_time = f"https://api.nhle.com/stats/rest/en/team/penaltykilltime?cayenneExp=teamId={team_id}"
