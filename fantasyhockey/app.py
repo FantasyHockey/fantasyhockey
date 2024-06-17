@@ -1,7 +1,7 @@
 import time
 from fantasyhockey.database.database_init import DatabaseInitializer
-from fantasyhockey.data_fetching.fetch import FetchSeasons, FetchDraftRankings
-from fantasyhockey.data_fetching.update import UpdateSeasons, UpdateDraftRankings
+from fantasyhockey.data_fetching.fetch import *
+from fantasyhockey.data_fetching.update import *
 from fantasyhockey.database.database_operator import DatabaseOperator
 from fantasyhockey.data_fetching.update import CentralUpdater
 
@@ -24,13 +24,18 @@ def run():
 
     database_operator = DatabaseOperator()
     #fetch_seasons = FetchSeasons()
-    fetch_draft_rankings = FetchDraftRankings()
+    fetch_team_advanced_stats = FetchTeamAdvancedStats()
+    #fetch_team_advanced_stats._get_items()
 
     #update_seasons = UpdateSeasons(database_operator, fetch_seasons)
-    update_draft_rankings = UpdateDraftRankings(database_operator, fetch_draft_rankings)
-    #updater = CentralUpdater([update_seasons, update_draft_rankings])
-    updater = CentralUpdater([update_draft_rankings])
+    #update_draft_rankings = UpdateDraftRankings(database_operator, fetch_draft_rankings)
+    #fetch_teams = FetchTeams()
+    #update_teams = UpdateTeams(database_operator, fetch_teams)
+    #update_team_stats = UpdateTeamStats(database_operator, fetch_teams)
+    #update_team_advanced_stats = UpdateTeamAdvancedStats(database_operator, fetch_team_advanced_stats)
+    updater = CentralUpdater([update_team_advanced_stats])
     updater.update_all()
+
 
     print("Execution time: ", (time.time() - start_time) / 60, " minutes.")
     pass

@@ -559,7 +559,6 @@ class FetchSkaters:
             pk_goals = self.__data_parser.parse(season, "shGoals", "none")
             skaterAdvancedStatsPenaltyKill.set_pk_goals(pk_goals)
 
-            #TODO: Fix this, its actually for not against
             pk_individual_corsi_against = self.__data_parser.parse(season, "shIndividualSatFor", "none")
             skaterAdvancedStatsPenaltyKill.set_pk_individual_corsi_against(pk_individual_corsi_against)
 

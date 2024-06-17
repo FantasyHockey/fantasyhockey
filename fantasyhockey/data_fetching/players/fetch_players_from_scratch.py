@@ -106,7 +106,7 @@ class FetchPlayersFromScratch:
             self.__get_player_details(player, json)
             self.__players.append(player)
 
-    def __get_player_draft(self, player, json):
+    def __get_player_draft(self, player: Player, json):
         player_id = player.get_player_id()
         player_draft = PlayerDraft(player_id)
 
@@ -150,7 +150,7 @@ class FetchPlayersFromScratch:
             player_details.set_position(self.data_parser.parse(json, "position", "none"))
             player_details.set_headshot(self.data_parser.parse(json, "headshot", "none"))
             player_details.set_hero_image(self.data_parser.parse(json, "heroImage", "none"))
-            player_details.set_height_inches(self.data_parser.parse(json, "heightInCentimeters", "none"))
+            player_details.set_height_inches(self.data_parser.parse(json, "heightInInches", "none"))
             player_details.set_weight_pounds(self.data_parser.parse(json, "weightInPounds", "none"))
             player_details.set_birth_date(self.data_parser.parse(json, "birthDate", "none"))
 

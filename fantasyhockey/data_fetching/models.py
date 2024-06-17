@@ -230,8 +230,6 @@ class DraftRanking:
     def midterm_rank(self, value):
         self._midterm_rank = value
 
-#pass
-
 
 class SkaterAdvancedStatsCorsiFenwick:
 
@@ -1314,7 +1312,7 @@ class SkaterAdvancedStatsPenaltyKill:
     def pk_time_on_ice_percentage(self, value):
         self._pk_time_on_ice_percentage = value
 
-class SkaterAdvancedStatsPowerplay():
+class SkaterAdvancedStatsPowerplay:
 
     def __init__(self, player_id):
         self._player_id = player_id
@@ -1435,7 +1433,7 @@ class SkaterAdvancedStatsPowerplay():
     def pp_time_on_ice_percentage(self, value):
         self._pp_time_on_ice_percentage = value
 
-class SkaterAdvancedStatsScoring():
+class SkaterAdvancedStatsScoring:
     def __init__(self, player_id):
         self._player_id = player_id
         self._year = None
@@ -2561,7 +2559,7 @@ class GoalieAdvancedStatsPenaltyShots:
     def penalty_shot_saves(self, value):
         self._penalty_shot_saves = value
 
-class GoalieAdvancedStatsSavesByStrength():
+class GoalieAdvancedStatsSavesByStrength:
     
     def __init__(self, player_id):
         self._player_id = player_id
@@ -3880,24 +3878,22 @@ class Player:
     def player_details(self, value):
         self._player_details = value
 
-class Team:
+class TeamAdvancedStats:
     def __init__(self, team_id):
         self._team_id = team_id
-        self._team_data: TeamData = None
-        self._team_stats: TeamStats = None
-        self._team_advanced_stats_days_rest: TeamAdvancedStatsDaysRest = None
-        self._team_advanced_stats_corsi_fenwick = None
-        self._team_advanced_stats_faceoff_percent = None
-        self._team_advanced_stats_goals_by_period = None
-        self._team_advanced_stats_goals_by_strength = None
-        self._team_advanced_stats_leading_trailing = None
-        self._team_advanced_stats_misc = None
-        self._team_advanced_stats_outshoot_outshot = None
-        self._team_advanced_stats_penalties = None
-        self._team_advanced_stats_powerplay_penalty_kill = None
-        self._team_advanced_stats_scoring_first = None
-        self._team_advanced_stats_shot_type = None
-        self._team_advanced_stats_team_goal_games = None
+        self._team_advanced_stats_days_rest: list[TeamAdvancedStatsDaysRest] = []
+        self._team_advanced_stats_corsi_fenwick = []
+        self._team_advanced_stats_faceoff_percent = []
+        self._team_advanced_stats_goals_by_period = []
+        self._team_advanced_stats_goals_by_strength = []
+        self._team_advanced_stats_leading_trailing = []
+        self._team_advanced_stats_misc = []
+        self._team_advanced_stats_outshoot_outshot = []
+        self._team_advanced_stats_penalties = []
+        self._team_advanced_stats_powerplay_penalty_kill = []
+        self._team_advanced_stats_scoring_first = []
+        self._team_advanced_stats_shot_type = []
+        self._team_advanced_stats_team_goal_games = []
 
     @property
     def team_id(self):
@@ -3906,23 +3902,7 @@ class Team:
     @team_id.setter
     def team_id(self, value):
         self._team_id = value
-
-    @property
-    def team_data(self):
-        return self._team_data
     
-    @team_data.setter
-    def team_data(self, value):
-        self._team_data = value
-
-    @property
-    def team_stats(self):
-        return self._team_stats
-    
-    @team_stats.setter
-    def team_stats(self, value):
-        self._team_stats = value
-
     @property
     def team_advanced_stats_days_rest(self):
         return self._team_advanced_stats_days_rest
@@ -4026,6 +4006,37 @@ class Team:
     @team_advanced_stats_team_goal_games.setter
     def team_advanced_stats_team_goal_games(self, value):
         self._team_advanced_stats_team_goal_games = value
+
+class Team:
+    def __init__(self, team_id):
+        self._team_id = team_id
+        self._team_data: TeamData = None
+        self._team_stats: TeamStats = None
+        
+
+    @property
+    def team_id(self):
+        return self._team_id
+    
+    @team_id.setter
+    def team_id(self, value):
+        self._team_id = value
+
+    @property
+    def team_data(self):
+        return self._team_data
+    
+    @team_data.setter
+    def team_data(self, value):
+        self._team_data = value
+
+    @property
+    def team_stats(self):
+        return self._team_stats
+    
+    @team_stats.setter
+    def team_stats(self, value):
+        self._team_stats = value
 
 class TeamStats:
     def __init__(self, team_id):
@@ -4459,7 +4470,7 @@ class TeamData:
         self._year = None
         self._conference_name = None
         self._division_name = None
-        self._location_name = None
+        self._place_name = None
         self._team_name = None
         self._team_abbreviation = None
         self._team_logo = None
@@ -4499,12 +4510,12 @@ class TeamData:
         self._division_name = value
 
     @property
-    def location_name(self):
-        return self._location_name
+    def place_name(self):
+        return self._place_name
 
-    @location_name.setter
-    def location_name(self, value):
-        self._location_name = value
+    @place_name.setter
+    def place_name(self, value):
+        self._place_name = value
 
     @property
     def team_name(self):
@@ -5650,7 +5661,6 @@ class TeamAdvancedStatsPenalties:
     def total_penalties_drawn(self, value):
         self._total_penalties_drawn = value
 
-
 class TeamAdvancedStatsOutshootOutshot:
     def __init__(self, team_id):
         self._team_id = team_id
@@ -6564,7 +6574,7 @@ class TeamAdvancedStatsFaceoffPercent:
     def total_faceoffs(self, value):
         self._total_faceoffs = value
 
- class TeamAdvancedStatsDaysRest:
+class TeamAdvancedStatsDaysRest:
 
     def __init__(self, team_id):
         self._team_id = team_id

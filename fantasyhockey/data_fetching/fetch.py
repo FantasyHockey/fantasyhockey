@@ -69,8 +69,17 @@ class DataFetcher(ABC):
             accumulated_data = []
 
         paginated_url = f"{url}&start={start}"
-        data = self._api_connector.get_json(paginated_url)
+        try:
+            data = self._api_connector.get_json(paginated_url)
+            
+            if "total" not in data or "data" not in data:
+                print(f"Unexpected response format: {data}")
+                return []
 
+        except Exception as e:
+            print(f"Error occurred while fetching paginated data from {paginated_url}: {e}")
+            return []
+        
         total_count = data["total"]
         accumulated_data.extend(data["data"])
 
@@ -175,13 +184,16 @@ class FetchTeams(DataFetcher):
         self.__TEAM_ID_URL = "https://api.nhle.com/stats/rest/en/team"
         self.__ROSTER_SEASON_URL = "https://api-web.nhle.com/v1/roster-season/mtl"
         self.__TEAM_URL = "https://api-web.nhle.com/v1/standings/"
-        self.team_id_lookup = None   
+        self.__SEASON_STANDINGS_URL = "https://api-web.nhle.com/v1/standings-season/"
+        self.team_id_lookup = None
+        self.season_end_lookup = None
 
     def _get_items(self):
         """
         Fetches the team data from the NHL API and returns a list of team objects
         """
         self._get_team_id_lookup()
+        self._get_season_standings()
         years = self._api_connector.get_json(self.__ROSTER_SEASON_URL)
         for year in years:
             self._process_data(year)
@@ -189,15 +201,24 @@ class FetchTeams(DataFetcher):
 
     def _get_data_by_item(self):
         for team in self._items:
+            # Each season combination of every team
             try:
-                draft_ranking = self._serializer.deserialize(item, DraftRanking)
-                self._data.append(draft_ranking)
-            except ValueError as e:
-                print(f"Error occurred while fetching draft ranking data (ranking: {item['firstName']}): {e}")
+                team_abbrev = self._data_parser.double_parse(team, "teamAbbrev", "default", "none")
+                team_id = self.__find_team_id(team_abbrev)
+                team["teamId"] = team_id
 
+                team_obj = Team(team_id)
+                team_obj.team_data = self._serializer.deserialize(team, TeamData)
+                team_obj.team_stats = self._serializer.deserialize(team, TeamStats)
+
+                self._data.append(team_obj)
+        
+            except ValueError as e:
+                print(f"Error: ", e)
 
     def _process_data(self, year):
-        data = self._api_connector.get_json(self.__TEAM_URL + str(year)[4:] + "-04-18")
+        season_end = self._find_season_end(year)
+        data = self._api_connector.get_json(self.__TEAM_URL + season_end)
         for team_json in data["standings"]:
             self._items.append(team_json)
 
@@ -207,3 +228,141 @@ class FetchTeams(DataFetcher):
         """
         data = self._api_connector.get_json(self.__TEAM_ID_URL)
         self.team_id_lookup = data["data"]
+
+    def _get_season_standings(self):
+        data = self._api_connector.get_json(self.__SEASON_STANDINGS_URL)
+        self.season_end_lookup = data["seasons"]
+
+    def _find_season_end(self, year):
+        for season in self.season_end_lookup:
+            if season["id"] == year:
+                return season["standingsEnd"]
+        return None
+
+
+    def __find_team_id(self, team_abbrev):
+        """
+        Finds and returns the team ID for a given team abbreviation.
+        
+        Args:
+            team_abbrev (str): The abbreviation of the team.
+        
+        Returns:
+            int: The ID of the team, or None if not found.
+        """
+        for team in self.team_id_lookup:
+            if team["triCode"] == team_abbrev:
+                return team["id"]
+        return None
+    
+class FetchTeamAdvancedStats(DataFetcher):
+    def __init__(self):
+        super().__init__()  
+        self._team_ids = []
+
+    def _get_items(self):
+        """
+        Fetches the team data from the NHL API and returns a list of team objects
+        """
+        query = "SELECT team_id FROM teams;"
+        res = self._database_operator.read(query)
+        ids = []
+        for row in res:
+            ids.append(row[0])
+        self._items = list(set(ids))
+        
+
+    def _get_data_by_item(self):
+        for team_id in self._items:
+            team_obj = TeamAdvancedStats(team_id)
+            
+            '''days_rest_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/daysbetweengames?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsDaysRest)
+            team_obj.team_advanced_stats_days_rest = days_rest_list
+
+            corsi_fenwick_counts = self._fetch_paginated_data(f"https://api.nhle.com/stats/rest/en/team/summaryshooting?cayenneExp=teamId={team_id}")
+            corsi_fenwick_percents = self._fetch_paginated_data(f"https://api.nhle.com/stats/rest/en/team/percentages?cayenneExp=teamId={team_id}")
+
+            if len(corsi_fenwick_counts) != len(corsi_fenwick_percents):
+                raise ValueError("The lengths of corsi_fenwick_counts and corsi_fenwick_percents do not match.")
+            corsi_fenwick_data = zip(corsi_fenwick_counts, corsi_fenwick_percents)
+            corsi_fenwick_list = []
+
+            for counts, percents in corsi_fenwick_data:
+                merged_data = {**counts, **percents}
+                merged_data["teamId"] = team_id
+                corsi_fenwick_obj = self._serializer.deserialize(merged_data, TeamAdvancedStatsCorsiFenwick)
+                corsi_fenwick_list.append(corsi_fenwick_obj)
+
+            team_obj.team_advanced_stats_corsi_fenwick = corsi_fenwick_list
+            
+
+            shot_type_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/shottype?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsShotType)
+            team_obj.team_advanced_stats_shot_type = shot_type_list
+
+            outshoot_outshot_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/outshootoutshotby?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsOutshootOutshot)
+            team_obj.team_advanced_stats_outshoot_outshot = outshoot_outshot_list
+
+            faceoff_percent_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/faceoffpercentages?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsFaceoffPercent)
+            team_obj.team_advanced_stats_faceoff_percent = faceoff_percent_list
+            count += len(shot_type_list)
+
+            goals_by_period_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/goalsbyperiod?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsGoalsByPeriod)
+            team_obj.team_advanced_stats_goals_by_period = goals_by_period_list
+
+            goals_by_strength_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/goalsforbystrength?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsGoalsByStrength)
+            team_obj.team_advanced_stats_goals_by_strength = goals_by_strength_list
+
+            leading_trailing_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/leadingtrailing?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsLeadingTrailing)
+            team_obj.team_advanced_stats_leading_trailing = leading_trailing_list
+
+            misc_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/realtime?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsMisc)
+            team_obj.team_advanced_stats_misc = misc_list
+
+            penalties_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/penalties?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsPenalties)
+            team_obj.team_advanced_stats_penalties = penalties_list'''
+
+            url_pk = f"https://api.nhle.com/stats/rest/en/team/penaltykill?cayenneExp=teamId={team_id}"
+            url_pk_time = f"https://api.nhle.com/stats/rest/en/team/penaltykilltime?cayenneExp=teamId={team_id}"
+            url_pp = f"https://api.nhle.com/stats/rest/en/team/powerplay?cayenneExp=teamId={team_id}"
+            url_pp_time = f"https://api.nhle.com/stats/rest/en/team/powerplaytime?cayenneExp=teamId={team_id}"
+
+            pk_data = self._fetch_paginated_data(url_pk)
+            pk_time_data = self._fetch_paginated_data(url_pk_time)
+            pp_data = self._fetch_paginated_data(url_pp)
+            pp_time_data = self._fetch_paginated_data(url_pp_time)
+
+            pk_merged_data = [{**pk, **pk_time} for pk, pk_time in zip(pk_data, pk_time_data)]
+            pp_merged_data = [{**pp, **pp_time} for pp, pp_time in zip(pp_data, pp_time_data)]
+            pp_pk_data = zip(pk_merged_data, pp_merged_data)
+
+            pp_pk_list = []
+            for pk_data, pp_data in pp_pk_data:
+                merged_data = {**pk_data, **pp_data}
+                merged_data["teamId"] = team_id
+                pp_pk_obj = self._serializer.deserialize(merged_data, TeamAdvancedStatsPowerplayPenaltyKill)
+                pp_pk_list.append(pp_pk_obj)
+
+            team_obj.team_advanced_stats_powerplay_penalty_kill = pp_pk_list
+
+            scoring_first_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/scoretrailfirst?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsScoringFirst)
+            
+            team_obj.team_advanced_stats_scoring_first = scoring_first_list
+
+            team_goal_games = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/team/goalgames?cayenneExp=teamId={team_id}", team_id, TeamAdvancedStatsTeamGoalGames)
+            team_obj.team_advanced_stats_team_goal_games = team_goal_games
+
+            self._data.append(team_obj)
+
+    def _process_advanced_stats_obj(self, url, team_id, obj):
+        advanced_stats_list = []
+        data = self._fetch_paginated_data(url)
+        for advanced_stats in data:
+            advanced_stats["teamId"] = team_id
+            advanced_stats_obj = self._serializer.deserialize(advanced_stats, obj)
+            advanced_stats_list.append(advanced_stats_obj)
+  
+        return advanced_stats_list
+    
+    def _process_data(self, data):
+        pass
+    

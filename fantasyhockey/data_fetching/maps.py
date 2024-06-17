@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from fantasyhockey.data_fetching.models import *
+from fantasyhockey.util.data_parser import DataParser
+from fantasyhockey.util.util import Util
 
 
 class ApiMapper(ABC):
@@ -52,10 +54,89 @@ class ApiMapperFactory:
         Raises:
         - ValueError: If the object type is unknown.
         """
+        data_parser = DataParser()
+        util = Util()
         if obj_type == Season:
             return SeasonApiMapper()
         elif obj_type == DraftRanking:
             return DraftRankingApiMapper()
+
+        elif obj_type == GoalieAdvancedStatsDaysRest:
+            return GoalieAdvancedStatsDaysRestApiMapper()
+        elif obj_type == GoalieAdvancedStatsPenaltyShots:
+            return GoalieAdvancedStatsPenaltyShotsApiMapper()
+        elif obj_type == GoalieAdvancedStatsSavesByStrength:
+            return GoalieAdvancedStatsSavesByStrengthApiMapper()
+        elif obj_type == GoalieAdvancedStatsStartRelieved:
+            return GoalieAdvancedStatsStartRelievedApiMapper()
+        elif obj_type == GoalieAdvancedStatsShootout:
+            return GoalieAdvancedStatsShootoutApiMapper()
+        elif obj_type == GoalieAdvancedStats:
+            return GoalieAdvancedStatsApiMapper()
+        elif obj_type == GoalieYouthStats:
+            return GoalieYouthStatsApiMapper()
+        elif obj_type == GoalieStats:
+            return GoalieStatsApiMapper()
+        elif obj_type == SkaterStats:
+            return SkaterStatsApiMapper()
+        elif obj_type == YouthSkaterStats:
+            return SkaterYouthStatsApiMapper()
+        elif obj_type == SkaterAdvancedStatsCorsiFenwick:
+            return SkaterAdvancedStatsCorsiFenwickApiMapper()
+        elif obj_type == SkaterAdvancedStatsFaceoffs:
+            return SkaterAdvancedStatsFaceoffsApiMapper()
+        elif obj_type == SkaterAdvancedStatsGoals:
+            return SkaterAdvancedStatsGoalsApiMapper()
+        elif obj_type == SkaterAdvancedStatsMisc:
+            return SkaterAdvancedStatsMiscApiMapper()
+        elif obj_type == SkaterAdvancedStatsPenalties:
+            return SkaterAdvancedStatsPenaltiesApiMapper()
+        elif obj_type == SkaterAdvancedStatsPenaltyKill:
+            return SkaterAdvancedStatsPenaltyKillApiMapper()
+        elif obj_type == SkaterAdvancedStatsPowerplay:
+            return SkaterAdvancedStatsPowerplayApiMapper()
+        elif obj_type == SkaterAdvancedStatsScoring:
+            return SkaterAdvancedStatsScoringApiMapper()
+        elif obj_type == SkaterAdvancedStatsShootout:
+            return SkaterAdvancedStatsShootoutApiMapper()
+        elif obj_type == SkaterAdvancedStatsTOI:
+            return SkaterAdvancedStatsTOIApiMapper()
+        elif obj_type == PlayerAwards:
+            return PlayerAwardsApiMapper()
+        elif obj_type == PlayerDetails:
+            return PlayerDetailsApiMapper()
+        elif obj_type == PlayerDraft:
+            return PlayerDraftApiMapper()
+        elif obj_type == TeamStats:
+            return TeamStatsApiMapper(data_parser, util)
+        elif obj_type == TeamData:
+            return TeamDataApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsTeamGoalGames:
+            return TeamAdvancedStatsTeamGoalGamesApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsShotType:
+            return TeamAdvancedStatsShotTypeApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsScoringFirst:
+            return TeamAdvancedStatsScoringFirstApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsPowerplayPenaltyKill:
+            return TeamAdvancedStatsPowerplayPenaltyKillApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsPenalties:
+            return TeamAdvancedStatsPenaltiesApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsOutshootOutshot:
+            return TeamAdvancedStatsOutshootOutshotApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsMisc:
+            return TeamAdvancedStatsMiscApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsLeadingTrailing:
+            return TeamAdvancedStatsLeadingTrailingApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsGoalsByStrength:
+            return TeamAdvancedStatsGoalsByStrengthApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsGoalsByPeriod:
+            return TeamAdvancedStatsGoalsByPeriodApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsFaceoffPercent:
+            return TeamAdvancedStatsFaceoffPercentApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsDaysRest:
+            return TeamAdvancedStatsDaysRestApiMapper(data_parser, util)
+        elif obj_type == TeamAdvancedStatsCorsiFenwick:
+            return TeamAdvancedStatsCorsiFenwickApiMapper(data_parser, util)
         else:
             raise ValueError(f"Unknown object type: {obj_type}")
         
@@ -365,7 +446,7 @@ class GoalieAdvancedStatsDaysRestDatabaseMapper:
     """
 
     @staticmethod
-    def to_database_params(season: Season) -> tuple:
+    def to_database_params(season: GoalieAdvancedStatsDaysRest) -> tuple:
         """
         Maps a `GoalieAdvancedStatsDaysRest` object to a tuple of parameters for database operations.
 
@@ -486,7 +567,7 @@ class GoalieAdvancedStatsPenaltyShotsApiMapper(ApiMapper):
 class GoalieAdvancedStatsPenaltyShotsDatabaseMapper:
 
     @staticmethod
-    def to_database_params(season: Season) -> tuple:
+    def to_database_params(season: GoalieAdvancedStatsPenaltyShots) -> tuple:
         return (
             season.player_id,
             season.year,
@@ -521,7 +602,7 @@ class GoalieAdvancedStatsPenaltyShotsDatabaseMapper:
     def create_check_existence_query() -> str:
         return "SELECT 1 FROM goalie_advanced_stats_penalty_shots WHERE id = %s AND year = %s"
     
-class GoalieAdvancedStatsSavesByStrength(ApiMapper):
+class GoalieAdvancedStatsSavesByStrengthApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
@@ -555,7 +636,7 @@ class GoalieAdvancedStatsSavesByStrength(ApiMapper):
 class GoalieAdvancedStatsSavesByStrengthDatabaseMapper:
     
         @staticmethod
-        def to_database_params(season: Season) -> tuple:
+        def to_database_params(season: GoalieAdvancedStatsSavesByStrength) -> tuple:
             return (
                 season.player_id,
                 season.year,
@@ -648,7 +729,7 @@ class GoalieAdvancedStatsStartRelievedApiMapper(ApiMapper):
 class GoalieAdvancedStatsStartRelievedDatabaseMapper:
 
     @staticmethod
-    def to_database_params(season: Season) -> tuple:
+    def to_database_params(season: GoalieAdvancedStatsStartRelieved) -> tuple:
         return (
             season.player_id,
             season.year,
@@ -750,7 +831,7 @@ class GoalieAdvancedStatsShootoutApiMapper(ApiMapper):
 class GoalieAdvancedStatsShootoutDatabaseMapper:
 
     @staticmethod
-    def to_database_params(season: Season) -> tuple:
+    def to_database_params(season: GoalieAdvancedStatsShootout) -> tuple:
         return (
             season.player_id,
             season.year,
@@ -836,7 +917,7 @@ class GoalieAdvancedStatsApiMapper(ApiMapper):
 class GoalieAdvancedStatsDatabaseMapper:
 
     @staticmethod
-    def to_database_params(season: Season) -> tuple:
+    def to_database_params(season: GoalieAdvancedStats) -> tuple:
         return (
             season.player_id,
             season.year,
@@ -922,12 +1003,12 @@ class GoalieYouthStatsApiMapper(ApiMapper):
 class GoalieYouthStatsDatabaseMapper:
     
         @staticmethod
-        def to_database_params(season: Season) -> tuple:
+        def to_database_params(season: GoalieYouthStats) -> tuple:
             return (
                 season.player_id,
                 season.year,
                 season.team_name,
-                season.league_abbrev,
+                season.league_name,
                 season.game_type_id,
                 season.sequence,
                 season.games_played,
@@ -1009,7 +1090,7 @@ class GoalieStatsApiMapper(ApiMapper):
 class GoalieStatsDatabaseMapper:
         
     @staticmethod
-    def to_database_params(season: Season) -> tuple:
+    def to_database_params(season: GoalieStats) -> tuple:
         return (
             season.player_id,
             season.year,
@@ -1109,7 +1190,7 @@ class SkaterStatsApiMapper(ApiMapper):
 class SkaterStatsDatabaseMapper:
         
         @staticmethod
-        def to_database_params(season: Season) -> tuple:
+        def to_database_params(season: SkaterStats) -> tuple:
             return (
                 season.player_id,
                 season.year,
@@ -1128,10 +1209,10 @@ class SkaterStatsDatabaseMapper:
                 season.shorthanded_goals,
                 season.shorthanded_points,
                 season.shots,
-                season.average_time_on_ice,
+                season.time_on_ice,
                 season.game_type_id,
                 season.sequence,
-                season.faceoff_winning_percent
+                season.faceoff_percent
             )
         
         @staticmethod
@@ -1173,7 +1254,85 @@ class SkaterStatsDatabaseMapper:
         @staticmethod
         def create_check_existence_query() -> str:
             return "SELECT 1 FROM skater_stats WHERE id = %s AND team_id = %s AND year = %s AND game_type_id = %s AND sequence = %s"
+
+class SkaterYouthStatsApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "season": "year",
+            "teamName": "team_name",
+            "leagueAbbrev": "league_abbrev",
+            "gameTypeId": "game_type_id",
+            "sequence": "sequence",
+            "gamesPlayed": "games_played",
+            "goals": "goals",
+            "assists": "assists",
+            "points": "points",
+            "pim": "pim",
+        }
+
+    def map(self, source: dict) -> object:
+        skater_stats = GoalieYouthStats()
+        for json_key, attr_name in self.field_map.items():
+            if json_key == "teamName":
+                value = self.data_parser.double_parse(source, "teamName", "default", "none")
+            else:
+                value = self.data_parser.parse(source, json_key, "none")
+            setattr(skater_stats, attr_name, value)
+        return skater_stats
+    
+class SkaterYouthStatsDatabaseMapper:
+    
+        @staticmethod
+        def to_database_params(season: YouthSkaterStats) -> tuple:
+            return (
+                season.player_id,
+                season.year,
+                season.team_name,
+                season.league_name,
+                season.game_type_id,
+                season.sequence,
+                season.games_played,
+                season.goals,
+                season.assists,
+                season.points,
+                season.pim
+            )
         
+        @staticmethod
+        def create_insert_query() -> str:
+            return """
+                    INSERT INTO goalie_youth_stats (id, year, team_name, league_name, game_type_id, sequence, games_played, save_percent,\
+                    goals_against_average, goals_against, wins, losses, time_on_ice, ties) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+        
+        @staticmethod
+        def create_update_query() -> str:
+            return """
+                UPDATE goalie_youth_stats SET
+                year = %s,
+                team_name = %s,
+                league_name = %s,
+                game_type_id = %s,
+                sequence = %s,
+                games_played = %s,
+                save_percent = %s,
+                goals_against_average = %s,
+                goals_against = %s,
+                wins = %s,
+                losses = %s,
+                time_on_ice = %s,
+                ties = %s
+                WHERE id = %s AND year = %s AND team_name = %s AND league_name = %s AND game_type_id = %s AND sequence = %s
+                """
+        
+        @staticmethod
+        def create_check_existence_query() -> str:
+            return "SELECT 1 FROM goalie_youth_stats WHERE id = %s AND year = %s AND team_name = %s AND league_name = %s AND game_type_id = %s AND sequence = %s"
+
+
 class SkaterAdvancedStatsCorsiFenwickApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
@@ -1214,15 +1373,14 @@ class SkaterAdvancedStatsCorsiFenwickApiMapper(ApiMapper):
             "usatPercentageBehind": "fenwick_percentage_behind",
             "usatPrecentageClose": "fenwick_percentage_close",
             "usatPercentageTied": "fenwick_percentage_tied",
-            "zoneStartPct5v5": "zone_start_percent_5v5"
+            "zoneStartPct5v5": "zone_start_percent_5v5",
+            "teamId": "team_id"
         }
 
     def map(self, source: dict) -> object:
         skater_stats = SkaterAdvancedStatsCorsiFenwick()
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
-            if attr_name == "team_id":
-                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
@@ -1352,7 +1510,8 @@ class SkaterAdvancedStatsFaceoffsApiMapper(ApiMapper):
             "shFaceoffsLost": "pk_faceoffs_lost",
             "totalFaceoffs": "total_faceoffs",
             "totalFaceoffWins": "total_faceoffs_won",
-            "totalFaceoffLosses": "total_faceoffs_lost"
+            "totalFaceoffLosses": "total_faceoffs_lost",
+            "teamAbbrevs": "team_id"
         }
 
     def map(self, source: dict) -> object:
@@ -1440,3 +1599,3464 @@ class SkaterAdvancedStatsFaceoffsDatabaseMapper:
     def create_check_existence_query() -> str:
         return "SELECT 1 FROM skater_advanced_stats_faceoffs WHERE id = %s AND year = %s"
     
+class SkaterAdvancedStatsGoalsApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a SkaterAdvancedStatsGoals object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the SkaterAdvancedStatsGoals object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "seasonId": "year",
+            "evenStrengthGoalDifference": "even_strength_goal_difference",
+            "evenStrengthGoalsAgainst": "even_strength_goals_against",
+            "evenStrengthGoalsFor": "even_strength_goals_for",
+            "evenStrengthTimeOnIcePerGame": "even_strength_time_on_ice_per_game",
+            "gamesPlayed": "games_played",
+            "powerPlayerGoalFor": "pp_goals_for",
+            "powerPlayGoalsAgainst": "pp_goals_against",
+            "shortHandedGoalsFor": "pk_goals_for",
+            "shortHandedGoalsAgainst": "pk_goals_against",
+            "teamAbbrevs": "team_id"
+        }
+
+    def map(self, source: dict) -> object:
+        skater_stats = SkaterAdvancedStatsGoals()
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+            setattr(skater_stats, attr_name, value)
+        return skater_stats
+    
+class SkaterAdvancedStatsGoalsDatabaseMapper:
+    """
+    Maps SkaterAdvancedStatsGoals objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(skater_advanced_stats_goals: SkaterAdvancedStatsGoals) -> tuple:
+        """
+        Maps a SkaterAdvancedStatsGoals object to a tuple of parameters for database operations.
+
+        Args:
+            skater_advanced_stats_goals (SkaterAdvancedStatsGoals): The SkaterAdvancedStatsGoals object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            skater_advanced_stats_goals.player_id,
+            skater_advanced_stats_goals.year,
+            skater_advanced_stats_goals.team_id,
+            skater_advanced_stats_goals.even_strength_goal_difference,
+            skater_advanced_stats_goals.even_strength_goals_against,
+            skater_advanced_stats_goals.even_strength_goals_for,
+            skater_advanced_stats_goals.even_strength_time_on_ice_per_game,
+            skater_advanced_stats_goals.games_played,
+            skater_advanced_stats_goals.pp_goals_for,
+            skater_advanced_stats_goals.pp_goals_against,
+            skater_advanced_stats_goals.pk_goals_for,
+            skater_advanced_stats_goals.pk_goals_against
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the skater_advanced_stats_goals table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO skater_advanced_stats_goals (
+                id, year, team_id, even_strength_goal_difference, even_strength_goals_against, 
+                even_strength_goals_for, even_strength_time_on_ice_per_game, games_played, pp_goals_for, 
+                pp_goals_against, pk_goals_for, pk_goals_against
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the skater_advanced_stats_goals table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE skater_advanced_stats_goals SET
+                year = %s,
+                team_id = %s,
+                even_strength_goal_difference = %s,
+                even_strength_goals_against = %s,
+                even_strength_goals_for = %s,
+                even_strength_time_on_ice_per_game = %s,
+                games_played = %s,
+                pp_goals_for = %s,
+                pp_goals_against = %s,
+                pk_goals_for = %s,
+                pk_goals_against = %s
+            WHERE id = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a skater_advanced_stats_goals exists in the skater_advanced_stats_goals table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM skater_advanced_stats_goals WHERE id = %s AND year = %s"
+
+class SkaterAdvancedStatsMiscApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a SkaterAdvancedStatsMisc object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the SkaterAdvancedStatsMisc object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "seasonId": "year",
+            "blockedShots": "blocked_shots",
+            "emptyNetAssists": "empty_net_assists",
+            "emptyNetGoals": "empty_net_goals",
+            "emptyNetPoints": "empty_net_points",
+            "firstGoals": "first_goals",
+            "giveaways": "giveaways",
+            "gamesPlayed": "games_played",
+            "hits": "hits",
+            "missedShotCrossbar": "missed_shot_crossbar",
+            "missedShotGoalpost": "missed_shot_goalpost",
+            "missedShotOver": "missed_shot_over",
+            "missedShotWideOfNet": "missed_shot_wide",
+            "missedShots": "missed_shots",
+            "otGoals": "ot_goals",
+            "takeaways": "takeaways",
+            "timeOnIcePerGame": "time_on_ice_per_game",
+            "teamAbbrevs": "team_id"
+        }
+
+    def map(self, source: dict) -> object:
+        skater_stats = SkaterAdvancedStatsMisc()
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+            setattr(skater_stats, attr_name, value)
+        return skater_stats
+    
+class SkaterAdvancedStatsMiscDatabaseMapper:
+    """
+    Maps SkaterAdvancedStatsMisc objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(skater_advanced_stats_misc: SkaterAdvancedStatsMisc) -> tuple:
+        """
+        Maps a SkaterAdvancedStatsMisc object to a tuple of parameters for database operations.
+
+        Args:
+            skater_advanced_stats_misc (SkaterAdvancedStatsMisc): The SkaterAdvancedStatsMisc object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            skater_advanced_stats_misc.player_id,
+            skater_advanced_stats_misc.year,
+            skater_advanced_stats_misc.team_id,
+            skater_advanced_stats_misc.blocked_shots,
+            skater_advanced_stats_misc.empty_net_assists,
+            skater_advanced_stats_misc.empty_net_goals,
+            skater_advanced_stats_misc.empty_net_points,
+            skater_advanced_stats_misc.first_goals,
+            skater_advanced_stats_misc.giveaways,
+            skater_advanced_stats_misc.games_played,
+            skater_advanced_stats_misc.hits,
+            skater_advanced_stats_misc.missed_shot_crossbar,
+            skater_advanced_stats_misc.missed_shot_goalpost,
+            skater_advanced_stats_misc.missed_shot_over,
+            skater_advanced_stats_misc.missed_shot_wide,
+            skater_advanced_stats_misc.missed_shots,
+            skater_advanced_stats_misc.ot_goals,
+            skater_advanced_stats_misc.takeaways,
+            skater_advanced_stats_misc.time_on_ice_per_game
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the skater_advanced_stats_misc table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO skater_advanced_stats_misc (
+                id, year, team_id, blocked_shots, empty_net_assists, empty_net_goals,
+                empty_net_points, first_goals, giveaways, games_played, hits, missed_shot_crossbar,
+                missed_shot_goalpost, missed_shot_over, missed_shot_wide, missed_shots, ot_goals,
+                takeaways, time_on_ice_per_game
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the skater_advanced_stats_misc table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE skater_advanced_stats_misc SET
+                year = %s,
+                team_id = %s,
+                blocked_shots = %s,
+                empty_net_assists = %s,
+                empty_net_goals = %s,
+                empty_net_points = %s,
+                first_goals = %s,
+                giveaways = %s,
+                games_played = %s,
+                hits = %s,
+                missed_shot_crossbar = %s,
+                missed_shot_goalpost = %s,
+                missed_shot_over = %s,
+                missed_shot_wide = %s,
+                missed_shots = %s,
+                ot_goals = %s,
+                takeaways = %s,
+                time_on_ice_per_game = %s
+            WHERE id = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a skater_advanced_stats_misc exists in the skater_advanced_stats_misc table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM skater_advanced_stats_misc WHERE id = %s AND year = %s"
+    
+class SkaterAdvancedStatsPenaltiesApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a SkaterAdvancedStatsPenalties object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the SkaterAdvancedStatsPenalties object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "seasonId": "year",
+            "gameMisconductPenalties": "game_misconduct_penalties",
+            "gamesPlayed": "games_played",
+            "majorPenalties": "major_penalties",
+            "matchPenalties": "match_penalties",
+            "minorPenalties": "minor_penalties",
+            "misconductPenalties": "misconduct_penalties",
+            "netPenalties": "net_penalties",
+            "penalties": "penalties",
+            "penaltiesDrawn": "penalties_drawn",
+            "penaltyMinutes": "penalty_minutes",
+            "timeOnIcePerGame": "time_on_ice_per_game",
+            "teamAbbrevs": "team_id"
+        }
+
+    def map(self, source: dict) -> object:
+        skater_stats = SkaterAdvancedStatsPenalties()
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+            setattr(skater_stats, attr_name, value)
+        return skater_stats
+    
+class SkaterAdvancedStatsPenaltiesDatabaseMapper:
+    """
+    Maps SkaterAdvancedStatsPenalties objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(skater_advanced_stats_penalties: SkaterAdvancedStatsPenalties) -> tuple:
+        """
+        Maps a SkaterAdvancedStatsPenalties object to a tuple of parameters for database operations.
+
+        Args:
+            skater_advanced_stats_penalties (SkaterAdvancedStatsPenalties): The SkaterAdvancedStatsPenalties object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            skater_advanced_stats_penalties.player_id,
+            skater_advanced_stats_penalties.year,
+            skater_advanced_stats_penalties.team_id,
+            skater_advanced_stats_penalties.game_misconduct_penalties,
+            skater_advanced_stats_penalties.games_played,
+            skater_advanced_stats_penalties.major_penalties,
+            skater_advanced_stats_penalties.match_penalties,
+            skater_advanced_stats_penalties.minor_penalties,
+            skater_advanced_stats_penalties.misconduct_penalties,
+            skater_advanced_stats_penalties.net_penalties,
+            skater_advanced_stats_penalties.penalties,
+            skater_advanced_stats_penalties.penalties_drawn,
+            skater_advanced_stats_penalties.penalty_minutes,
+            skater_advanced_stats_penalties.time_on_ice_per_game
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the skater_advanced_stats_penalties table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO skater_advanced_stats_penalties (
+                id, year, team_id, game_misconduct_penalties, games_played, major_penalties,
+                match_penalties, minor_penalties, misconduct_penalties, net_penalties, penalties,
+                penalties_drawn, penalty_minutes, time_on_ice_per_game
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the skater_advanced_stats_penalties table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE skater_advanced_stats_penalties SET
+                year = %s,
+                team_id = %s,
+                game_misconduct_penalties = %s,
+                games_played = %s,
+                major_penalties = %s,
+                match_penalties = %s,
+                minor_penalties = %s,
+                misconduct_penalties = %s,
+                net_penalties = %s,
+                penalties = %s,
+                penalties_drawn = %s,
+                penalty_minutes = %s,
+                time_on_ice_per_game = %s
+            WHERE id = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a skater_advanced_stats_penalties exists in the skater_advanced_stats_penalties table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM skater_advanced_stats_penalties WHERE id = %s AND year = %s"
+    
+class SkaterAdvancedStatsPenaltyKillApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a SkaterAdvancedStatsPenaltyKill object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the SkaterAdvancedStatsPenaltyKill object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "seasonId": "year",
+            "shAssists": "pk_assists",
+            "shGoals": "pk_goals",
+            "shIndividualSatAgainst": "pk_individual_corsi_against",
+            "shPrimaryAssists": "pk_primary_assists",
+            "stSecondaryAssists": "pk_secondary_assists",
+            "stShootingPct": "pk_shooting_percentage",
+            "shShots": "pk_shots",
+            "shTimeOnIce": "pk_time_on_ice",
+            "shTimeOnIcePerGame": "pk_time_on_ice_per_game",
+            "shTimeOnIcePctPerGame": "pk_time_on_ice_percentage",
+            "teamAbbrevs": "team_id"
+        }
+
+    def map(self, source: dict) -> object:
+        skater_stats = SkaterAdvancedStatsPenaltyKill()
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+            setattr(skater_stats, attr_name, value)
+        return skater_stats
+    
+class SkaterAdvancedStatsPenaltyKillDatabaseMapper:
+    """
+    Maps SkaterAdvancedStatsPenaltyKill objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(skater_advanced_stats_penalty_kill: SkaterAdvancedStatsPenaltyKill) -> tuple:
+        """
+        Maps a SkaterAdvancedStatsPenaltyKill object to a tuple of parameters for database operations.
+
+        Args:
+            skater_advanced_stats_penalty_kill (SkaterAdvancedStatsPenaltyKill): The SkaterAdvancedStatsPenaltyKill object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            skater_advanced_stats_penalty_kill.player_id,
+            skater_advanced_stats_penalty_kill.year,
+            skater_advanced_stats_penalty_kill.team_id,
+            skater_advanced_stats_penalty_kill.pk_assists,
+            skater_advanced_stats_penalty_kill.pk_goals,
+            skater_advanced_stats_penalty_kill.pk_individual_corsi_against,
+            skater_advanced_stats_penalty_kill.pk_primary_assists,
+            skater_advanced_stats_penalty_kill.pk_secondary_assists,
+            skater_advanced_stats_penalty_kill.pk_shooting_percentage,
+            skater_advanced_stats_penalty_kill.pk_shots,
+            skater_advanced_stats_penalty_kill.pk_time_on_ice,
+            skater_advanced_stats_penalty_kill.pk_time_on_ice_per_game,
+            skater_advanced_stats_penalty_kill.pk_time_on_ice_percentage
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the skater_advanced_stats_penalty_kill table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO skater_advanced_stats_penalty_kill (
+                id, year, team_id, pk_assists, pk_goals, pk_individual_corsi_against, pk_primary_assists,
+                pk_secondary_assists, pk_shooting_percentage, pk_shots, pk_time_on_ice, pk_time_on_ice_per_game, pk_time_on_ice_percentage
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the skater_advanced_stats_penalty_kill table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE skater_advanced_stats_penalty_kill SET
+                year = %s,
+                team_id = %s,
+                pk_assists = %s,
+                pk_goals = %s,
+                pk_individual_corsi_against = %s,
+                pk_primary_assists = %s,
+                pk_secondary_assists = %s,
+                pk_shooting_percentage = %s,
+                pk_shots = %s,
+                pk_time_on_ice = %s,
+                pk_time_on_ice_per_game = %s,
+                pk_time_on_ice_percentage = %s
+            WHERE id = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a skater_advanced_stats_penalty_kill exists in the skater_advanced_stats_penalty_kill table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM skater_advanced_stats_penalty_kill WHERE id = %s AND year = %s"
+    
+class SkaterAdvancedStatsPowerplayApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a SkaterAdvancedStatsPowerplay object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the SkaterAdvancedStatsPowerplay object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "seasonId": "year",
+            "ppAssists": "pp_assists",
+            "ppGoals": "pp_goals",
+            "ppIndividualSatFor": "pp_individual_corsi_for",
+            "ppPrimaryAssists": "pp_primary_assists",
+            "ppSecondaryAssists": "pp_secondary_assists",
+            "ppShootingPct": "pp_shooting_percentage",
+            "ppShots": "pp_shots",
+            "ppTimeOnIce": "pp_time_on_ice",
+            "ppTimeOnIcePerGame": "pp_time_on_ice_per_game",
+            "ppTimeOnIcePctPerGame": "pp_time_on_ice_percentage",
+            "teamAbbrevs": "team_id"
+        }
+
+    def map(self, source: dict) -> object:
+        skater_stats = SkaterAdvancedStatsPowerplay(self.data_parser.parse(source, "playerId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+            setattr(skater_stats, attr_name, value)
+        return skater_stats
+    
+class SkaterAdvancedStatsPowerplayDatabaseMapper:
+    """
+    Maps SkaterAdvancedStatsPowerplay objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(skater_advanced_stats_powerplay: SkaterAdvancedStatsPowerplay) -> tuple:
+        """
+        Maps a SkaterAdvancedStatsPowerplay object to a tuple of parameters for database operations.
+
+        Args:
+            skater_advanced_stats_powerplay (SkaterAdvancedStatsPowerplay): The SkaterAdvancedStatsPowerplay object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            skater_advanced_stats_powerplay.player_id,
+            skater_advanced_stats_powerplay.team_id,
+            skater_advanced_stats_powerplay.year,
+            skater_advanced_stats_powerplay.pp_assists,
+            skater_advanced_stats_powerplay.pp_goals,
+            skater_advanced_stats_powerplay.pp_individual_corsi_for,
+            skater_advanced_stats_powerplay.pp_primary_assists,
+            skater_advanced_stats_powerplay.pp_secondary_assists,
+            skater_advanced_stats_powerplay.pp_shooting_percentage,
+            skater_advanced_stats_powerplay.pp_shots,
+            skater_advanced_stats_powerplay.pp_time_on_ice,
+            skater_advanced_stats_powerplay.pp_time_on_ice_per_game,
+            skater_advanced_stats_powerplay.pp_time_on_ice_percentage
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the skater_advanced_stats_powerplay table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO skater_advanced_stats_powerplay (
+                id, team_id, year, pp_assists, pp_goals, pp_individual_corsi_for, pp_primary_assists,
+                pp_secondary_assists, pp_shooting_percentage, pp_shots, pp_time_on_ice, pp_time_on_ice_per_game, pp_time_on_ice_percentage
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the skater_advanced_stats_powerplay table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE skater_advanced_stats_powerplay SET
+                team_id = %s,
+                year = %s,
+                pp_assists = %s,
+                pp_goals = %s,
+                pp_individual_corsi_for = %s,
+                pp_primary_assists = %s,
+                pp_secondary_assists = %s,
+                pp_shooting_percentage = %s,
+                pp_shots = %s,
+                pp_time_on_ice = %s,
+                pp_time_on_ice_per_game = %s,
+                pp_time_on_ice_percentage = %s
+            WHERE id = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a skater_advanced_stats_powerplay exists in the skater_advanced_stats_powerplay table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM skater_advanced_stats_powerplay WHERE id = %s AND year = %s"
+    
+class SkaterAdvancedStatsScoringApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a SkaterAdvancedStatsScoring object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the SkaterAdvancedStatsScoring object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "seasonId": "year",
+            "goalsBackhand": "goals_backhand",
+            "goalsBat": "goals_bat",
+            "goalsBetweenLegs": "goals_between_legs",
+            "goalsCradle": "goals_cradle",
+            "goalsDeflected": "goals_deflected",
+            "goalsPoke": "goals_poke",
+            "goalsSlap": "goals_slap",
+            "goalsSnap": "goals_snap",
+            "goalsTipIn": "goals_tip",
+            "goalsWrapAround": "goals_wrap_around",
+            "goalsWrist": "goals_wrist",
+            "shotsOnNetBackhand": "shots_backhand",
+            "shotsOnNetBat": "shots_bat",
+            "shotsOnNetBetweenLegs": "shots_between_legs",
+            "shotsOnNetCradle": "shots_cradle",
+            "shotsOnNetDeflected": "shots_deflected",
+            "shotsOnNetPoke": "shots_poke",
+            "shotsOnNetSlap": "shots_slap",
+            "shotsOnNetSnap": "shots_snap",
+            "shotsOnNetTipIn": "shots_tip",
+            "shotsOnNetWrapAround": "shots_wrap_around",
+            "shotsOnNetWrist": "shots_wrist",
+            "teamAbbrevs": "team_id"
+        }
+
+    def map(self, source: dict) -> object:
+        skater_stats = SkaterAdvancedStatsScoring(self.data_parser.parse(source, "playerId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+            setattr(skater_stats, attr_name, value)
+        return skater_stats
+
+class SkaterAdvancedStatsScoringDatabaseMapper:
+    """
+    Maps SkaterAdvancedStatsScoring objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(skater_advanced_stats_scoring: SkaterAdvancedStatsScoring) -> tuple:
+        """
+        Maps a SkaterAdvancedStatsScoring object to a tuple of parameters for database operations.
+
+        Args:
+            skater_advanced_stats_scoring (SkaterAdvancedStatsScoring): The SkaterAdvancedStatsScoring object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            skater_advanced_stats_scoring.player_id,
+            skater_advanced_stats_scoring.year,
+            skater_advanced_stats_scoring.team_id,
+            skater_advanced_stats_scoring.goals_backhand,
+            skater_advanced_stats_scoring.goals_bat,
+            skater_advanced_stats_scoring.goals_between_legs,
+            skater_advanced_stats_scoring.goals_cradle,
+            skater_advanced_stats_scoring.goals_deflected,
+            skater_advanced_stats_scoring.goals_poke,
+            skater_advanced_stats_scoring.goals_slap,
+            skater_advanced_stats_scoring.goals_snap,
+            skater_advanced_stats_scoring.goals_tip,
+            skater_advanced_stats_scoring.goals_wrap_around,
+            skater_advanced_stats_scoring.goals_wrist,
+            skater_advanced_stats_scoring.shots_backhand,
+            skater_advanced_stats_scoring.shots_bat,
+            skater_advanced_stats_scoring.shots_between_legs,
+            skater_advanced_stats_scoring.shots_cradle,
+            skater_advanced_stats_scoring.shots_deflected,
+            skater_advanced_stats_scoring.shots_poke,
+            skater_advanced_stats_scoring.shots_slap,
+            skater_advanced_stats_scoring.shots_snap,
+            skater_advanced_stats_scoring.shots_tip,
+            skater_advanced_stats_scoring.shots_wrap_around,
+            skater_advanced_stats_scoring.shots_wrist
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the skater_advanced_stats_scoring table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO skater_advanced_stats_scoring (
+                id, year, team_id, goals_backhand, goals_bat, goals_between_legs, goals_cradle,
+                goals_deflected, goals_poke, goals_slap, goals_snap, goals_tip, goals_wrap_around, goals_wrist,
+                shots_backhand, shots_bat, shots_between_legs, shots_cradle, shots_deflected, shots_poke,
+                shots_slap, shots_snap, shots_tip, shots_wrap_around, shots_wrist
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the skater_advanced_stats_scoring table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE skater_advanced_stats_scoring SET
+                year = %s,
+                team_id = %s,
+                goals_backhand = %s,
+                goals_bat = %s,
+                goals_between_legs = %s,
+                goals_cradle = %s,
+                goals_deflected = %s,
+                goals_poke = %s,
+                goals_slap = %s,
+                goals_snap = %s,
+                goals_tip = %s,
+                goals_wrap_around = %s,
+                goals_wrist = %s,
+                shots_backhand = %s,
+                shots_bat = %s,
+                shots_between_legs = %s,
+                shots_cradle = %s,
+                shots_deflected = %s,
+                shots_poke = %s,
+                shots_slap = %s,
+                shots_snap = %s,
+                shots_tip = %s,
+                shots_wrap_around = %s,
+                shots_wrist = %s
+            WHERE id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a skater_advanced_stats_scoring exists in the skater_advanced_stats_scoring table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM skater_advanced_stats_scoring WHERE id = %s AND year = %s"
+    
+class SkaterAdvancedStatsShootoutApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a SkaterAdvancedStatsShootout object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the SkaterAdvancedStatsShootout object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "seasonId": "year",
+            "careerShootoutGameDecidingGoals": "career_shootout_game_deciding_goals",
+            "careerShootoutGamesPlayed": "career_shootout_games_played",
+            "careerShootoutGoals": "career_shootout_goals",
+            "careerShootoutShootingPct": "career_shootout_percentage",
+            "careerShootoutShots": "career_shootout_shots",
+            "shootoutGameDecidingGoals": "shootout_game_deciding_goals",
+            "shootoutGamesPlayed": "shootout_games_played",
+            "shootoutGoals": "shootout_goals",
+            "shootoutShootingPct": "shootout_percentage",
+            "shootoutShots": "shootout_shots",
+            "teamAbbrevs": "team_id"
+        }
+
+    def map(self, source: dict) -> object:
+        skater_stats = SkaterAdvancedStatsShootout(self.data_parser.parse(source, "playerId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+            setattr(skater_stats, attr_name, value)
+        return skater_stats
+    
+class SkaterAdvancedStatsShootoutDatabaseMapper:
+    """
+    Maps SkaterAdvancedStatsShootout objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(skater_advanced_stats_shootout: SkaterAdvancedStatsShootout) -> tuple:
+        """
+        Maps a SkaterAdvancedStatsShootout object to a tuple of parameters for database operations.
+
+        Args:
+            skater_advanced_stats_shootout (SkaterAdvancedStatsShootout): The SkaterAdvancedStatsShootout object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            skater_advanced_stats_shootout.player_id,
+            skater_advanced_stats_shootout.year,
+            skater_advanced_stats_shootout.team_id,
+            skater_advanced_stats_shootout.career_shootout_game_deciding_goals,
+            skater_advanced_stats_shootout.career_shootout_games_played,
+            skater_advanced_stats_shootout.career_shootout_goals,
+            skater_advanced_stats_shootout.career_shootout_percentage,
+            skater_advanced_stats_shootout.career_shootout_shots,
+            skater_advanced_stats_shootout.shootout_game_deciding_goals,
+            skater_advanced_stats_shootout.shootout_games_played,
+            skater_advanced_stats_shootout.shootout_goals,
+            skater_advanced_stats_shootout.shootout_percentage,
+            skater_advanced_stats_shootout.shootout_shots
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the skater_advanced_stats_shootout table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO skater_advanced_stats_shootout (
+                id, year, team_id, career_shootout_game_deciding_goals, career_shootout_games_played, 
+                career_shootout_goals, career_shootout_percentage, career_shootout_shots, shootout_game_deciding_goals, 
+                shootout_games_played, shootout_goals, shootout_percentage, shootout_shots
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the skater_advanced_stats_shootout table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE skater_advanced_stats_shootout SET
+                year = %s,
+                team_id = %s,
+                career_shootout_game_deciding_goals = %s,
+                career_shootout_games_played = %s,
+                career_shootout_goals = %s,
+                career_shootout_percentage = %s,
+                career_shootout_shots = %s,
+                shootout_game_deciding_goals = %s,
+                shootout_games_played = %s,
+                shootout_goals = %s,
+                shootout_percentage = %s,
+                shootout_shots = %s
+            WHERE id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a skater_advanced_stats_shootout exists in the skater_advanced_stats_shootout table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM skater_advanced_stats_shootout WHERE id = %s AND year = %s"
+    
+class SkaterAdvancedStatsTOIApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a SkaterAdvancedStatsTOI object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the SkaterAdvancedStatsTOI object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "seasonId": "year",
+            "teamAbbrevs": "team_id",
+            "evTimeOnIce": "ev_time_on_ice",
+            "gamesPlayed": "games_played",
+            "otTimeOnIce": "ot_time_on_ice",
+            "otTimeOnIcePerOTGame": "ot_time_on_ice_per_ot_game",
+            "ppTimeOnIce": "pp_time_on_ice",
+            "shTimeOnIce": "sh_time_on_ice",
+            "shifts": "shifts",
+            "timeOnIce": "time_on_ice",
+            "teamAbbrevs": "team_id"
+        }
+
+    def map(self, source: dict) -> object:
+        skater_toi = SkaterAdvancedStatsTOI(self.data_parser.parse(source, "playerId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(value)
+            setattr(skater_toi, attr_name, value)
+        return skater_toi
+    
+class SkaterAdvancedStatsTOIDatabaseMapper:
+    """
+    Maps SkaterAdvancedStatsTOI objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(skater_advanced_stats_toi: SkaterAdvancedStatsTOI) -> tuple:
+        """
+        Maps a SkaterAdvancedStatsTOI object to a tuple of parameters for database operations.
+
+        Args:
+            skater_advanced_stats_toi (SkaterAdvancedStatsTOI): The SkaterAdvancedStatsTOI object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            skater_advanced_stats_toi.player_id,
+            skater_advanced_stats_toi.team_id,
+            skater_advanced_stats_toi.year,
+            skater_advanced_stats_toi.ev_time_on_ice,
+            skater_advanced_stats_toi.games_played,
+            skater_advanced_stats_toi.ot_time_on_ice,
+            skater_advanced_stats_toi.ot_time_on_ice_per_ot_game,
+            skater_advanced_stats_toi.pp_time_on_ice,
+            skater_advanced_stats_toi.sh_time_on_ice,
+            skater_advanced_stats_toi.shifts,
+            skater_advanced_stats_toi.time_on_ice
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the skater_advanced_stats_toi table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO skater_advanced_stats_toi (
+                id, team_id, year, ev_time_on_ice, games_played, ot_time_on_ice, ot_time_on_ice_per_ot_game,
+                pp_time_on_ice, sh_time_on_ice, shifts, time_on_ice
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the skater_advanced_stats_toi table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE skater_advanced_stats_toi SET
+                team_id = %s,
+                year = %s,
+                ev_time_on_ice = %s,
+                games_played = %s,
+                ot_time_on_ice = %s,
+                ot_time_on_ice_per_ot_game = %s,
+                pp_time_on_ice = %s,
+                sh_time_on_ice = %s,
+                shifts = %s,
+                time_on_ice = %s
+            WHERE id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a skater_advanced_stats_toi exists in the skater_advanced_stats_toi table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM skater_advanced_stats_toi WHERE id = %s AND year = %s"
+    
+# Make sure the json given here is with the player_id added and for a single award.
+class PlayerAwardsApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a PlayerAwards object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the PlayerAwards object.
+    """
+
+    def __init__(self, data_parser):
+        self.data_parser = data_parser
+        self.field_map = {
+            "playerId": "player_id",
+            "trophy": "award",
+            "seasonId": "year"
+        }
+
+    def map(self, source: dict) -> object:
+        player_awards = PlayerAwards(self.data_parser.parse(source, "playerId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "award":
+                value = self.data_parser.double_parse(source, "trophy", "default", "none")
+            setattr(player_awards, attr_name, value)
+        return player_awards
+    
+class PlayerAwardsDatabaseMapper:
+    """
+    Maps PlayerAwards objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(player_awards: PlayerAwards) -> tuple:
+        """
+        Maps a PlayerAwards object to a tuple of parameters for database operations.
+
+        Args:
+            player_awards (PlayerAwards): The PlayerAwards object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            player_awards.player_id,
+            player_awards.award,
+            player_awards.year
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the player_awards table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO player_awards (id, award, year) VALUES (%s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the player_awards table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE player_awards SET award = %s WHERE id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a player_awards exists in the player_awards table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM player_awards WHERE id = %s AND year = %s"
+    
+class PlayerDetailsApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a PlayerDetails object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the PlayerDetails object.
+    """
+
+    def __init__(self, data_parser):
+        self.data_parser = data_parser
+        self.field_map = {
+            "playerId": "player_id",
+            "firstName": "first_name",
+            "lastName": "last_name",
+            "sweaterNumber": "jersey_number",
+            "position": "position",
+            "headshot": "headshot",
+            "heroImage": "hero_image",
+            "heightInInches": "height_inches",
+            "weightInPounds": "weight_pounds",
+            "birthDate": "birth_date",
+            "birthCity": "birth_city",
+            "birthCountry": "birth_country",
+            "birthStateProvince": "birth_state_province",
+            "shootsCatches": "shoots_catches",
+            "inTop100AllTime": "in_top_100_all_time",
+            "inHHOF": "in_hhof"
+        }
+
+    def map(self, source: dict) -> object:
+        player_details = PlayerDetails(self.data_parser.parse(source, "playerId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "first_name":
+                value = self.data_parser.double_parse(source, "firstName", "default", "none")
+            elif attr_name == "last_name":
+                value = self.data_parser.double_parse(source, "lastName", "default", "none")
+            elif attr_name == "birthCity":
+                value = self.data_parser.double_parse(source, "birthCity", "default", "none")
+            elif attr_name == "birthStateProvince":
+                value = self.data_parser.double_parse(source, "birthStateProvince", "default", "none")
+            setattr(player_details, attr_name, value)
+        return player_details
+    
+class PlayerDetailsDatabaseMapper:
+    """
+    Maps PlayerDetails objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(player_details: PlayerDetails) -> tuple:
+        """
+        Maps a PlayerDetails object to a tuple of parameters for database operations.
+
+        Args:
+            player_details (PlayerDetails): The PlayerDetails object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            player_details.player_id,
+            player_details.first_name,
+            player_details.last_name,
+            player_details.jersey_number,
+            player_details.position,
+            player_details.headshot,
+            player_details.hero_image,
+            player_details.height_inches,
+            player_details.weight_pounds,
+            player_details.birth_date,
+            player_details.birth_city,
+            player_details.birth_state_province,
+            player_details.birth_country,
+            player_details.shoots_catches,
+            player_details.in_top_100_all_time,
+            player_details.in_hhof
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the player_details table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO player_details (
+                id, first_name, last_name, jersey_number, position, headshot, hero_image, height_inches, 
+                weight_pounds, birth_date, birth_city, birth_state_province, birth_country, shoots_catches, 
+                in_top_100_all_time, in_hhof
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the player_details table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE player_details SET
+                first_name = %s,
+                last_name = %s,
+                jersey_number = %s,
+                position = %s,
+                headshot = %s,
+                hero_image = %s,
+                height_inches = %s,
+                weight_pounds = %s,
+                birth_date = %s,
+                birth_city = %s,
+                birth_state_province = %s,
+                birth_country = %s,
+                shoots_catches = %s,
+                in_top_100_all_time = %s,
+                in_hhof = %s
+            WHERE id = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a player_details entry exists in the player_details table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM player_details WHERE id = %s"
+    
+class PlayerDraftApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a PlayerDraft object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the PlayerDraft object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "playerId": "player_id",
+            "year": "year",
+            "teamAbbrev": "team_id",
+            "round": "round",
+            "pickInRound": "pick_in_round",
+            "overallPick": "overall_pick"
+        }
+
+    def map(self, source: dict) -> object:
+        player_draft = PlayerDraft(self.data_parser.parse(source, "playerId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrev", "none"))
+            setattr(player_draft, attr_name, value)
+        return player_draft
+    
+class PlayerDraftDatabaseMapper:
+    """
+    Maps PlayerDraft objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(player_draft: PlayerDraft) -> tuple:
+        """
+        Maps a PlayerDraft object to a tuple of parameters for database operations.
+
+        Args:
+            player_draft (PlayerDraft): The PlayerDraft object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            player_draft.player_id,
+            player_draft.year,
+            player_draft.team_id,
+            player_draft.round,
+            player_draft.pick_in_round,
+            player_draft.overall_pick
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the player_draft table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO player_draft (
+                id, year, team_id, round, pick_in_round, overall_pick
+            ) VALUES (%s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the player_draft table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE player_draft SET
+                year = %s,
+                team_id = %s,
+                round = %s,
+                pick_in_round = %s,
+                overall_pick = %s
+            WHERE id = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a player_draft entry exists in the player_draft table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM player_draft WHERE id = %s AND year = %s"
+    
+class TeamStatsApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamStats object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamStats object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "gameTypeId": "game_type_id",
+            "gamesPlayed": "games_played",
+            "goalAgainst": "goals_against",
+            "goalFor": "goals_for",
+            "losses": "losses",
+            "otLosses": "ot_losses",
+            "points": "points",
+            "shootoutLosses": "shootout_losses",
+            "shootoutWins": "shootout_wins",
+            "streakCode": "streak_code",
+            "streakCount": "streak_count",
+            "ties": "ties",
+            "waiversSequence": "waiver_sequence",
+            "regulationWins": "regulation_wins",
+            "regulationPlusOtWins": "regulation_plus_ot_wins",
+            "homeGamesPlayed": "home_games_played",
+            "homeGoalsAgainst": "home_goals_against",
+            "homeGoalsFor": "home_goals_for",
+            "homeLosses": "home_losses",
+            "homeOtLosses": "home_ot_losses",
+            "homePoints": "home_points",
+            "homeRegulationWins": "home_regulation_wins",
+            "homeRegulationPlusOtWins": "home_regulation_plus_ot_wins",
+            "homeTies": "home_ties",
+            "homeWins": "home_wins",
+            "l10GamesPlayed": "last_10_games_played",
+            "l10GoalsAgainst": "last_10_goals_against",
+            "l10GoalsFor": "last_10_goals_for",
+            "l10Losses": "last_10_losses",
+            "l10OtLosses": "last_10_ot_losses",
+            "l10Points": "last_10_points",
+            "l10RegulationWins": "last_10_regulation_wins",
+            "l10RegulationPlusOtWins": "last_10_regulation_plus_ot_wins",
+            "l10Ties": "last_10_ties",
+            "l10Wins": "last_10_wins",
+            "roadGamesPlayed": "road_games_played",
+            "roadGoalsAgainst": "road_goals_against",
+            "roadGoalsFor": "road_goals_for",
+            "roadLosses": "road_losses",
+            "roadOtLosses": "road_ot_losses",
+            "roadPoints": "road_points",
+            "roadRegulationWins": "road_regulation_wins",
+            "roadRegulationPlusOtWins": "road_regulation_plus_ot_wins",
+            "roadTies": "road_ties",
+            "roadWins": "road_wins"
+        }
+
+    def map(self, source: dict) -> object:
+        team_stats = TeamStats(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_stats, attr_name, value)
+        return team_stats
+    
+class TeamStatsDatabaseMapper:
+    """
+    Maps TeamStats objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_stats: TeamStats) -> tuple:
+        """
+        Maps a TeamStats object to a tuple of parameters for database operations.
+
+        Args:
+            team_stats (TeamStats): The TeamStats object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_stats.team_id,
+            team_stats.year,
+            team_stats.game_type_id,
+            team_stats.games_played,
+            team_stats.goals_against,
+            team_stats.goals_for,
+            team_stats.losses,
+            team_stats.ot_losses,
+            team_stats.points,
+            team_stats.shootout_losses,
+            team_stats.shootout_wins,
+            team_stats.streak_code,
+            team_stats.streak_count,
+            team_stats.ties,
+            team_stats.waiver_sequence,
+            team_stats.regulation_wins,
+            team_stats.regulation_plus_ot_wins,
+            team_stats.home_games_played,
+            team_stats.home_goals_against,
+            team_stats.home_goals_for,
+            team_stats.home_losses,
+            team_stats.home_ot_losses,
+            team_stats.home_points,
+            team_stats.home_regulation_wins,
+            team_stats.home_regulation_plus_ot_wins,
+            team_stats.home_ties,
+            team_stats.home_wins,
+            team_stats.last_10_games_played,
+            team_stats.last_10_goals_against,
+            team_stats.last_10_goals_for,
+            team_stats.last_10_losses,
+            team_stats.last_10_ot_losses,
+            team_stats.last_10_points,
+            team_stats.last_10_regulation_wins,
+            team_stats.last_10_regulation_plus_ot_wins,
+            team_stats.last_10_ties,
+            team_stats.last_10_wins,
+            team_stats.road_games_played,
+            team_stats.road_goals_against,
+            team_stats.road_goals_for,
+            team_stats.road_losses,
+            team_stats.road_ot_losses,
+            team_stats.road_points,
+            team_stats.road_regulation_wins,
+            team_stats.road_regulation_plus_ot_wins,
+            team_stats.road_ties,
+            team_stats.road_wins
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_stats table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_stats (
+                team_id, year, game_type_id, games_played, goals_against, goals_for, losses, ot_losses, points,
+                shootout_losses, shootout_wins, streak_code, streak_count, ties, waiver_sequence, regulation_wins,
+                regulation_plus_ot_wins, home_games_played, home_goals_against, home_goals_for, home_losses, home_ot_losses,
+                home_points, home_regulation_wins, home_regulation_plus_ot_wins, home_ties, home_wins,
+                last_10_games_played, last_10_goals_against, last_10_goals_for, last_10_losses, last_10_ot_losses,
+                last_10_points, last_10_regulation_wins, last_10_regulation_plus_ot_wins, last_10_ties, last_10_wins,
+                road_games_played, road_goals_against, road_goals_for, road_losses, road_ot_losses, road_points,
+                road_regulation_wins, road_regulation_plus_ot_wins, road_ties, road_wins
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                      %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_stats table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_stats SET
+                year = %s,
+                game_type_id = %s,
+                games_played = %s,
+                goals_against = %s,
+                goals_for = %s,
+                losses = %s,
+                ot_losses = %s,
+                points = %s,
+                shootout_losses = %s,
+                shootout_wins = %s,
+                streak_code = %s,
+                streak_count = %s,
+                ties = %s,
+                waiver_sequence = %s,
+                regulation_wins = %s,
+                regulation_plus_ot_wins = %s,
+                home_games_played = %s,
+                home_goals_against = %s,
+                home_goals_for = %s,
+                home_losses = %s,
+                home_ot_losses = %s,
+                home_points = %s,
+                home_regulation_wins = %s,
+                home_regulation_plus_ot_wins = %s,
+                home_ties = %s,
+                home_wins = %s,
+                last_10_games_played = %s,
+                last_10_goals_against = %s,
+                last_10_goals_for = %s,
+                last_10_losses = %s,
+                last_10_ot_losses = %s,
+                last_10_points = %s,
+                last_10_regulation_wins = %s,
+                last_10_regulation_plus_ot_wins = %s,
+                last_10_ties = %s,
+                last_10_wins = %s,
+                road_games_played = %s,
+                road_goals_against = %s,
+                road_goals_for = %s,
+                road_losses = %s,
+                road_ot_losses = %s,
+                road_points = %s,
+                road_regulation_wins = %s,
+                road_regulation_plus_ot_wins = %s,
+                road_ties = %s,
+                road_wins = %s
+                WHERE team_id = %s AND year = %s
+                """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_stats entry exists in the team_stats table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_stats WHERE team_id = %s AND year = %s"
+    
+class TeamDataApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamData object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamData object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "conferenceName": "conference_name",
+            "divisionName": "division_name",
+            "placeName": "place_name",
+            "teamName": "team_name",
+            "teamAbbrev": "team_abbreviation",
+            "teamLogo": "team_logo",
+            "teamColor1": "team_color_1",
+            "teamColor2": "team_color_2"
+        }
+
+    def map(self, source: dict) -> object:
+        team_data = TeamData(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            if attr_name == "team_name":
+                value = self.data_parser.double_parse(source, "teamName", "default", "none")
+            elif attr_name =="place_name":
+                value = self.data_parser.double_parse(source, "placeName", "default", "none")
+            elif attr_name == "team_abbreviation":
+                value = self.data_parser.double_parse(source, "teamAbbrev", "default", "none")
+            else:
+                value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_data, attr_name, value)
+        return team_data
+    
+class TeamDataDatabaseMapper:
+    """
+    Maps TeamData objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_data: TeamData) -> tuple:
+        """
+        Maps a TeamData object to a tuple of parameters for database operations.
+
+        Args:
+            team_data (TeamData): The TeamData object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_data.team_id,
+            team_data.year,
+            team_data.conference_name,
+            team_data.division_name,
+            team_data.place_name,
+            team_data.team_name,
+            team_data.team_abbreviation,
+            team_data.team_logo,
+            team_data.team_color_1,
+            team_data.team_color_2
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_data table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO teams (
+                team_id, year, conference_name, division_name, place_name, team_name, team_abbreviation, 
+                team_logo, team_color_1, team_color_2
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_data table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE teams SET
+                year = %s,
+                conference_name = %s,
+                division_name = %s,
+                place_name = %s,
+                team_name = %s,
+                team_abbreviation = %s,
+                team_logo = %s,
+                team_color_1 = %s,
+                team_color_2 = %s
+            WHERE team_id = %s and year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_data entry exists in the team_data table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM teams WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsTeamGoalGamesApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsTeamGoalGames object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsTeamGoalGames object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "lossesOneGoalGames": "losses_one_goal_games",
+            "lossesTwoGoalGames": "losses_two_goal_games",
+            "lossesThreeGoalGames": "losses_three_goal_games",
+            "otLossesOneGoalGames": "ot_losses_one_goal_games",
+            "winPctOneGoalGames": "win_percent_one_goal_games",
+            "winPctTwoGoalGames": "win_percent_two_goal_games",
+            "winPctThreeGoalGames": "win_percent_three_goal_games",
+            "winsOneGoalGames": "wins_one_goal_games",
+            "winsTwoGoalGames": "wins_two_goal_games",
+            "winsThreeGoalGames": "wins_three_goal_games"
+        }
+
+    def map(self, source: dict) -> object:
+        team_goal_games = TeamAdvancedStatsTeamGoalGames(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_goal_games, attr_name, value)
+        return team_goal_games
+    
+class TeamAdvancedStatsTeamGoalGamesDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsTeamGoalGames objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_goal_games: TeamAdvancedStatsTeamGoalGames) -> tuple:
+        """
+        Maps a TeamAdvancedStatsTeamGoalGames object to a tuple of parameters for database operations.
+
+        Args:
+            team_goal_games (TeamAdvancedStatsTeamGoalGames): The TeamAdvancedStatsTeamGoalGames object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_goal_games.team_id,
+            team_goal_games.year,
+            team_goal_games.losses_one_goal_games,
+            team_goal_games.losses_two_goal_games,
+            team_goal_games.losses_three_goal_games,
+            team_goal_games.ot_losses_one_goal_games,
+            team_goal_games.win_percent_one_goal_games,
+            team_goal_games.win_percent_two_goal_games,
+            team_goal_games.win_percent_three_goal_games,
+            team_goal_games.wins_one_goal_games,
+            team_goal_games.wins_two_goal_games,
+            team_goal_games.wins_three_goal_games
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_goal_games table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_team_goal_games (
+                team_id, year, losses_one_goal_games, losses_two_goal_games, losses_three_goal_games, 
+                ot_losses_one_goal_games, win_percent_one_goal_games, win_percent_two_goal_games, 
+                win_percent_three_goal_games, wins_one_goal_games, wins_two_goal_games, wins_three_goal_games
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_goal_games table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_team_goal_games SET
+                losses_one_goal_games = %s,
+                losses_two_goal_games = %s,
+                losses_three_goal_games = %s,
+                ot_losses_one_goal_games = %s,
+                win_percent_one_goal_games = %s,
+                win_percent_two_goal_games = %s,
+                win_percent_three_goal_games = %s,
+                wins_one_goal_games = %s,
+                wins_two_goal_games = %s,
+                wins_three_goal_games = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_goal_games entry exists in the team_goal_games table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_team_goal_games WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsShotTypeApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsShotType object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsShotType object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "goalsBackhand": "goals_backhand",
+            "goalsDeflected": "goals_deflected",
+            "goalsFor": "goals_for",
+            "goalsSlap": "goals_slap",
+            "goalsSnap": "goals_snap",
+            "goalsTipIn": "goals_tip_in",
+            "goalsWrapAround": "goals_wrap_around",
+            "goalsWrist": "goals_wrist",
+            "shootingPctBackhand": "shooting_percent_backhand",
+            "shootingPctDeflected": "shooting_percent_deflected",
+            "shootingPctSlap": "shooting_percent_slap",
+            "shootingPctSnap": "shooting_percent_snap",
+            "shootingPctTipIn": "shooting_percent_tip_in",
+            "shootingPctWrapAround": "shooting_percent_wrap_around",
+            "shootingPctWrist": "shooting_percent_wrist",
+            "shotsOnNetBackhand": "shots_on_net_backhand",
+            "shotsOnNetDeflected": "shots_on_net_deflected",
+            "shotsOnNetSlap": "shots_on_net_slap",
+            "shotsOnNetSnap": "shots_on_net_snap",
+            "shotsOnNetTipIn": "shots_on_net_tip_in",
+            "shotsOnNetWrapAround": "shots_on_net_wrap_around",
+            "shotsOnNetWrist": "shots_on_net_wrist",
+            "shotsAttemptedBackhand": "shots_attempted_backhand",
+            "shotsAttemptedDeflected": "shots_attempted_deflected"
+        }
+
+    def map(self, source: dict) -> object:
+        team_shot_type = TeamAdvancedStatsShotType(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_shot_type, attr_name, value)
+        return team_shot_type
+    
+class TeamAdvancedStatsShotTypeDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsShotType objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_shot_type: TeamAdvancedStatsShotType) -> tuple:
+        """
+        Maps a TeamAdvancedStatsShotType object to a tuple of parameters for database operations.
+
+        Args:
+            team_shot_type (TeamAdvancedStatsShotType): The TeamAdvancedStatsShotType object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_shot_type.team_id,
+            team_shot_type.year,
+            team_shot_type.goals_backhand,
+            team_shot_type.goals_deflected,
+            team_shot_type.goals_for,
+            team_shot_type.goals_slap,
+            team_shot_type.goals_snap,
+            team_shot_type.goals_tip_in,
+            team_shot_type.goals_wrap_around,
+            team_shot_type.goals_wrist,
+            team_shot_type.shooting_percent_backhand,
+            team_shot_type.shooting_percent_deflected,
+            team_shot_type.shooting_percent_slap,
+            team_shot_type.shooting_percent_snap,
+            team_shot_type.shooting_percent_tip_in,
+            team_shot_type.shooting_percent_wrap_around,
+            team_shot_type.shooting_percent_wrist,
+            team_shot_type.shots_on_net_backhand,
+            team_shot_type.shots_on_net_deflected,
+            team_shot_type.shots_on_net_slap,
+            team_shot_type.shots_on_net_snap,
+            team_shot_type.shots_on_net_tip_in,
+            team_shot_type.shots_on_net_wrap_around,
+            team_shot_type.shots_on_net_wrist
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_shot_type table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_shot_type (
+                team_id, year, goals_backhand, goals_deflected, goals_for, goals_slap, goals_snap, 
+                goals_tip_in, goals_wrap_around, goals_wrist, shooting_percent_backhand, shooting_percent_deflected, 
+                shooting_percent_slap, shooting_percent_snap, shooting_percent_tip_in, shooting_percent_wrap_around, 
+                shooting_percent_wrist, shots_on_net_backhand, shots_on_net_deflected, shots_on_net_slap, 
+                shots_on_net_snap, shots_on_net_tip_in, shots_on_net_wrap_around, shots_on_net_wrist
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_shot_type table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_shot_type SET
+                goals_backhand = %s,
+                goals_deflected = %s,
+                goals_for = %s,
+                goals_slap = %s,
+                goals_snap = %s,
+                goals_tip_in = %s,
+                goals_wrap_around = %s,
+                goals_wrist = %s,
+                shooting_percent_backhand = %s,
+                shooting_percent_deflected = %s,
+                shooting_percent_slap = %s,
+                shooting_percent_snap = %s,
+                shooting_percent_tip_in = %s,
+                shooting_percent_wrap_around = %s,
+                shooting_percent_wrist = %s,
+                shots_on_net_backhand = %s,
+                shots_on_net_deflected = %s,
+                shots_on_net_slap = %s,
+                shots_on_net_snap = %s,
+                shots_on_net_tip_in = %s,
+                shots_on_net_wrap_around = %s,
+                shots_on_net_wrist = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_shot_type entry exists in the team_shot_type table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_shot_type WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsScoringFirstApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsScoringFirst object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsScoringFirst object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "lossesScoringFirst": "losses_scoring_first",
+            "lossesTrailingFirst": "losses_trailing_first",
+            "otLossesScoringFirst": "ot_losses_scoring_first",
+            "otLossesTrailingFirst": "ot_losses_trailing_first",
+            "scoringFirstGamesPlayed": "scoring_first_games_played",
+            "tiesScoringFirst": "ties_scoring_first",
+            "tiesTrailingFirst": "ties_trailing_first",
+            "trailingFirstGamesPlayed": "trailing_first_games_played",
+            "winPctScoringFirst": "win_percent_scoring_first",
+            "winPctTrailingFirst": "win_percent_trailing_first",
+            "winsScoringFirst": "wins_scoring_first",
+            "winsTrailingFirst": "wins_trailing_first"
+        }
+
+    def map(self, source: dict) -> object:
+        team_scoring_first = TeamAdvancedStatsScoringFirst(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_scoring_first, attr_name, value)
+        return team_scoring_first
+    
+class TeamAdvancedStatsScoringFirstDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsScoringFirst objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_scoring_first: TeamAdvancedStatsScoringFirst) -> tuple:
+        """
+        Maps a TeamAdvancedStatsScoringFirst object to a tuple of parameters for database operations.
+
+        Args:
+            team_scoring_first (TeamAdvancedStatsScoringFirst): The TeamAdvancedStatsScoringFirst object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_scoring_first.team_id,
+            team_scoring_first.year,
+            team_scoring_first.losses_scoring_first,
+            team_scoring_first.losses_trailing_first,
+            team_scoring_first.ot_losses_scoring_first,
+            team_scoring_first.ot_losses_trailing_first,
+            team_scoring_first.scoring_first_games_played,
+            team_scoring_first.ties_scoring_first,
+            team_scoring_first.ties_trailing_first,
+            team_scoring_first.trailing_first_games_played,
+            team_scoring_first.win_percent_scoring_first,
+            team_scoring_first.win_percent_trailing_first,
+            team_scoring_first.wins_scoring_first,
+            team_scoring_first.wins_trailing_first
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_scoring_first table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_scoring_first (
+                team_id, year, losses_scoring_first, losses_trailing_first, ot_losses_scoring_first,
+                ot_losses_trailing_first, scoring_first_games_played, ties_scoring_first, ties_trailing_first,
+                trailing_first_games_played, win_percent_scoring_first, win_percent_trailing_first,
+                wins_scoring_first, wins_trailing_first
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_scoring_first table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_scoring_first SET
+                losses_scoring_first = %s,
+                losses_trailing_first = %s,
+                ot_losses_scoring_first = %s,
+                ot_losses_trailing_first = %s,
+                scoring_first_games_played = %s,
+                ties_scoring_first = %s,
+                ties_trailing_first = %s,
+                trailing_first_games_played = %s,
+                win_percent_scoring_first = %s,
+                win_percent_trailing_first = %s,
+                wins_scoring_first = %s,
+                wins_trailing_first = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_scoring_first entry exists in the team_scoring_first table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_scoring_first WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsPowerplayPenaltyKillApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsPowerplayPenaltyKill object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsPowerplayPenaltyKill object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "penaltyKillNetPct": "pk_net_percent",
+            "penaltyKillPct": "pk_percent",
+            "pkNetGoals": "pk_net_goals",
+            "pkNetGoalsPerGame": "pk_net_goals_for_per_game",
+            "pkTimeOnIcePerGame": "pk_time_on_ice_per_game",
+            "ppGoalsAgainst": "pk_goals_against",
+            "ppGoalsAgainstPerGame": "pk_goals_against_per_game",
+            "shGoalsFor": "pk_goals_for",
+            "shGoalsForPerGame": "pk_goals_for_per_game",
+            "timesShorthanded": "times_shorthanded",
+            "timesShorthandedPerGame": "times_shorthanded_per_game",
+            "overallPenaltyKillPct": "overall_penalty_kill_percent",
+            "penaltyKillPct3v4": "penalty_kill_percent_3on4",
+            "penaltyKillPct3v5": "penalty_kill_percent_3on5",
+            "penaltyKillPct4v5": "penalty_kill_percent_4on5",
+            "timeOnIce3v4": "time_on_ice_3on4",
+            "timeOnIce3v5": "time_on_ice_3on5",
+            "timeOnIce4v5": "time_on_ice_4on5",
+            "timeOnIceShorthanded": "time_on_ice_shorthanded",
+            "timesShorthanded3v4": "time_shorthanded_3v4",
+            "timesShorthanded3v5": "time_shorthanded_3v5",
+            "timesShorthanded4v5": "time_shorthanded_4v5",
+            "powerPlayGoalsFor": "pp_goals_for",
+            "powerPlayNetPct": "pp_net_percent",
+            "powerPlayPct": "pp_percent",
+            "ppGoalsPerGame": "pp_goals_per_game",
+            "ppNetGoals": "pp_net_goals",
+            "ppNetGoalsPerGame": "pp_net_goals_for_per_game",
+            "ppOpportunities": "pp_opportunites",
+            "ppOpportunitiesPerGame": "pp_opportunities_per_game",
+            "ppTimeOnIcePerGame": "pp_time_on_ice_per_game",
+            "shGoalsAgainst": "pp_goals_against",
+            "shGoalsAgainstPerGame": "pp_goals_against_per_game",
+            "opportunities4v3": "opportunities_4on3",
+            "opportunities5v3": "opportunities_5on3",
+            "opportunities5v4": "opportunities_5on4",
+            "powerPlayPct4v3": "pp_percent_4on3",
+            "powerPlayPct5v3": "pp_percent_5on3",
+            "powerPlayPct5v4": "pp_percent_5on4",
+            "timeOnIce4v3": "time_on_ice_4on3",
+            "timeOnIce5v3": "time_on_ice_5on3",
+            "timeOnIce5v4": "time_on_ice_5on4",
+            "timeOnIcePp": "pp_time_on_ice",
+            "goalsAgainst3v4": "goals_against_3on4",
+            "goalsAgainst3v5": "goals_against_3on5",
+            "goalsAgainst4v5": "goals_against_4on5"
+        }
+
+    def map(self, source: dict) -> object:
+        team_pp_pk_stats = TeamAdvancedStatsPowerplayPenaltyKill(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_pp_pk_stats, attr_name, value)
+        return team_pp_pk_stats
+    
+class TeamAdvancedStatsPowerplayPenaltyKillDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsPowerplayPenaltyKill objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_pp_pk_stats: TeamAdvancedStatsPowerplayPenaltyKill) -> tuple:
+        """
+        Maps a TeamAdvancedStatsPowerplayPenaltyKill object to a tuple of parameters for database operations.
+
+        Args:
+            team_pp_pk_stats (TeamAdvancedStatsPowerplayPenaltyKill): The TeamAdvancedStatsPowerplayPenaltyKill object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_pp_pk_stats.team_id,
+            team_pp_pk_stats.year,
+            team_pp_pk_stats.pk_net_percent,
+            team_pp_pk_stats.pk_percent,
+            team_pp_pk_stats.pk_net_goals,
+            team_pp_pk_stats.pk_net_goals_for_per_game,
+            team_pp_pk_stats.pk_time_on_ice_per_game,
+            team_pp_pk_stats.pk_goals_against,
+            team_pp_pk_stats.pk_goals_against_per_game,
+            team_pp_pk_stats.pk_goals_for,
+            team_pp_pk_stats.pk_goals_for_per_game,
+            team_pp_pk_stats.times_shorthanded,
+            team_pp_pk_stats.times_shorthanded_per_game,
+            team_pp_pk_stats.overall_penalty_kill_percent,
+            team_pp_pk_stats.penalty_kill_percent_3on4,
+            team_pp_pk_stats.penalty_kill_percent_3on5,
+            team_pp_pk_stats.penalty_kill_percent_4on5,
+            team_pp_pk_stats.time_on_ice_3on4,
+            team_pp_pk_stats.time_on_ice_3on5,
+            team_pp_pk_stats.time_on_ice_4on5,
+            team_pp_pk_stats.time_on_ice_shorthanded,
+            team_pp_pk_stats.time_shorthanded_3v4,
+            team_pp_pk_stats.time_shorthanded_3v5,
+            team_pp_pk_stats.time_shorthanded_4v5,
+            team_pp_pk_stats.pp_goals_for,
+            team_pp_pk_stats.pp_net_percent,
+            team_pp_pk_stats.pp_percent,
+            team_pp_pk_stats.pp_goals_per_game,
+            team_pp_pk_stats.pp_net_goals,
+            team_pp_pk_stats.pp_net_goals_for_per_game,
+            team_pp_pk_stats.pp_opportunites,
+            team_pp_pk_stats.pp_opportunities_per_game,
+            team_pp_pk_stats.pp_time_on_ice_per_game,
+            team_pp_pk_stats.pp_goals_against,
+            team_pp_pk_stats.pp_goals_against_per_game,
+            team_pp_pk_stats.opportunities_4on3,
+            team_pp_pk_stats.opportunities_5on3,
+            team_pp_pk_stats.opportunities_5on4,
+            team_pp_pk_stats.pp_percent_4on3,
+            team_pp_pk_stats.pp_percent_5on3,
+            team_pp_pk_stats.pp_percent_5on4,
+            team_pp_pk_stats.time_on_ice_4on3,
+            team_pp_pk_stats.time_on_ice_5on3,
+            team_pp_pk_stats.time_on_ice_5on4,
+            team_pp_pk_stats.pp_time_on_ice,
+            team_pp_pk_stats.goals_against_3on4,
+            team_pp_pk_stats.goals_against_3on5,
+            team_pp_pk_stats.goals_against_4on5,
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_pp_pk_stats table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_powerplay_penalty_kill(
+                team_id, year, pk_net_percent, pk_percent, pk_net_goals_for, pk_net_goals_for_per_game,
+                pk_time_on_ice_per_game, pk_goals_against, pk_goals_against_per_game, pk_goals_for,
+                pk_goals_for_per_game, times_shorthanded, times_shorthanded_per_game, overall_penalty_kill_percent,
+                penalty_kill_percent_3on4, penalty_kill_percent_3on5, penalty_kill_percent_4on5, time_on_ice_3on4,
+                time_on_ice_3on5, time_on_ice_4on5, time_on_ice_shorthanded, time_shorthanded_3v4,
+                time_shorthanded_3v5, time_shorthanded_4v5, pp_goals_for, pp_net_percent, pp_percent, pp_goals_per_game,
+                pp_net_goals_for, pp_net_goals_for_per_game, pp_opportunities, pp_opportunities_per_game,
+                pp_time_on_ice_per_game, pp_goals_against,pp_goals_against_per_game, opportunities_4on3,
+                opportunities_5on3, opportunities_5on4, pp_percent_4on3, pp_percent_5on3, pp_percent_5on4,
+                time_on_ice_4on3, time_on_ice_5on3, time_on_ice_5on4, pp_time_on_ice, goals_against_3on4,
+                goals_against_3on5, goals_against_4on5
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+    
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_pp_pk_stats table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_powerplay_penalty_kill SET
+                pk_net_percent = %s,
+                pk_percent = %s,
+                pk_net_goals_for = %s,
+                pk_net_goals_for_per_game = %s,
+                pk_time_on_ice_per_game = %s,
+                pk_goals_against = %s,
+                pk_goals_against_per_game = %s,
+                pk_goals_for = %s,
+                pk_goals_for_per_game = %s,
+                times_shorthanded = %s,
+                times_shorthanded_per_game = %s,
+                overall_penalty_kill_percent = %s,
+                penalty_kill_percent_3on4 = %s,
+                penalty_kill_percent_3on5 = %s,
+                penalty_kill_percent_4on5 = %s,
+                time_on_ice_3on4 = %s,
+                time_on_ice_3on5 = %s,
+                time_on_ice_4on5 = %s,
+                time_on_ice_shorthanded = %s,
+                time_shorthanded_3v4 = %s,
+                time_shorthanded_3v5 = %s,
+                time_shorthanded_4v5 = %s,
+                pp_goals_for = %s,
+                pp_net_percent = %s,
+                pp_percent = %s,
+                pp_goals_per_game = %s,
+                pp_net_goals_for = %s,
+                pp_net_goals_for_per_game = %s,
+                pp_opportunities = %s,
+                pp_opportunities_per_game = %s,
+                pp_time_on_ice_per_game = %s,
+                pp_goals_against = %s,
+                pp_goals_against_per_game = %s,
+                opportunities_4on3 = %s,
+                opportunities_5on3 = %s,
+                opportunities_5on4 = %s,
+                pp_percent_4on3 = %s,
+                pp_percent_5on3 = %s,
+                pp_percent_5on4 = %s,
+                time_on_ice_4on3 = %s,
+                time_on_ice_5on3 = %s,
+                time_on_ice_5on4 = %s,
+                pp_time_on_ice = %s,
+                goals_against_3on4 = %s,
+                goals_against_3on5 = %s,
+                goals_against_4on5 = %s
+            WHERE team_id = %s AND year = %s
+            """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_pp_pk_stats entry exists in the team_pp_pk_stats table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_powerplay_penalty_kill WHERE team_id = %s AND year = %s"
+        
+class TeamAdvancedStatsPenaltiesApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsPenalties object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsPenalties object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "benchMinorPenalties": "bench_minor_penalties",
+            "gameMisconducts": "game_misconducts",
+            "majors": "majors",
+            "matchPenalties": "match_penalties",
+            "minors": "minors",
+            "misconducts": "misconducts",
+            "netPenalties": "net_penalties",
+            "penalties": "penalties",
+            "penaltyMinutes": "penalty_minutes",
+            "penaltySecondsPerGame": "penalty_seconds_per_game",
+            "totalPenaltiesDrawn": "total_penalties_drawn"
+        }
+
+    def map(self, source: dict) -> object:
+        team_penalties_stats = TeamAdvancedStatsPenalties(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_penalties_stats, attr_name, value)
+        return team_penalties_stats
+    
+class TeamAdvancedStatsPenaltiesDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsPenalties objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_penalties_stats: TeamAdvancedStatsPenalties) -> tuple:
+        """
+        Maps a TeamAdvancedStatsPenalties object to a tuple of parameters for database operations.
+
+        Args:
+            team_penalties_stats (TeamAdvancedStatsPenalties): The TeamAdvancedStatsPenalties object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_penalties_stats.team_id,
+            team_penalties_stats.year,
+            team_penalties_stats.bench_minor_penalties,
+            team_penalties_stats.game_misconducts,
+            team_penalties_stats.majors,
+            team_penalties_stats.match_penalties,
+            team_penalties_stats.minors,
+            team_penalties_stats.misconducts,
+            team_penalties_stats.net_penalties,
+            team_penalties_stats.penalties,
+            team_penalties_stats.penalty_minutes,
+            team_penalties_stats.penalty_seconds_per_game,
+            team_penalties_stats.total_penalties_drawn
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_penalties_stats table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_penalties (
+                team_id, year, bench_minor_penalties, game_misconducts, majors, match_penalties, minors,
+                misconducts, net_penalties, penalties, penalty_minutes, penalty_seconds_per_game, total_penalties_drawn
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_penalties_stats table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_penalties SET
+                bench_minor_penalties = %s,
+                game_misconducts = %s,
+                majors = %s,
+                match_penalties = %s,
+                minors = %s,
+                misconducts = %s,
+                net_penalties = %s,
+                penalties = %s,
+                penalty_minutes = %s,
+                penalty_seconds_per_game = %s,
+                total_penalties_drawn = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_penalties_stats entry exists in the team_penalties_stats table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_penalties WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsOutshootOutshotApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsOutshootOutshot object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsOutshootOutshot object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "lossesEvenShots": "losses_even_shots",
+            "lossesOutshootOpponent": "losses_outshoot",
+            "lossesOutshotByOpponent": "losses_outshot",
+            "netShotsPerGame": "net_shots_per_game",
+            "otLossesEvenShots": "ot_losses_even_shots",
+            "otLossesOutshootOpponent": "ot_losses_outshoot",
+            "otLossesOutshotByOpponent": "ot_losses_outshot",
+            "shotsAgainstPerGame": "shots_against_per_game",
+            "shotsForPerGame": "shots_for_per_game",
+            "tiesEvenShots": "ties_even_shots",
+            "tiesOutshootOpponent": "ties_outshoot",
+            "tiesOutshotByOpponent": "ties_outshot",
+            "winsEvenShots": "wins_even_shots",
+            "winsOutshootOpponent": "wins_outshoot",
+            "winsOutshotByOpponent": "wins_outshot"
+        }
+
+    def map(self, source: dict) -> object:
+        team_outshoot_outshot_stats = TeamAdvancedStatsOutshootOutshot(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_outshoot_outshot_stats, attr_name, value)
+        return team_outshoot_outshot_stats
+    
+class TeamAdvancedStatsOutshootOutshotDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsOutshootOutshot objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_outshoot_outshot_stats: TeamAdvancedStatsOutshootOutshot) -> tuple:
+        """
+        Maps a TeamAdvancedStatsOutshootOutshot object to a tuple of parameters for database operations.
+
+        Args:
+            team_outshoot_outshot_stats (TeamAdvancedStatsOutshootOutshot): The TeamAdvancedStatsOutshootOutshot object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_outshoot_outshot_stats.team_id,
+            team_outshoot_outshot_stats.year,
+            team_outshoot_outshot_stats.losses_even_shots,
+            team_outshoot_outshot_stats.losses_outshoot,
+            team_outshoot_outshot_stats.losses_outshot,
+            team_outshoot_outshot_stats.net_shots_per_game,
+            team_outshoot_outshot_stats.ot_losses_even_shots,
+            team_outshoot_outshot_stats.ot_losses_outshoot,
+            team_outshoot_outshot_stats.ot_losses_outshot,
+            team_outshoot_outshot_stats.shots_against_per_game,
+            team_outshoot_outshot_stats.shots_for_per_game,
+            team_outshoot_outshot_stats.ties_even_shots,
+            team_outshoot_outshot_stats.ties_outshoot,
+            team_outshoot_outshot_stats.ties_outshot,
+            team_outshoot_outshot_stats.wins_even_shots,
+            team_outshoot_outshot_stats.wins_outshoot,
+            team_outshoot_outshot_stats.wins_outshot
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_outshoot_outshot_stats table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_outshoot_outshot (
+                team_id, year, losses_even_shots, losses_outshoot, losses_outshot, net_shots_per_game, ot_losses_even_shots, 
+                ot_losses_outshoot, ot_losses_outshot, shots_against_per_game, shots_for_per_game, ties_even_shots, 
+                ties_outshoot, ties_outshot, wins_even_shots, wins_outshoot, wins_outshot
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_outshoot_outshot_stats table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_outshoot_outshot SET
+                losses_even_shots = %s,
+                losses_outshoot = %s,
+                losses_outshot = %s,
+                net_shots_per_game = %s,
+                ot_losses_even_shots = %s,
+                ot_losses_outshoot = %s,
+                ot_losses_outshot = %s,
+                shots_against_per_game = %s,
+                shots_for_per_game = %s,
+                ties_even_shots = %s,
+                ties_outshoot = %s,
+                ties_outshot = %s,
+                wins_even_shots = %s,
+                wins_outshoot = %s,
+                wins_outshot = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_outshoot_outshot_stats entry exists in the team_outshoot_outshot_stats table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_outshoot_outshot WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsMiscApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsMisc object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsMisc object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "blockedShots": "blocked_shots",
+            "emptyNetGoals": "empty_net_goals",
+            "giveaways": "giveaways",
+            "hits": "hits",
+            "missedShots": "missed_shots",
+            "takeaways": "takeaways",
+            "timeOnIcePerGame5v5": "time_on_ice_per_game_5on5"
+        }
+
+    def map(self, source: dict) -> object:
+        team_misc_stats = TeamAdvancedStatsMisc(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_misc_stats, attr_name, value)
+        return team_misc_stats
+    
+class TeamAdvancedStatsMiscDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsMisc objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_misc_stats: TeamAdvancedStatsMisc) -> tuple:
+        """
+        Maps a TeamAdvancedStatsMisc object to a tuple of parameters for database operations.
+
+        Args:
+            team_misc_stats (TeamAdvancedStatsMisc): The TeamAdvancedStatsMisc object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_misc_stats.team_id,
+            team_misc_stats.year,
+            team_misc_stats.blocked_shots,
+            team_misc_stats.empty_net_goals,
+            team_misc_stats.giveaways,
+            team_misc_stats.hits,
+            team_misc_stats.missed_shots,
+            team_misc_stats.takeaways,
+            team_misc_stats.time_on_ice_per_game_5on5
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_misc_stats table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_misc (
+                team_id, year, blocked_shots, empty_net_goals, giveaways, hits, missed_shots, takeaways, time_on_ice_per_game_5v5
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_misc_stats table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_misc SET
+                blocked_shots = %s,
+                empty_net_goals = %s,
+                giveaways = %s,
+                hits = %s,
+                missed_shots = %s,
+                takeaways = %s,
+                time_on_ice_per_game_5v5 = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_misc_stats entry exists in the team_misc_stats table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_misc WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsLeadingTrailingApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsLeadingTrailing object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsLeadingTrailing object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "lossLeadPeriod1": "loss_lead_period_1",
+            "lossLeadPeriod2": "loss_lead_period_2",
+            "lossTrailPeriod1": "loss_trail_period_1",
+            "lossTrailPeriod2": "loss_trail_period_2",
+            "otLossLeadPeriod1": "ot_loss_lead_period_1",
+            "otLossLeadPeriod2": "ot_loss_lead_period_2",
+            "otLossTrailPeriod1": "ot_loss_trail_period_1",
+            "otLossTrailPeriod2": "ot_loss_trail_period_2",
+            "period1GoalsAgainst": "period_1_goals_against",
+            "period1GoalsFor": "period_1_goals_for",
+            "period2GoalsAgainst": "period_2_goals_against",
+            "period2GoalsFor": "period_2_goals_for",
+            "tiesLeadPeriod1": "ties_lead_period_1",
+            "tiesLeadPeriod2": "ties_lead_period_2",
+            "tiesTrailPeriod1": "ties_trail_period_1",
+            "tiesTrailPeriod2": "ties_trail_period_2",
+            "winPctLeadPeriod1": "win_percent_lead_period_1",
+            "winPctLeadPeriod2": "win_percent_lead_period_2",
+            "winPctTrailPeriod1": "win_percent_trail_period_1",
+            "winPctTrailPeriod2": "win_percent_trail_period_2",
+            "winsLeadPeriod1": "wins_lead_period_1",
+            "winsLeadPeriod2": "wins_lead_period_2",
+            "winsTrailPeriod1": "wins_trail_period_1",
+            "winsTrailPeriod2": "wins_trail_period_2"
+        }
+
+    def map(self, source: dict) -> object:
+        team_leading_trailing_stats = TeamAdvancedStatsLeadingTrailing(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_leading_trailing_stats, attr_name, value)
+        return team_leading_trailing_stats
+    
+class TeamAdvancedStatsLeadingTrailingDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsLeadingTrailing objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_leading_trailing_stats: TeamAdvancedStatsLeadingTrailing) -> tuple:
+        """
+        Maps a TeamAdvancedStatsLeadingTrailing object to a tuple of parameters for database operations.
+
+        Args:
+            team_leading_trailing_stats (TeamAdvancedStatsLeadingTrailing): The TeamAdvancedStatsLeadingTrailing object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_leading_trailing_stats.team_id,
+            team_leading_trailing_stats.year,
+            team_leading_trailing_stats.loss_lead_period_1,
+            team_leading_trailing_stats.loss_lead_period_2,
+            team_leading_trailing_stats.loss_trail_period_1,
+            team_leading_trailing_stats.loss_trail_period_2,
+            team_leading_trailing_stats.ot_loss_lead_period_1,
+            team_leading_trailing_stats.ot_loss_lead_period_2,
+            team_leading_trailing_stats.ot_loss_trail_period_1,
+            team_leading_trailing_stats.ot_loss_trail_period_2,
+            team_leading_trailing_stats.period_1_goals_against,
+            team_leading_trailing_stats.period_1_goals_for,
+            team_leading_trailing_stats.period_2_goals_against,
+            team_leading_trailing_stats.period_2_goals_for,
+            team_leading_trailing_stats.ties_lead_period_1,
+            team_leading_trailing_stats.ties_lead_period_2,
+            team_leading_trailing_stats.ties_trail_period_1,
+            team_leading_trailing_stats.ties_trail_period_2,
+            team_leading_trailing_stats.win_percent_lead_period_1,
+            team_leading_trailing_stats.win_percent_lead_period_2,
+            team_leading_trailing_stats.win_percent_trail_period_1,
+            team_leading_trailing_stats.win_percent_trail_period_2,
+            team_leading_trailing_stats.wins_lead_period_1,
+            team_leading_trailing_stats.wins_lead_period_2,
+            team_leading_trailing_stats.wins_trail_period_1,
+            team_leading_trailing_stats.wins_trail_period_2
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_leading_trailing_stats table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_leading_trailing (
+                team_id, year, loss_lead_period_1, loss_lead_period_2, loss_trail_period_1, loss_trail_period_2,
+                ot_loss_lead_period_1, ot_loss_lead_period_2, ot_loss_trail_period_1, ot_loss_trail_period_2,
+                period_1_goals_against, period_1_goals_for, period_2_goals_against, period_2_goals_for,
+                ties_lead_period_1, ties_lead_period_2, ties_trail_period_1, ties_trail_period_2,
+                win_percent_lead_period_1, win_percent_lead_period_2, win_percent_trail_period_1,
+                win_percent_trail_period_2, wins_lead_period_1, wins_lead_period_2, wins_trail_period_1,
+                wins_trail_period_2
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_leading_trailing_stats table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_leading_trailing SET
+                loss_lead_period_1 = %s,
+                loss_lead_period_2 = %s,
+                loss_trail_period_1 = %s,
+                loss_trail_period_2 = %s,
+                ot_loss_lead_period_1 = %s,
+                ot_loss_lead_period_2 = %s,
+                ot_loss_trail_period_1 = %s,
+                ot_loss_trail_period_2 = %s,
+                period_1_goals_against = %s,
+                period_1_goals_for = %s,
+                period_2_goals_against = %s,
+                period_2_goals_for = %s,
+                ties_lead_period_1 = %s,
+                ties_lead_period_2 = %s,
+                ties_trail_period_1 = %s,
+                ties_trail_period_2 = %s,
+                win_percent_lead_period_1 = %s,
+                win_percent_lead_period_2 = %s,
+                win_percent_trail_period_1 = %s,
+                win_percent_trail_period_2 = %s,
+                wins_lead_period_1 = %s,
+                wins_lead_period_2 = %s,
+                wins_trail_period_1 = %s,
+                wins_trail_period_2 = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_leading_trailing_stats entry exists in the team_leading_trailing_stats table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_leading_trailing WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsGoalsByStrengthApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsGoalsByStrength object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsGoalsByStrength object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "goalsFor3On3": "goals_for_3on3",
+            "goalsFor3On4": "goals_for_3on4",
+            "goalsFor3On5": "goals_for_3on5",
+            "goalsFor3On6": "goals_for_3on6",
+            "goalsFor4On3": "goals_for_4on3",
+            "goalsFor4On4": "goals_for_4on4",
+            "goalsFor4On5": "goals_for_4on5",
+            "goalsFor4On6": "goals_for_4on6",
+            "goalsFor5On3": "goals_for_5on3",
+            "goalsFor5On4": "goals_for_5on4",
+            "goalsFor5On5": "goals_for_5on5",
+            "goalsFor5On6": "goals_for_5on6",
+            "goalsFor6On3": "goals_for_6on3",
+            "goalsFor6On4": "goals_for_6on4",
+            "goalsFor6On5": "goals_for_6on5",
+            "goalsForPenaltyShots": "goals_for_penalty_shots"
+        }
+
+    def map(self, source: dict) -> object:
+        team_goals_by_strength = TeamAdvancedStatsGoalsByStrength(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_goals_by_strength, attr_name, value)
+        return team_goals_by_strength
+    
+class TeamAdvancedStatsGoalsByStrengthDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsGoalsByStrength objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_goals_by_strength: TeamAdvancedStatsGoalsByStrength) -> tuple:
+        """
+        Maps a TeamAdvancedStatsGoalsByStrength object to a tuple of parameters for database operations.
+
+        Args:
+            team_goals_by_strength (TeamAdvancedStatsGoalsByStrength): The TeamAdvancedStatsGoalsByStrength object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_goals_by_strength.team_id,
+            team_goals_by_strength.year,
+            team_goals_by_strength.goals_for_3on3,
+            team_goals_by_strength.goals_for_3on4,
+            team_goals_by_strength.goals_for_3on5,
+            team_goals_by_strength.goals_for_3on6,
+            team_goals_by_strength.goals_for_4on3,
+            team_goals_by_strength.goals_for_4on4,
+            team_goals_by_strength.goals_for_4on5,
+            team_goals_by_strength.goals_for_4on6,
+            team_goals_by_strength.goals_for_5on3,
+            team_goals_by_strength.goals_for_5on4,
+            team_goals_by_strength.goals_for_5on5,
+            team_goals_by_strength.goals_for_5on6,
+            team_goals_by_strength.goals_for_6on3,
+            team_goals_by_strength.goals_for_6on4,
+            team_goals_by_strength.goals_for_6on5,
+            team_goals_by_strength.goals_for_penalty_shots
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_goals_by_strength table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_goals_by_strength (
+                team_id, year, goals_for_3on3, goals_for_3on4, goals_for_3on5, goals_for_3on6, goals_for_4on3,
+                goals_for_4on4, goals_for_4on5, goals_for_4on6, goals_for_5on3, goals_for_5on4, goals_for_5on5,
+                goals_for_5on6, goals_for_6on3, goals_for_6on4, goals_for_6on5, goals_for_penalty_shots
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_goals_by_strength table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_goals_by_strength SET
+                goals_for_3on3 = %s,
+                goals_for_3on4 = %s,
+                goals_for_3on5 = %s,
+                goals_for_3on6 = %s,
+                goals_for_4on3 = %s,
+                goals_for_4on4 = %s,
+                goals_for_4on5 = %s,
+                goals_for_4on6 = %s,
+                goals_for_5on3 = %s,
+                goals_for_5on4 = %s,
+                goals_for_5on5 = %s,
+                goals_for_5on6 = %s,
+                goals_for_6on3 = %s,
+                goals_for_6on4 = %s,
+                goals_for_6on5 = %s,
+                goals_for_penalty_shots = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_goals_by_strength entry exists in the team_goals_by_strength table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_goals_by_strength WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsGoalsByPeriodApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsGoalsByPeriod object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsGoalsByPeriod object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "evGoalsFor": "ev_goals_for",
+            "period1GoalsAgainst": "period_1_goals_against",
+            "period1GoalsFor": "period_1_goals_for",
+            "period2GoalsAgainst": "period_2_goals_against",
+            "period2GoalsFor": "period_2_goals_for",
+            "period3GoalsAgainst": "period_3_goals_against",
+            "period3GoalsFor": "period_3_goals_for",
+            "periodOtGoalsAgainst": "period_ot_goals_against",
+            "periodOtGoalsFor": "period_ot_goals_for",
+            "ppGoalsFor": "pp_goals_for",
+            "shGoalsFor": "pk_goals_for"
+        }
+
+    def map(self, source: dict) -> object:
+        team_goals_by_period = TeamAdvancedStatsGoalsByPeriod(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_goals_by_period, attr_name, value)
+        return team_goals_by_period
+    
+class TeamAdvancedStatsGoalsByPeriodDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsGoalsByPeriod objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_goals_by_period: TeamAdvancedStatsGoalsByPeriod) -> tuple:
+        """
+        Maps a TeamAdvancedStatsGoalsByPeriod object to a tuple of parameters for database operations.
+
+        Args:
+            team_goals_by_period (TeamAdvancedStatsGoalsByPeriod): The TeamAdvancedStatsGoalsByPeriod object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_goals_by_period.team_id,
+            team_goals_by_period.year,
+            team_goals_by_period.ev_goals_for,
+            team_goals_by_period.period_1_goals_against,
+            team_goals_by_period.period_1_goals_for,
+            team_goals_by_period.period_2_goals_against,
+            team_goals_by_period.period_2_goals_for,
+            team_goals_by_period.period_3_goals_against,
+            team_goals_by_period.period_3_goals_for,
+            team_goals_by_period.period_ot_goals_against,
+            team_goals_by_period.period_ot_goals_for,
+            team_goals_by_period.pp_goals_for,
+            team_goals_by_period.pk_goals_for
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_goals_by_period table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_goals_by_period (
+                team_id, year, ev_goals_for, period_1_goals_against, period_1_goals_for, 
+                period_2_goals_against, period_2_goals_for, period_3_goals_against, 
+                period_3_goals_for, period_ot_goals_against, period_ot_goals_for, 
+                pp_goals_for, pk_goals_for
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_goals_by_period table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_goals_by_period SET
+                ev_goals_for = %s,
+                period_1_goals_against = %s,
+                period_1_goals_for = %s,
+                period_2_goals_against = %s,
+                period_2_goals_for = %s,
+                period_3_goals_against = %s,
+                period_3_goals_for = %s,
+                period_ot_goals_against = %s,
+                period_ot_goals_for = %s,
+                pp_goals_for = %s,
+                pk_goals_for = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_goals_by_period entry exists in the team_goals_by_period table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_goals_by_period WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsFaceoffPercentApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsFaceoffPercent object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsFaceoffPercent object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "defensiveZoneFaceoffPct": "defensive_zone_faceoff_percent",
+            "defensiveZoneFaceoffs": "defensive_zone_faceoffs",
+            "evFaceoffPct": "ev_faceoff_percent",
+            "evFaceoffs": "ev_faceoffs",
+            "faceoffWinPct": "faceoff_win_percent",
+            "neutralZoneFaceoffPct": "neutral_zone_faceoff_percent",
+            "neutralZoneFaceoffs": "neutral_zone_faceoffs",
+            "offensiveZoneFaceoffPct": "offensive_zone_faceoff_percent",
+            "offensiveZoneFaceoffs": "offensive_zone_faceoffs",
+            "ppFaceoffPct": "pp_faceoff_percent",
+            "ppFaceoffs": "pp_faceoffs",
+            "shFaceoffPct": "pk_faceoff_percent",
+            "shFaceoffs": "pk_faceoffs",
+            "totalFaceoffs": "total_faceoffs"
+        }
+
+    def map(self, source: dict) -> object:
+        team_faceoff_percent = TeamAdvancedStatsFaceoffPercent(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_faceoff_percent, attr_name, value)
+        return team_faceoff_percent
+    
+class TeamAdvancedStatsFaceoffPercentDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsFaceoffPercent objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_faceoff_percent: TeamAdvancedStatsFaceoffPercent) -> tuple:
+        """
+        Maps a TeamAdvancedStatsFaceoffPercent object to a tuple of parameters for database operations.
+
+        Args:
+            team_faceoff_percent (TeamAdvancedStatsFaceoffPercent): The TeamAdvancedStatsFaceoffPercent object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_faceoff_percent.team_id,
+            team_faceoff_percent.year,
+            team_faceoff_percent.defensive_zone_faceoff_percent,
+            team_faceoff_percent.defensive_zone_faceoffs,
+            team_faceoff_percent.ev_faceoff_percent,
+            team_faceoff_percent.ev_faceoffs,
+            team_faceoff_percent.faceoff_win_percent,
+            team_faceoff_percent.neutral_zone_faceoff_percent,
+            team_faceoff_percent.neutral_zone_faceoffs,
+            team_faceoff_percent.offensive_zone_faceoff_percent,
+            team_faceoff_percent.offensive_zone_faceoffs,
+            team_faceoff_percent.pp_faceoff_percent,
+            team_faceoff_percent.pp_faceoffs,
+            team_faceoff_percent.pk_faceoff_percent,
+            team_faceoff_percent.pk_faceoffs,
+            team_faceoff_percent.total_faceoffs
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_faceoff_percent table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_faceoff_percent (
+                team_id, year, defensive_zone_faceoff_percent, defensive_zone_faceoffs, ev_faceoff_percent,
+                ev_faceoffs, faceoff_win_percent, neutral_zone_faceoff_percent, neutral_zone_faceoffs,
+                offensive_zone_faceoff_percent, offensive_zone_faceoffs, pp_faceoff_percent, pp_faceoffs,
+                pk_faceoff_percent, pk_faceoffs, total_faceoffs
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_faceoff_percent table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_faceoff_percent SET
+                defensive_zone_faceoff_percent = %s,
+                defensive_zone_faceoffs = %s,
+                ev_faceoff_percent = %s,
+                ev_faceoffs = %s,
+                faceoff_win_percent = %s,
+                neutral_zone_faceoff_percent = %s,
+                neutral_zone_faceoffs = %s,
+                offensive_zone_faceoff_percent = %s,
+                offensive_zone_faceoffs = %s,
+                pp_faceoff_percent = %s,
+                pp_faceoffs = %s,
+                pk_faceoff_percent = %s,
+                pk_faceoffs = %s,
+                total_faceoffs = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_faceoff_percent entry exists in the team_faceoff_percent table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_faceoff_percent WHERE team_id = %s AND year = %s"
+    
+class TeamAdvancedStatsDaysRestApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsDaysRest object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsDaysRest object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "daysRest": "days_rest",
+            "gamesPlayed": "games_played",
+            "faceoffWinPct": "faceoff_percent",
+            "goalsAgainstPerGame": "goals_against_per_game",
+            "goalsForPerGame": "goals_for_per_game",
+            "losses": "losses",
+            "netGoalsPerGame": "net_goals_per_game",
+            "otLosses": "ot_losses",
+            "penaltyKillPct": "penalty_kill_percent",
+            "pointPct": "point_percent",
+            "points": "points",
+            "powerPlayPct": "power_play_percent",
+            "ppOpportunitiesPerGame": "power_play_opportunities_per_game",
+            "shotDifferentialPerGame": "shot_differential_per_game",
+            "shotsAgainstPerGame": "shots_against_per_game",
+            "shotsForPerGame": "shots_for_per_game",
+            "ties": "ties",
+            "timesShorthandedPerGame": "times_shorthanded_per_game",
+            "wins": "wins"
+        }
+
+    def map(self, source: dict) -> object:
+        team_days_rest = TeamAdvancedStatsDaysRest(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_days_rest, attr_name, value)
+        return team_days_rest
+    
+class TeamAdvancedStatsDaysRestDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsDaysRest objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_days_rest: TeamAdvancedStatsDaysRest) -> tuple:
+        """
+        Maps a TeamAdvancedStatsDaysRest object to a tuple of parameters for database operations.
+
+        Args:
+            team_days_rest (TeamAdvancedStatsDaysRest): The TeamAdvancedStatsDaysRest object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_days_rest.team_id,
+            team_days_rest.year,
+            team_days_rest.days_rest,
+            team_days_rest.games_played,
+            team_days_rest.faceoff_percent,
+            team_days_rest.goals_against_per_game,
+            team_days_rest.goals_for_per_game,
+            team_days_rest.losses,
+            team_days_rest.net_goals_per_game,
+            team_days_rest.ot_losses,
+            team_days_rest.penalty_kill_percent,
+            team_days_rest.point_percent,
+            team_days_rest.points,
+            team_days_rest.power_play_percent,
+            team_days_rest.power_play_opportunities_per_game,
+            team_days_rest.shot_differential_per_game,
+            team_days_rest.shots_against_per_game,
+            team_days_rest.shots_for_per_game,
+            team_days_rest.ties,
+            team_days_rest.times_shorthanded_per_game,
+            team_days_rest.wins
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_days_rest table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_days_rest (
+                team_id, year, days_rest, games_played, faceoff_percent, goals_against_per_game, goals_for_per_game, 
+                losses, net_goals_per_game, ot_losses, penalty_kill_percent, point_percent, points, power_play_percent, 
+                power_play_opportunities_per_game, shot_differential_per_game, shots_against_per_game, shots_for_per_game, 
+                ties, times_shorthanded_per_game, wins
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_days_rest table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_days_rest SET
+                games_played = %s,
+                faceoff_percent = %s,
+                goals_against_per_game = %s,
+                goals_for_per_game = %s,
+                losses = %s,
+                net_goals_per_game = %s,
+                ot_losses = %s,
+                penalty_kill_percent = %s,
+                point_percent = %s,
+                points = %s,
+                power_play_percent = %s,
+                power_play_opportunities_per_game = %s,
+                shot_differential_per_game = %s,
+                shots_against_per_game = %s,
+                shots_for_per_game = %s,
+                ties = %s,
+                times_shorthanded_per_game = %s,
+                wins = %s
+            WHERE team_id = %s AND year = %s AND days_rest = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_days_rest entry exists in the team_days_rest table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_days_rest WHERE team_id = %s AND year = %s AND days_rest = %s"
+    
+class TeamAdvancedStatsCorsiFenwickApiMapper(ApiMapper):
+    """
+    Maps data between a dictionary and a TeamAdvancedStatsCorsiFenwick object.
+
+    Attributes:
+        field_map (dict): A mapping of JSON keys to attribute names in the TeamAdvancedStatsCorsiFenwick object.
+    """
+
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {
+            "teamId": "team_id",
+            "seasonId": "year",
+            "gamesPlayed": "games_played",
+            "satAgainst": "corsi_against",
+            "satAhead": "corsi_ahead",
+            "satBehind": "corsi_behind",
+            "satClose": "corsi_close",
+            "satFor": "corsi_for",
+            "satTied": "corsi_tied",
+            "satTotal": "corsi_total",
+            "usatAgainst": "fenwick_against",
+            "usatAhead": "fenwick_ahead",
+            "usatBehind": "fenwick_behind",
+            "usatClose": "fenwick_close",
+            "usatFor": "fenwick_for",
+            "usatRelative": "fenwick_relative",
+            "usatTied": "fenwick_tied",
+            "usatTotal": "fenwick_total",
+            "satPct": "corsi_percent",
+            "satPctAhead": "corsi_ahead_percent",
+            "satPctBehind": "corsi_behind_percent",
+            "satPctClose": "corsi_close_percent",
+            "satPctTied": "corsi_tied_percent",
+            "satRelative": "corsi_relative",
+            "shootingPct5v5": "shooting_percent_5on5",
+            "savePct5v5": "save_percent_5on5",
+            "shootingPlusSavePct5v5": "shooting_plus_save_percent_5on5",
+            "usatPctTied": "fenwick_tied_percent",
+            "usatPctAhead": "fenwick_ahead_percent",
+            "usatPctBehind": "fenwick_behind_percent",
+            "usatPctClose": "fenwick_close_percent",
+            "zoneStartPct5v5": "zone_start_5on5_percent",
+            "usatPct": "fenwick_percent"
+        }
+
+    def map(self, source: dict) -> object:
+        team_corsi_fenwick = TeamAdvancedStatsCorsiFenwick(self.data_parser.parse(source, "teamId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(team_corsi_fenwick, attr_name, value)
+        return team_corsi_fenwick
+    
+class TeamAdvancedStatsCorsiFenwickDatabaseMapper:
+    """
+    Maps TeamAdvancedStatsCorsiFenwick objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(team_corsi_fenwick: TeamAdvancedStatsCorsiFenwick) -> tuple:
+        """
+        Maps a TeamAdvancedStatsCorsiFenwick object to a tuple of parameters for database operations.
+
+        Args:
+            team_corsi_fenwick (TeamAdvancedStatsCorsiFenwick): The TeamAdvancedStatsCorsiFenwick object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            team_corsi_fenwick.team_id,
+            team_corsi_fenwick.year,
+            team_corsi_fenwick.games_played,
+            team_corsi_fenwick.corsi_against,
+            team_corsi_fenwick.corsi_ahead,
+            team_corsi_fenwick.corsi_behind,
+            team_corsi_fenwick.corsi_close,
+            team_corsi_fenwick.corsi_for,
+            team_corsi_fenwick.corsi_tied,
+            team_corsi_fenwick.corsi_total,
+            team_corsi_fenwick.fenwick_against,
+            team_corsi_fenwick.fenwick_ahead,
+            team_corsi_fenwick.fenwick_behind,
+            team_corsi_fenwick.fenwick_close,
+            team_corsi_fenwick.fenwick_for,
+            team_corsi_fenwick.fenwick_relative,
+            team_corsi_fenwick.fenwick_tied,
+            team_corsi_fenwick.fenwick_total,
+            team_corsi_fenwick.corsi_percent,
+            team_corsi_fenwick.corsi_ahead_percent,
+            team_corsi_fenwick.corsi_behind_percent,
+            team_corsi_fenwick.corsi_close_percent,
+            team_corsi_fenwick.corsi_tied_percent,
+            team_corsi_fenwick.corsi_relative,
+            team_corsi_fenwick.shooting_percent_5on5,
+            team_corsi_fenwick.save_percent_5on5,
+            team_corsi_fenwick.shooting_plus_save_percent_5on5,
+            team_corsi_fenwick.fenwick_tied_percent,
+            team_corsi_fenwick.fenwick_ahead_percent,
+            team_corsi_fenwick.fenwick_behind_percent,
+            team_corsi_fenwick.fenwick_close_percent,
+            team_corsi_fenwick.zone_start_5on5_percent,
+            team_corsi_fenwick.fenwick_percent
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the team_corsi_fenwick table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO team_advanced_stats_corsi_fenwick (
+                team_id, year, games_played, corsi_against, corsi_ahead, corsi_behind, corsi_close, corsi_for,
+                corsi_tied, corsi_total, fenwick_against, fenwick_ahead, fenwick_behind, fenwick_close,
+                fenwick_for, fenwick_relative, fenwick_tied, fenwick_total, corsi_percent, corsi_ahead_percent,
+                corsi_behind_percent, corsi_close_percent, corsi_tied_percent, corsi_relative, shooting_percent_5on5,
+                save_percent_5on5, shooting_plus_save_percent_5on5, fenwick_tied_percent, fenwick_ahead_percent,
+                fenwick_behind_percent, fenwick_close_percent, zone_start_5on5_percent, fenwick_percent
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the team_corsi_fenwick table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE team_advanced_stats_corsi_fenwick SET
+                games_played = %s,
+                corsi_against = %s,
+                corsi_ahead = %s,
+                corsi_behind = %s,
+                corsi_close = %s,
+                corsi_for = %s,
+                corsi_tied = %s,
+                corsi_total = %s,
+                fenwick_against = %s,
+                fenwick_ahead = %s,
+                fenwick_behind = %s,
+                fenwick_close = %s,
+                fenwick_for = %s,
+                fenwick_relative = %s,
+                fenwick_tied = %s,
+                fenwick_total = %s,
+                corsi_percent = %s,
+                corsi_ahead_percent = %s,
+                corsi_behind_percent = %s,
+                corsi_close_percent = %s,
+                corsi_tied_percent = %s,
+                corsi_relative = %s,
+                shooting_percent_5on5 = %s,
+                save_percent_5on5 = %s,
+                shooting_plus_save_percent_5on5 = %s,
+                fenwick_tied_percent = %s,
+                fenwick_ahead_percent = %s,
+                fenwick_behind_percent = %s,
+                fenwick_close_percent = %s,
+                zone_start_5on5_percent = %s,
+                fenwick_percent = %s
+            WHERE team_id = %s AND year = %s
+        """
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a team_corsi_fenwick entry exists in the team_corsi_fenwick table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM team_advanced_stats_corsi_fenwick WHERE team_id = %s AND year = %s"
