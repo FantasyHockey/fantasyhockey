@@ -1661,7 +1661,6 @@ class SkaterAdvancedStatsScoring:
     def shots_wrist(self, value):
         self._shots_wrist = value
 
-
 class SkaterAdvancedStatsShootout:
 
     def __init__(self, player_id):

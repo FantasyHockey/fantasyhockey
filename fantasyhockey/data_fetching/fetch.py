@@ -205,6 +205,9 @@ class FetchTeams(DataFetcher):
             try:
                 team_abbrev = self._data_parser.double_parse(team, "teamAbbrev", "default", "none")
                 team_id = self.__find_team_id(team_abbrev)
+                if team_id is None:
+                    print(f"Team ID not found for team abbreviation: {team_abbrev}")
+                    continue
                 team["teamId"] = team_id
 
                 team_obj = Team(team_id)
@@ -215,6 +218,12 @@ class FetchTeams(DataFetcher):
         
             except ValueError as e:
                 print(f"Error: ", e)
+
+        # Add a null team object
+        null_team_obj = Team(0)
+        null_team_obj.team_data = TeamData(0)
+        null_team_obj.team_data.year = 20232024
+        self._data.append(null_team_obj)
 
     def _process_data(self, year):
         season_end = self._find_season_end(year)
@@ -365,4 +374,148 @@ class FetchTeamAdvancedStats(DataFetcher):
     
     def _process_data(self, data):
         pass
+
+class FetchPlayers(DataFetcher):
+    def __init__(self):
+        super().__init__()
+        self.__player_ids = set()  # Use a set to ensure uniqueness
+
+    def _get_items(self):
+        for team in self._fetch_team_ids():
+            self.__fetch_players_for_team(team[0], team[1])
+
+    def _get_data_by_item(self):
+        count = 0
+        player_ids = list(self.__player_ids)  # Convert set to list
+        for player_id in player_ids:
+            count += 1
+            print(f"Fetching player {player_id} - {count} of {len(player_ids)}")
+            json = self._api_connector.get_json(f"https://api-web.nhle.com/v1/player/{player_id}/landing")
+            player = Player(player_id)
+            if "currentTeamId" not in json:
+                team_id = None
+            else:
+                team_id = self._data_parser.parse(json, "currentTeamId", "error")
+            player.team_id = team_id
+            is_active = self._data_parser.parse(json, "isActive", "error")
+            player.is_active = is_active
+
+            player_details = self._serializer.deserialize(json, PlayerDetails)
+            player.player_details = player_details
+
+            player_draft_json = self._data_parser.parse(json, "draftDetails", "empty_dict")
+            player_draft_json["playerId"] = player_id
+            player_draft = self._serializer.deserialize(player_draft_json, PlayerDraft)
+            player.player_draft = player_draft
+
+            player_awards = self._data_parser.parse(json, "awards", "empty_list")
+            player_awards_list = self._parse_awards(player_awards, player_id)
+            player_awards_list = [self._serializer.deserialize(award, PlayerAwards) for award in player_awards_list]
+            player.player_awards = player_awards_list
+
+            self._data.append(player)
+            
+    def _parse_awards(self, player_awards, player_id):
+        player_awards_list = []
+
+        for award in player_awards:
+            for season in self._data_parser.parse(award, "seasons", "empty_list"):
+                award_json = {}
+                award_json["playerId"] = player_id
+                award_json["trophy"] = self._data_parser.double_parse(award, "trophy", "default")
+                award_json["seasonId"] = self._data_parser.parse(season, "seasonId")
+                player_awards_list.append(award_json)
+
+        return player_awards_list
     
+    def _process_data(self, data):
+        pass
+
+    def _fetch_team_ids(self):
+        query = "SELECT team_abbreviation, year FROM teams;"
+        res = self._database_operator.read(query)
+        teams = []
+        for row in res:
+            teams.append([row[0], row[1]])
+        
+        return teams
+    
+    def __fetch_players_for_team(self, team_abbrev, year):
+        """Fetch players for a given team."""
+        players = self._api_connector.get_json(f"https://api-web.nhle.com/v1/roster/{team_abbrev}/{year}")
+
+        try:
+            forwards = self._data_parser.parse(players, "forwards", "empty_list")
+            for player in forwards:
+                try:
+                    self.__player_ids.add(self._data_parser.parse(player, "id", "error"))
+                except KeyError:
+                    print("Error parsing a player id from the forwards from team id: ", team_abbrev, " year: ", year)
+                    continue
+
+            defensemen = self._data_parser.parse(players, "defensemen", "empty_list")
+            for player in defensemen:
+                try:
+                    self.__player_ids.add(self._data_parser.parse(player, "id", "error"))
+                except KeyError:
+                    print("Error parsing a player id from the defensemen from team id: ", team_abbrev, " year: ", year)
+                    continue
+
+            goalies = self._data_parser.parse(players, "goalies", "empty_list")
+            for player in goalies:
+                try:
+                    self.__player_ids.add(self._data_parser.parse(player, "id", "error"))
+                except KeyError:
+                    print("Error parsing a player id from the goalies from team id: ", team_abbrev, " year: ", year)
+                    continue
+        except KeyError:
+            print("Error parsing players from team id: ", team_abbrev, " year: ", year)
+            return
+        
+class FetchSkaters(DataFetcher):
+    def __init__(self):
+        super().__init__()
+
+    def _get_items(self):
+        for player_id in self._get_player_ids():
+            json = self._api_connector.get_json(f"https://api-web.nhle.com/v1/player/{player_id}/landing")
+            if self._data_parser.parse(json, "position") != "G":
+                self._items.append(player_id)
+
+    def _get_data_by_item(self):
+        for skater_id in self._items:
+            skater = Skater(skater_id)
+            skater_stats = self._data_parser(self._api_connector.get_json(f"https://api-web.nhle.com/v1/player/{skater_id}/landing"), "seasonsTotals", "empty_list")
+            nhl_seasons, youth_seasons = self._parse_skater_stats(skater_stats)
+            skater.skater_stats = nhl_seasons
+            skater.youth_stats = youth_seasons
+
+            skater
+
+    def _process_data(self, data):
+        pass
+
+    def _get_player_ids(self):
+        query = "SELECT id FROM players;"
+        res = self._database_operator.read(query)
+        ids = []
+        for row in res:
+            ids.append(row[0])
+
+        return list(set(ids))
+    
+    def _parse_skater_stats(self, skater_stats):
+        stat_seasons = []
+        youth_seasons = []
+
+        for season in skater_stats:
+            if season["leagueAbbrev"] != "NHL":
+                youth_season = self._serializer.deserialize(season, YouthSkaterStats)
+                youth_seasons.append(youth_season)
+            else:
+                nhl_season = self._serializer.deserialize(season, SkaterStats)
+                stat_seasons.append(nhl_season)
+
+        return stat_seasons, youth_seasons
+
+

@@ -102,11 +102,11 @@ class ApiMapperFactory:
         elif obj_type == SkaterAdvancedStatsTOI:
             return SkaterAdvancedStatsTOIApiMapper()
         elif obj_type == PlayerAwards:
-            return PlayerAwardsApiMapper()
+            return PlayerAwardsApiMapper(data_parser)
         elif obj_type == PlayerDetails:
-            return PlayerDetailsApiMapper()
+            return PlayerDetailsApiMapper(data_parser)
         elif obj_type == PlayerDraft:
-            return PlayerDraftApiMapper()
+            return PlayerDraftApiMapper(data_parser, util)
         elif obj_type == TeamStats:
             return TeamStatsApiMapper(data_parser, util)
         elif obj_type == TeamData:
@@ -1331,7 +1331,6 @@ class SkaterYouthStatsDatabaseMapper:
         @staticmethod
         def create_check_existence_query() -> str:
             return "SELECT 1 FROM goalie_youth_stats WHERE id = %s AND year = %s AND team_name = %s AND league_name = %s AND game_type_id = %s AND sequence = %s"
-
 
 class SkaterAdvancedStatsCorsiFenwickApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
@@ -2600,6 +2599,69 @@ class SkaterAdvancedStatsTOIDatabaseMapper:
         return "SELECT 1 FROM skater_advanced_stats_toi WHERE id = %s AND year = %s"
     
 # Make sure the json given here is with the player_id added and for a single award.
+
+class PlayersDatabaseMapper:
+    """
+    Maps Player objects to database rows and vice versa.
+    """
+
+    @staticmethod
+    def to_database_params(player: Player) -> tuple:
+        """
+        Maps a Player object to a tuple of parameters for database operations.
+
+        Args:
+            player (Player): The Player object to be mapped.
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        return (
+            player.player_id,
+            player.team_id,
+            player.is_active
+        )
+
+    @staticmethod
+    def create_insert_query() -> str:
+        """
+        Creates an insert query for the players table.
+
+        Returns:
+            str: The insert query string.
+        """
+        return """
+            INSERT INTO players (
+                id, team_id, is_active
+            ) VALUES (%s, %s, %s)
+        """
+    
+    @staticmethod
+    def create_update_query() -> str:
+        """
+        Creates an update query for the players table.
+
+        Returns:
+            str: The update query string.
+        """
+        return """
+            UPDATE players SET
+                team_id = %s,
+                is_active = %s
+            WHERE id = %s
+        """
+    
+    @staticmethod
+    def create_check_existence_query() -> str:
+        """
+        Creates a query to check if a player exists in the players table.
+
+        Returns:
+            str: The existence check query string.
+        """
+        return "SELECT 1 FROM players WHERE id = %s"
+
+
 class PlayerAwardsApiMapper(ApiMapper):
     """
     Maps data between a dictionary and a PlayerAwards object.
@@ -2620,8 +2682,6 @@ class PlayerAwardsApiMapper(ApiMapper):
         player_awards = PlayerAwards(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
-            if attr_name == "award":
-                value = self.data_parser.double_parse(source, "trophy", "default", "none")
             setattr(player_awards, attr_name, value)
         return player_awards
     
@@ -2656,7 +2716,7 @@ class PlayerAwardsDatabaseMapper:
             str: The insert query string.
         """
         return """
-            INSERT INTO player_awards (id, award, year) VALUES (%s, %s, %s)
+            INSERT INTO player_awards (id, award_name, year) VALUES (%s, %s, %s)
         """
 
     @staticmethod
@@ -2668,7 +2728,7 @@ class PlayerAwardsDatabaseMapper:
             str: The update query string.
         """
         return """
-            UPDATE player_awards SET award = %s WHERE id = %s AND year = %s
+            UPDATE player_awards SET award_name = %s WHERE id = %s AND year = %s AND award_name = %s
         """
 
     @staticmethod
@@ -2679,7 +2739,7 @@ class PlayerAwardsDatabaseMapper:
         Returns:
             str: The existence check query string.
         """
-        return "SELECT 1 FROM player_awards WHERE id = %s AND year = %s"
+        return "SELECT 1 FROM player_awards WHERE id = %s AND year = %s AND award_name = %s"
     
 class PlayerDetailsApiMapper(ApiMapper):
     """
@@ -2718,9 +2778,9 @@ class PlayerDetailsApiMapper(ApiMapper):
                 value = self.data_parser.double_parse(source, "firstName", "default", "none")
             elif attr_name == "last_name":
                 value = self.data_parser.double_parse(source, "lastName", "default", "none")
-            elif attr_name == "birthCity":
+            elif attr_name == "birth_city":
                 value = self.data_parser.double_parse(source, "birthCity", "default", "none")
-            elif attr_name == "birthStateProvince":
+            elif attr_name == "birth_state_province":
                 value = self.data_parser.double_parse(source, "birthStateProvince", "default", "none")
             setattr(player_details, attr_name, value)
         return player_details
@@ -2908,7 +2968,7 @@ class PlayerDraftDatabaseMapper:
         Returns:
             str: The existence check query string.
         """
-        return "SELECT 1 FROM player_draft WHERE id = %s AND year = %s"
+        return "SELECT 1 FROM player_draft WHERE id = %s"
     
 class TeamStatsApiMapper(ApiMapper):
     """
@@ -3076,8 +3136,6 @@ class TeamStatsDatabaseMapper:
         """
         return """
             UPDATE team_stats SET
-                year = %s,
-                game_type_id = %s,
                 games_played = %s,
                 goals_against = %s,
                 goals_for = %s,
@@ -3122,7 +3180,7 @@ class TeamStatsDatabaseMapper:
                 road_regulation_plus_ot_wins = %s,
                 road_ties = %s,
                 road_wins = %s
-                WHERE team_id = %s AND year = %s
+                WHERE team_id = %s AND year = %s AND game_type_id = %s
                 """
 
     @staticmethod
@@ -3227,7 +3285,6 @@ class TeamDataDatabaseMapper:
         """
         return """
             UPDATE teams SET
-                year = %s,
                 conference_name = %s,
                 division_name = %s,
                 place_name = %s,

@@ -24,16 +24,18 @@ def run():
 
     database_operator = DatabaseOperator()
     #fetch_seasons = FetchSeasons()
-    fetch_team_advanced_stats = FetchTeamAdvancedStats()
+    #fetch_team_advanced_stats = FetchTeamAdvancedStats()
     #fetch_team_advanced_stats._get_items()
 
     #update_seasons = UpdateSeasons(database_operator, fetch_seasons)
     #update_draft_rankings = UpdateDraftRankings(database_operator, fetch_draft_rankings)
-    #fetch_teams = FetchTeams()
-    #update_teams = UpdateTeams(database_operator, fetch_teams)
-    #update_team_stats = UpdateTeamStats(database_operator, fetch_teams)
+    fetch_teams = FetchTeams()
+    update_teams = UpdateTeams(database_operator, fetch_teams)
     #update_team_advanced_stats = UpdateTeamAdvancedStats(database_operator, fetch_team_advanced_stats)
-    updater = CentralUpdater([update_team_advanced_stats])
+
+    #fetch_players = FetchPlayers()
+    #update_players = UpdatePlayers(database_operator, fetch_players)
+    updater = CentralUpdater([update_teams])
     updater.update_all()
 
 

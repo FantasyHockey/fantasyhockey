@@ -172,7 +172,7 @@ class FetchSkaters:
         
     def __get_skater_advanced_stats_corsi_fenwick(self, skater_id) -> list[SkaterAdvancedStatsCorsiFenwick]:
         
-        url_counts = f"https://api.nhle.com/stats/rest/en/skater/summaryshooting?cayenneExp=playerId={skater_id}"
+        url_counts = f" "
         url_percents = f"https://api.nhle.com/stats/rest/en/skater/percentages?cayenneExp=playerId={skater_id}"
         
         data_counts = self.__api_connector.get_json(url_counts)

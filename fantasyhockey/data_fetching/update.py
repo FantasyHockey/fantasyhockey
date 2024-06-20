@@ -274,98 +274,6 @@ class UpdateDraftRankings(AbstractUpdater):
     
 class UpdateTeams(AbstractUpdater):
     """
-    A class to update the team details table in the database.
-    """
-
-    def __init__(self, database_operator: DatabaseOperator, fetch_teams: FetchTeams):
-        """
-        Initializes the UpdateTeams instance.
-        
-        Parameters
-        ----------
-        database_operator : DatabaseOperator
-            An instance of the DatabaseOperator class to interact with the database.
-
-        fetch_teams : FetchTeams
-            An instance of the FetchTeams class to fetch the teams data from the NHL API.
-        """
-        super().__init__(database_operator)
-        self.fetch_teams = fetch_teams
-
-    def fetch_entities(self):
-        """
-        Fetches the teams to be updated.
-        
-        Returns:
-            list: A list of Team objects to be updated.
-        """
-        return self.fetch_teams.get_data()
-
-    def entity_exists(self, team) -> bool:
-        """
-        Checks if a team exists in the team_details table.
-        
-        Parameters
-        ----------
-        team : Team
-            The Team object to check.
-        
-        Returns:
-            bool: True if the team exists, False otherwise.
-        """
-        query = TeamDataDatabaseMapper.create_check_existence_query()
-        result = self.database_operator.read(query, (team.team_data.team_id, team.team_data.year))
-        return bool(result)
-
-    def create_insert_query(self) -> str:
-        """
-        Creates an insert query for the team_details table.
-        
-        Returns:
-            str: The insert query string.
-        """
-        return TeamDataDatabaseMapper.create_insert_query()
-
-    def create_update_query(self) -> str:
-        """
-        Creates an update query for the team_details table.
-        
-        Returns:
-            str: The update query string.
-        """
-        return TeamDataDatabaseMapper.create_update_query()
-
-    def to_database_params(self, team) -> tuple:
-        """
-        Maps a Team object to a tuple of parameters for database operations.
-        
-        Parameters
-        ----------
-        team : Team
-            The Team object to be mapped.
-        
-        Returns:
-            tuple: The tuple of parameters for database operations.
-        """
-        return TeamDataDatabaseMapper.to_database_params(team.team_data)
-
-    def update_in_db(self):
-        """
-        Fetches the data and updates the corresponding table in the database.
-        """
-        teams = self.fetch_entities()
-        for team in teams:
-            if self.entity_exists(team):
-                query = self.create_update_query()
-                params = self.to_database_params(team)
-                self.database_operator.write(query, params[1:] + (params[0], params[1]))
-            else:
-                query = self.create_insert_query()
-                params = self.to_database_params(team)
-                self.database_operator.write(query, params)
-
-class UpdateTeams(AbstractUpdater):
-    """
     A class to update the team details and team stats tables in the database.
     """
 
@@ -478,21 +386,23 @@ class UpdateTeams(AbstractUpdater):
             if self.entity_exists(team, 'team_data'):
                 query = self.create_update_query('team_data')
                 params = self.to_database_params(team, 'team_data')
-                self.database_operator.write(query, params[1:] + (params[0],))
+
+                self.database_operator.write(query, params[2:] + (params[0], params[1]))
             else:
                 query = self.create_insert_query('team_data')
                 params = self.to_database_params(team, 'team_data')
                 self.database_operator.write(query, params)
 
             # Update team stats
-            if self.entity_exists(team, 'team_stats'):
-                query = self.create_update_query('team_stats')
-                params = self.to_database_params(team, 'team_stats')
-                self.database_operator.write(query, params[1:] + (params[0],))
-            else:
-                query = self.create_insert_query('team_stats')
-                params = self.to_database_params(team, 'team_stats')
-                self.database_operator.write(query, params)
+            if team.team_stats is not None:
+                if self.entity_exists(team, 'team_stats'):
+                    query = self.create_update_query('team_stats')
+                    params = self.to_database_params(team, 'team_stats')
+                    self.database_operator.write(query, params[3:] + (params[0], params[1], params[2]))
+                else:
+                    query = self.create_insert_query('team_stats')
+                    params = self.to_database_params(team, 'team_stats')
+                    self.database_operator.write(query, params)
 
 class UpdateTeamAdvancedStats(AbstractUpdater):
     """
@@ -837,3 +747,180 @@ class UpdateTeamAdvancedStats(AbstractUpdater):
                     query = self.create_insert_query('team_advanced_stats_scoring_first')
                     params = self.to_database_params(scoring_first, 'team_advanced_stats_scoring_first')
                     self.database_operator.write(query, params)
+
+class UpdatePlayers(AbstractUpdater):
+    """
+    A class to update the player details and team stats tables in the database.
+    """
+
+    def __init__(self, database_operator: DatabaseOperator, fetch_players: FetchPlayers):
+        """
+        Initializes the UpdatePlayers instance.
+        
+        Parameters
+        ----------
+        database_operator : DatabaseOperator
+            An instance of the DatabaseOperator class to interact with the database.
+
+        fetch_players : FetchPlayers
+            An instance of the FetchPlayers class to fetch the players data from the NHL API.
+        """
+        super().__init__(database_operator)
+        self.fetch_players = fetch_players
+
+    def fetch_entities(self):
+        """
+        Fetches the players to be updated.
+        
+        Returns:
+            list: A list of Player objects to be updated.
+        """
+        return self.fetch_players.get_data()
+
+    def entity_exists(self, entity, table: str) -> bool:
+        """
+        Checks if a player, player details, player awards, or player draft entry exists in the respective table.
+        
+        Parameters
+        ----------
+        entity : object
+            The entity object to check (Player, PlayerDetails, PlayerAward, PlayerDraft).
+        table : str
+            The table name to check ('players', 'player_details', 'player_awards', 'player_draft').
+
+        Returns:
+            bool: True if the entity exists, False otherwise.
+        """
+        if table == 'players':
+            query = PlayersDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id,))
+        elif table == 'player_details':
+            query = PlayerDetailsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id,))
+        elif table == 'player_awards':
+            query = PlayerAwardsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year, entity.award))
+        elif table == 'player_draft':
+            query = PlayerDraftDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id,))
+        return bool(result)
+
+    def create_insert_query(self, table: str) -> str:
+        """
+        Creates an insert query for the respective table.
+        
+        Parameters
+        ----------
+        table : str
+            The table name ('players', 'player_details', 'player_awards', 'player_draft').
+
+        Returns:
+            str: The insert query string.
+        """
+        if table == 'players':
+            return PlayersDatabaseMapper.create_insert_query()
+        elif table == 'player_details':
+            return PlayerDetailsDatabaseMapper.create_insert_query()
+        elif table == 'player_awards':
+            return PlayerAwardsDatabaseMapper.create_insert_query()
+        elif table == 'player_draft':
+            return PlayerDraftDatabaseMapper.create_insert_query()
+
+    def create_update_query(self, table: str) -> str:
+        """
+        Creates an update query for the respective table.
+        
+        Parameters
+        ----------
+        table : str
+            The table name ('players', 'player_details', 'player_awards', 'player_draft').
+
+        Returns:
+            str: The update query string.
+        """
+        if table == 'players':
+            return PlayersDatabaseMapper.create_update_query()
+        elif table == 'player_details':
+            return PlayerDetailsDatabaseMapper.create_update_query()
+        elif table == 'player_awards':
+            return PlayerAwardsDatabaseMapper.create_update_query()
+        elif table == 'player_draft':
+            return PlayerDraftDatabaseMapper.create_update_query()
+
+    def to_database_params(self, entity, table: str) -> tuple:
+        """
+        Maps a Player object to a tuple of parameters for database operations.
+        
+        Parameters
+        ----------
+        entity : object
+            The entity object to be mapped (Player, PlayerDetails, PlayerAward, PlayerDraft).
+        table : str
+            The table name ('players', 'player_details', 'player_awards', 'player_draft').
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        if table == 'players':
+            return PlayersDatabaseMapper.to_database_params(entity)
+        elif table == 'player_details':
+            return PlayerDetailsDatabaseMapper.to_database_params(entity)
+        elif table == 'player_awards':
+            return PlayerAwardsDatabaseMapper.to_database_params(entity)
+        elif table == 'player_draft':
+            return PlayerDraftDatabaseMapper.to_database_params(entity)
+
+    def update_in_db(self):
+        """
+        Fetches the data and updates the corresponding tables in the database.
+        """
+        players = self.fetch_entities()
+        for player in players:
+            # Update players data
+            if self.entity_exists(player, 'players'):
+                if player.team_id == None:
+                    player.team_id = 0
+                query = self.create_update_query('players')
+                params = self.to_database_params(player, 'players')
+                self.database_operator.write(query, params[1:] + (params[0],))
+            else:
+                print("Inserting player")
+                query = self.create_insert_query('players')
+                params = self.to_database_params(player, 'players')
+                self.database_operator.write(query, params)
+
+            # Update player details
+            if self.entity_exists(player.player_details, 'player_details'):
+                query = self.create_update_query('player_details')
+                params = self.to_database_params(player.player_details, 'player_details')
+                self.database_operator.write(query, params[1:] + (params[0],))
+            else:
+                #print("Inserting player details")
+                query = self.create_insert_query('player_details')
+                params = self.to_database_params(player.player_details, 'player_details')
+                self.database_operator.write(query, params)
+
+            # Update player awards
+            for award in player.player_awards:
+                if self.entity_exists(award, 'player_awards'):
+                    query = self.create_update_query('player_awards')
+                    params = self.to_database_params(award, 'player_awards')
+                    self.database_operator.write(query, (params[2], params[0], params[1], params[2]))
+                else:
+                    print("Inserting awards")
+                    query = self.create_insert_query('player_awards')
+                    params = self.to_database_params(award, 'player_awards')
+                    self.database_operator.write(query, params)
+            
+            # Update player draft
+            if self.entity_exists(player.player_draft, 'player_draft'):
+                query = self.create_update_query('player_draft')
+                params = self.to_database_params(player.player_draft, 'player_draft')
+                self.database_operator.write(query, params[1:] + (params[0],))
+            else:
+                print("Inserting draft")
+                query = self.create_insert_query('player_draft')
+                params = self.to_database_params(player.player_draft, 'player_draft')
+                self.database_operator.write(query, params)
+
+    
