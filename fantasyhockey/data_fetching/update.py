@@ -1443,6 +1443,3 @@ class UpdateGoalies(AbstractUpdater):
                     params = self.to_database_params(start_relieved, 'goalie_advanced_stats_start_relieved')
                     self.database_operator.write(query, params)
 
-            
-            
-            

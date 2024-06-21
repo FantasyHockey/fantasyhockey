@@ -376,13 +376,24 @@ class FetchTeamAdvancedStats(DataFetcher):
         pass
 
 class FetchPlayers(DataFetcher):
-    def __init__(self):
+    def __init__(self, active_only=False):
         super().__init__()
-        self.__player_ids = set()  # Use a set to ensure uniqueness
+        self.__player_ids = set()
+        self.active_only = active_only
 
     def _get_items(self):
-        for team in self._fetch_team_ids():
-            self.__fetch_players_for_team(team[0], team[1])
+        if self.active_only:
+            query = "SELECT p.id FROM players p JOIN player_details pd ON p.id = pd.id\
+                     WHERE pd.position != 'G' AND p.is_active = 1;"
+            res = self._database_operator.read(query)
+            ids = []
+            for row in res:
+                ids.append(row[0])
+
+            self._items = ids
+        else:
+            for team in self._fetch_team_ids():
+                self.__fetch_players_for_team(team[0], team[1])
 
     def _get_data_by_item(self):
         count = 0
