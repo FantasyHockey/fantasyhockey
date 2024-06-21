@@ -473,17 +473,20 @@ class FetchPlayers(DataFetcher):
             return
         
 class FetchSkaters(DataFetcher):
-    def __init__(self):
+    def __init__(self, active_only=False):
         super().__init__()
-
+        self.active_only = active_only
 
     def _get_items(self):
-        query = "SELECT id FROM player_details WHERE position <> 'G';"
+        if self.active_only:
+            query = "SELECT p.id FROM players p JOIN player_details pd ON p.id = pd.id\
+                     WHERE pd.position != 'G' AND p.is_active = 1;"
+        else:
+            query = "SELECT id FROM player_details WHERE position != 'G';"
         res = self._database_operator.read(query)
         ids = []
         for row in res:
             ids.append(row[0])
-
 
         self._items = ids
             
@@ -571,11 +574,16 @@ class FetchSkaters(DataFetcher):
         return stat_seasons, youth_seasons
 
 class FetchGoalies(DataFetcher):
-    def __init__(self):
+    def __init__(self, active_only=False):
         super().__init__()
+        self._active_only = active_only
 
     def _get_items(self):
-        query = "SELECT id FROM player_details WHERE position = 'G';"
+        if self.active_only:
+            query = "SELECT p.id FROM players p JOIN player_details pd ON p.id = pd.id\
+                     WHERE pd.position = 'G' AND p.is_active = 1;"
+        else:
+            query = "SELECT id FROM player_details WHERE position = 'G';"
         res = self._database_operator.read(query)
         ids = []
         for row in res:
