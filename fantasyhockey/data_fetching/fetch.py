@@ -660,6 +660,3 @@ class FetchGoalies(DataFetcher):
             advanced_stats_list.append(advanced_stats_obj)
   
         return advanced_stats_list
-
-
-
