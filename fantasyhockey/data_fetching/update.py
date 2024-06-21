@@ -1443,3 +1443,202 @@ class UpdateGoalies(AbstractUpdater):
                     params = self.to_database_params(start_relieved, 'goalie_advanced_stats_start_relieved')
                     self.database_operator.write(query, params)
 
+class UpdateGames(AbstractUpdater):
+    """
+    A class to update the player details and team stats tables in the database.
+    """
+
+    def __init__(self, database_operator: DatabaseOperator, fetch_games: FetchGames):
+        """
+        Initializes the UpdatePlayers instance.
+        
+        Parameters
+        ----------
+        database_operator : DatabaseOperator
+            An instance of the DatabaseOperator class to interact
+            with the database.
+
+        fetch_players : FetchPlayers
+            An instance of the FetchPlayers class to fetch the
+            players data from the NHL API.
+        """
+
+        super().__init__(database_operator)
+        self.fetch_games = fetch_games
+
+    def fetch_entities(self):
+        """
+        Fetches the players to be updated.
+        
+        Returns:
+            list: A list of Player objects to be updated.
+        """
+        return self.fetch_games.get_data()
+    
+    def entity_exists(self, entity, table: str) -> bool:
+        if table == 'games':
+            query = GamesDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id,))
+        elif table == 'game_three_stars':
+            query = GameThreeStarsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id,))
+        elif table == 'game_skater_stats':
+            query = GameSkaterStatsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id, entity.player_id))
+        elif table == 'game_goalie_stats':
+            query = GameGoalieStatsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id, entity.player_id))
+        elif table == 'game_roster':
+            query = GameRosterDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id, entity.team_id, entity.player_id))
+        elif table == 'referees':
+            query = RefereesDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id,))
+        elif table == 'game_scoreboard':
+            query = GameScoreboardDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id,))
+        elif table == 'game_boxscore':
+            query = GameBoxscoreDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id,))
+        return bool(result)
+        
+    
+    def create_insert_query(self, table: str) -> str:
+        if table == 'games':
+            return GamesDatabaseMapper.create_insert_query()
+        elif table == 'game_three_stars':
+            return GameThreeStarsDatabaseMapper.create_insert_query()
+        elif table == 'game_skater_stats':
+            return GameSkaterStatsDatabaseMapper.create_insert_query()
+        elif table == 'game_goalie_stats':
+            return GameGoalieStatsDatabaseMapper.create_insert_query()
+        elif table == 'game_roster':
+            return GameRosterDatabaseMapper.create_insert_query()
+        elif table == 'referees':
+            return RefereesDatabaseMapper.create_insert_query()
+        elif table == 'game_scoreboard':
+            return GameScoreboardDatabaseMapper.create_insert_query()
+        elif table == 'game_boxscore':
+            return GameBoxscoreDatabaseMapper.create_insert_query()
+
+        
+    def create_update_query(self, table: str) -> str:
+        if table == 'games':
+            return GamesDatabaseMapper.create_update_query()
+        elif table == 'game_three_stars':
+            return GameThreeStarsDatabaseMapper.create_update_query()
+        elif table == 'game_skater_stats':
+            return GameSkaterStatsDatabaseMapper.create_update_query()
+        elif table == 'game_goalie_stats':
+            return GameGoalieStatsDatabaseMapper.create_update_query()
+        elif table == 'game_roster':
+            return GameRosterDatabaseMapper.create_update_query()
+        elif table == 'referees':
+            return RefereesDatabaseMapper.create_update_query()
+        elif table == 'game_scoreboard':
+            return GameScoreboardDatabaseMapper.create_update_query()
+        elif table == 'game_boxscore':
+            return GameBoxscoreDatabaseMapper.create_update_query()
+        
+        
+    def to_database_params(self, entity, table: str) -> tuple:
+        if table == 'games':
+            return GamesDatabaseMapper.to_database_params(entity)
+        elif table == 'game_three_stars':
+            return GameThreeStarsDatabaseMapper.to_database_params(entity)
+        elif table == 'game_skater_stats':
+            return GameSkaterStatsDatabaseMapper.to_database_params(entity)
+        elif table == 'game_goalie_stats':
+            return GameGoalieStatsDatabaseMapper.to_database_params(entity)
+        elif table == 'game_roster':
+            return GameRosterDatabaseMapper.to_database_params(entity)
+        elif table == 'referees':
+            return RefereesDatabaseMapper.to_database_params(entity)
+        elif table == 'game_scoreboard':
+            return GameScoreboardDatabaseMapper.to_database_params(entity)
+        elif table == 'game_boxscore':
+            return GameBoxscoreDatabaseMapper.to_database_params(entity)
+        
+    def update_in_db(self):
+        games = self.fetch_entities()
+        for game in games:
+            if self.entity_exists(game, 'games'):
+                query = self.create_update_query('games')
+                params = self.to_database_params(game, 'games')
+                self.database_operator.write(query, params[2:] + (params[0],))
+            else:
+                query = self.create_insert_query('games')
+                params = self.to_database_params(game, 'games')
+                self.database_operator.write(query, params)
+
+            
+            if self.entity_exists(game, 'game_three_stars'):
+                query = self.create_update_query('game_three_stars')
+                params = self.to_database_params(game.game_three_stars, 'game_three_stars')
+                self.database_operator.write(query, params[1:] + (params[0],))
+            else:
+                query = self.create_insert_query('game_three_stars')
+                params = self.to_database_params(game.game_three_stars, 'game_three_stars')
+                print(query)
+                print(params)
+                self.database_operator.write(query, params)
+
+            for skater_stat in game.game_skater_stats:
+                if self.entity_exists(skater_stat, 'game_skater_stats'):
+                    query = GameSkaterStatsDatabaseMapper.create_update_query()
+                    params = GameSkaterStatsDatabaseMapper.to_database_params(skater_stat)
+                    self.database_operator.write(query, params[3:] + (params[0], params[1]))
+                else:
+                    query = GameSkaterStatsDatabaseMapper.create_insert_query()
+                    params = GameSkaterStatsDatabaseMapper.to_database_params(skater_stat)
+                    self.database_operator.write(query, params)
+
+            for goalie_stat in game.game_goalie_stats:
+                if self.entity_exists(goalie_stat, 'game_goalie_stats'):
+                    query = GameGoalieStatsDatabaseMapper.create_update_query()
+                    params = GameGoalieStatsDatabaseMapper.to_database_params(goalie_stat)
+                    self.database_operator.write(query, params[3:] + (params[0], params[1]))
+                else:
+                    query = GameGoalieStatsDatabaseMapper.create_insert_query()
+                    params = GameGoalieStatsDatabaseMapper.to_database_params(goalie_stat)
+                    self.database_operator.write(query, params)
+
+            for roster_spot in game.game_roster:
+                if self.entity_exists(roster_spot, 'game_roster'):
+                    query = GameRosterDatabaseMapper.create_update_query()
+                    params = GameRosterDatabaseMapper.to_database_params(roster_spot)
+                    self.database_operator.write(query, params[3:] + (params[0], params[1], params[2]))
+                else:
+                    query = GameRosterDatabaseMapper.create_insert_query()
+                    params = GameRosterDatabaseMapper.to_database_params(roster_spot)
+                    self.database_operator.write(query, params)
+
+            ref_obj = game.game_referees
+            if self.entity_exists(ref_obj, 'referees'):
+                query = RefereesDatabaseMapper.create_update_query()
+                params = RefereesDatabaseMapper.to_database_params(ref_obj)
+                self.database_operator.write(query, params[1:] + (params[0],))
+            else:
+                query = RefereesDatabaseMapper.create_insert_query()
+                params = RefereesDatabaseMapper.to_database_params(ref_obj)
+                self.database_operator.write(query, params)
+
+            scoreboard_obj = game.game_scoreboard
+            if self.entity_exists(scoreboard_obj, 'game_scoreboard'):
+                query = GameScoreboardDatabaseMapper.create_update_query()
+                params = GameScoreboardDatabaseMapper.to_database_params(scoreboard_obj)
+                self.database_operator.write(query, params[1:] + (params[0],))
+            else:
+                query = GameScoreboardDatabaseMapper.create_insert_query()
+                params = GameScoreboardDatabaseMapper.to_database_params(scoreboard_obj)
+                self.database_operator.write(query, params)
+
+            boxscore_obj = game.game_boxscore
+            if self.entity_exists(boxscore_obj, 'game_boxscore'):
+                query = GameBoxscoreDatabaseMapper.create_update_query()
+                params = GameBoxscoreDatabaseMapper.to_database_params(boxscore_obj)
+                self.database_operator.write(query, params[1:] + (params[0],))
+            else:
+                query = GameBoxscoreDatabaseMapper.create_insert_query()
+                params = GameBoxscoreDatabaseMapper.to_database_params(boxscore_obj)
+                self.database_operator.write(query, params)

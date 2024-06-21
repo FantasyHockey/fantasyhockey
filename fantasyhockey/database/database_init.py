@@ -86,7 +86,6 @@ class DatabaseInitializer:
 
         # Draft and Schedule
         db_operator.write(self.__initialize_draft_rankings())
-        db_operator.write(self.__initialize_schedule())
 
         # Additional Data
         db_operator.write(self.__initialize_shift_data())
@@ -158,7 +157,6 @@ class DatabaseInitializer:
         db_operator.write(self.__delete_playoff_bracket())
 
         db_operator.write(self.__delete_draft_rankings())
-        db_operator.write(self.__delete_schedule())
 
         db_operator.write(self.__delete_shift_data())
 
@@ -775,12 +773,12 @@ class DatabaseInitializer:
         Initializes the games table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS games\
-                (game_id INT, year INT, game_type_id INT, venue_name VARCHAR(255), start_time_utc VARCHAR(50), eastern_utc_offset VARCHAR(50),\
+                (game_id INT, year INT, game_type_id INT, game_date VARCHAR(25), venue_name VARCHAR(255), start_time_utc VARCHAR(50), eastern_utc_offset VARCHAR(50),\
                 venue_utc_offset VARCHAR(50), venue_time_zone VARCHAR(50), game_state VARCHAR(50), game_schedule_state VARCHAR(50),\
                 away_team_id INT, home_team_id INT, shootout_in_use BOOLEAN, regulation_periods INT, ot_in_use BOOLEAN, ties_in_use BOOLEAN,\
                 video_3_min_recap_id VARCHAR(255), video_condensed_game VARCHAR(255),\
-                FOREIGN KEY (year) REFERENCES seasons(year), FOREIGN KEY (away_team_id) REFERENCES teams(team_id),\
-                FOREIGN KEY (home_team_id) REFERENCES teams(team_id), PRIMARY KEY (game_id, year, game_type_id));"
+                FOREIGN KEY (year) REFERENCES seasons(year), FOREIGN KEY (away_team_id, year) REFERENCES teams(team_id, year),\
+                FOREIGN KEY (home_team_id, year) REFERENCES teams(team_id, year), PRIMARY KEY (game_id, year, game_type_id));"
 
     def __delete_games(self):
         return "DROP TABLE IF EXISTS games"
@@ -791,8 +789,8 @@ class DatabaseInitializer:
         """
         return "CREATE TABLE IF NOT EXISTS game_boxscore\
                 (game_id INT, away_team_id INT, away_goals INT, away_score INT, away_shots INT, away_faceoff_percent FLOAT, away_power_play_conversion VARCHAR(25),\
-                away_penalty_minutes INT, away_hits INT, away_blocked_shots INT, home_team_id INT, home_goals INT, home_score INT, home_shots INT,\
-                home_faceoff_percent FLOAT, home_power_play_conversion VARCHAR(25), home_penalty_minutes INT, home_hits INT, home_blocked_shots INT,\
+                away_penalty_minutes INT, away_hits INT, away_blocked_shots INT, away_giveaways INT, away_takeaways INT, home_team_id INT, home_goals INT, home_score INT, home_shots INT,\
+                home_faceoff_percent FLOAT, home_power_play_conversion VARCHAR(25), home_penalty_minutes INT, home_hits INT, home_blocked_shots INT, home_giveaways INT, home_takeaways INT,\
                 FOREIGN KEY (game_id) REFERENCES games(game_id), FOREIGN KEY (away_team_id) REFERENCES teams(team_id), FOREIGN KEY (home_team_id) REFERENCES teams(team_id),\
                 PRIMARY KEY (game_id)\
                 );"
@@ -809,7 +807,7 @@ class DatabaseInitializer:
                 team_id INT, 
                 player_id INT, 
                 scratched BOOLEAN, 
-                `starting` BOOLEAN,
+                is_starting BOOLEAN,
                 FOREIGN KEY (game_id) REFERENCES games(game_id),
                 FOREIGN KEY (team_id) REFERENCES teams(team_id),
                 FOREIGN KEY (player_id) REFERENCES players(id),
@@ -848,8 +846,7 @@ class DatabaseInitializer:
         """
         return "CREATE TABLE IF NOT EXISTS game_skater_stats \
                 (game_id INT, player_id INT, team_id INT, goals INT, assists INT, points INT, plus_minus INT, penalty_minutes INT,\
-                hits INT, blocks INT, power_play_goals INT, power_play_points INT, shorthanded_goals INT, shorthanded_points INT,\
-                shots INT, faceoffs VARCHAR(25), time_on_ice VARCHAR(25), power_play_time_on_ice VARCHAR(25), shorthanded_time_on_ice VARCHAR(25),\
+                hits INT, power_play_goals INT, shots INT, faceoffs VARCHAR(25), time_on_ice VARCHAR(25),\
                 FOREIGN KEY (game_id) REFERENCES games(game_id), FOREIGN KEY (player_id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id),\
                 PRIMARY KEY (game_id, player_id));"
     
@@ -863,7 +860,7 @@ class DatabaseInitializer:
         return "CREATE TABLE IF NOT EXISTS game_goalie_stats \
                 (game_id INT, player_id INT, team_id INT, even_strength_shots_against VARCHAR(25), power_play_shots_against VARCHAR(25),\
                 shorthanded_shots_against VARCHAR(25), saves_shots_against VARCHAR(25), even_strength_goals_against INT, power_play_goals_against INT,\
-                shorthanded_goals_against INT, penalty_minutes INT, goals_against INT, time_on_ice VARCHAR(25),\
+                shorthanded_goals_against INT, penalty_minutes INT, goals_against INT, time_on_ice VARCHAR(25), starter BOOLEAN,\
                 FOREIGN KEY (game_id) REFERENCES games(game_id), FOREIGN KEY (player_id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id),\
                 PRIMARY KEY (game_id, player_id));"
     
@@ -970,18 +967,6 @@ class DatabaseInitializer:
     
     def __delete_shift_data(self):
         return "DROP TABLE IF EXISTS shift_data"
-
-    def __initialize_schedule(self):
-        """
-        Initializes the schedule table in the database.
-        """
-        return "CREATE TABLE IF NOT EXISTS schedule \
-                (game_id INT, home_team_id INT, away_team_id INT,\
-                FOREIGN KEY (game_id) REFERENCES games(game_id), FOREIGN KEY (home_team_id) REFERENCES teams(team_id),\
-                FOREIGN KEY (away_team_id) REFERENCES teams(team_id), PRIMARY KEY (game_id));"
-    
-    def __delete_schedule(self):
-        return "DROP TABLE IF EXISTS schedule"
     
 # MISC
 

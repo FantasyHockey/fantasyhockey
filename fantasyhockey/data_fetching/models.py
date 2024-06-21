@@ -7054,6 +7054,7 @@ class Games:
         self._game_id = game_id
         self._year = None
         self._game_type_id = None
+        self._game_date = None
         self._venue_name = None
         self._start_time_utc = None
         self._eastern_utc_offset = None
@@ -7069,6 +7070,13 @@ class Games:
         self._ties_in_use = None
         self._video_3_min_recap_id = None
         self._video_condensed_game = None
+        self._game_three_stars: GameThreeStars = None
+        self._game_skater_stats: list[GameSkaterStats] = None
+        self._game_goalie_stats: list[GameGoalieStats] = None
+        self._game_roster: list[GameRoster] = None
+        self._game_referees: list[Referees] = None
+        self._game_scoreboard: GameScoreboard = None
+        self._game_boxscore: GameBoxscore = None
 
     @property
     def game_id(self):
@@ -7093,6 +7101,14 @@ class Games:
     @game_type_id.setter
     def game_type_id(self, value):
         self._game_type_id = value
+
+    @property
+    def game_date(self):
+        return self._game_date
+    
+    @game_date.setter
+    def game_date(self, value):
+        self._game_date = value
 
     @property
     def venue_name(self):
@@ -7214,6 +7230,63 @@ class Games:
     def video_condensed_game(self, value):
         self._video_condensed_game = value
 
+    @property
+    def game_three_stars(self):
+        return self._game_three_stars
+    
+    @game_three_stars.setter
+    def game_three_stars(self, value):
+        self._game_three_stars = value
+
+    @property
+    def game_skater_stats(self):
+        return self._game_skater_stats
+    
+    @game_skater_stats.setter
+    def game_skater_stats(self, value):
+        self._game_skater_stats = value
+
+    @property
+    def game_goalie_stats(self):
+        return self._game_goalie_stats
+    
+    @game_goalie_stats.setter
+    def game_goalie_stats(self, value):
+        self._game_goalie_stats = value
+
+    @property
+    def game_roster(self):
+        return self._game_roster
+    
+    @game_roster.setter
+    def game_roster(self, value):
+        self._game_roster = value
+
+    @property
+    def game_referees(self):
+        return self._game_referees
+    
+    @game_referees.setter
+    def game_referees(self, value):
+        self._game_referees = value
+
+    @property
+    def game_scoreboard(self):
+        return self._game_scoreboard
+    
+    @game_scoreboard.setter
+    def game_scoreboard(self, value):
+        self._game_scoreboard = value
+
+    @property
+    def game_boxscore(self):
+        return self._game_boxscore
+    
+    @game_boxscore.setter
+    def game_boxscore(self, value):
+        self._game_boxscore = value
+
+        
 class GameThreeStars:
     def __init__(self, game_id):
         self._game_id = game_id
@@ -7254,9 +7327,9 @@ class GameThreeStars:
         self._star_3 = value
 
 class GameSkaterStats:
-    def __init__(self, game_id, player_id):
+    def __init__(self, game_id):
         self._game_id = game_id
-        self._player_id = player_id
+        self._player_id = None
         self._team_id = None
         self._goals = None
         self._assists = None
@@ -7521,10 +7594,10 @@ class GameScoreboard:
         self._in_intermission = value
 
 class GameRoster:
-    def __init__(self, game_id, player_id, team_id):
+    def __init__(self, game_id):
         self._game_id = game_id
-        self._team_id = team_id
-        self._player_id = player_id
+        self._team_id = None
+        self._player_id = None
         self._scratched = None
         self._starting = None
 
@@ -7859,6 +7932,7 @@ class GameGoalieStats:
         self._penalty_minutes = None
         self._goals_against = None
         self._time_on_ice = None
+        self._starter = None
 
     @property
     def game_id(self):
@@ -7964,6 +8038,14 @@ class GameGoalieStats:
     def time_on_ice(self, value):
         self._time_on_ice = value
 
+    @property
+    def starter(self):
+        return self._starter
+    
+    @starter.setter
+    def starter(self, value):
+        self._starter = value
+
 class GameBoxscore:
     def __init__(self, game_id):
         self._game_id = game_id
@@ -7976,6 +8058,8 @@ class GameBoxscore:
         self._away_penalty_minutes = None
         self._away_hits = None
         self._away_blocked_shots = None
+        self._away_giveaways = None
+        self._away_takeaways = None
         self._home_team_id = None
         self._home_goals = None
         self._home_score = None
@@ -7985,6 +8069,8 @@ class GameBoxscore:
         self._home_penalty_minutes = None
         self._home_hits = None
         self._home_blocked_shots = None
+        self._home_giveaways = None
+        self._home_takeaways = None
 
     @property
     def game_id(self):
@@ -8067,6 +8153,22 @@ class GameBoxscore:
         self._away_blocked_shots = value
 
     @property
+    def away_giveaways(self):
+        return self._away_giveaways
+    
+    @away_giveaways.setter
+    def away_giveaways(self, value):
+        self._away_giveaways = value
+
+    @property
+    def away_takeaways(self):
+        return self._away_takeaways
+    
+    @away_takeaways.setter
+    def away_takeaways(self, value):
+        self._away_takeaways = value
+
+    @property
     def home_team_id(self):
         return self._home_team_id
     
@@ -8137,6 +8239,22 @@ class GameBoxscore:
     @home_blocked_shots.setter
     def home_blocked_shots(self, value):
         self._home_blocked_shots = value
+
+    @property
+    def home_giveaways(self):
+        return self._home_giveaways
+    
+    @home_giveaways.setter
+    def home_giveaways(self, value):
+        self._home_giveaways = value
+
+    @property
+    def home_takeaways(self):
+        return self._home_takeaways
+    
+    @home_takeaways.setter
+    def home_takeaways(self, value):
+        self._home_takeaways = value
 
 class PlayoffBracket:
     def __init__(self, year):
@@ -8449,36 +8567,6 @@ class Referees:
     @linesman_2_name.setter
     def linesman_2_name(self, value):
         self._linesman_2_name = value
-
-class Schedule:
-    def __init__(self, game_id):
-        self._game_id = game_id
-        self._home_team_id = None
-        self._away_team_id = None
-
-    @property
-    def game_id(self):
-        return self._game_id
-    
-    @game_id.setter
-    def game_id(self, value):
-        self._game_id = value
-
-    @property
-    def home_team_id(self):
-        return self._home_team_id
-    
-    @home_team_id.setter
-    def home_team_id(self, value):
-        self._home_team_id = value
-
-    @property
-    def away_team_id(self):
-        return self._away_team_id
-    
-    @away_team_id.setter
-    def away_team_id(self, value):
-        self._away_team_id = value
 
 class ShiftData:
     def __init__(self, shift_id):

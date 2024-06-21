@@ -137,6 +137,36 @@ class ApiMapperFactory:
             return TeamAdvancedStatsDaysRestApiMapper(data_parser, util)
         elif obj_type == TeamAdvancedStatsCorsiFenwick:
             return TeamAdvancedStatsCorsiFenwickApiMapper(data_parser, util)
+        elif obj_type == Games:
+            return GamesApiMapper(data_parser, util)
+        elif obj_type == GameBoxscore:
+            return GameBoxscoreApiMapper(data_parser, util)
+        elif obj_type == GameGoalieStats:
+            return GameGoalieStatsApiMapper(data_parser, util)
+        elif obj_type == GameGoals:
+            return GameGoalsApiMapper(data_parser, util)
+        elif obj_type == GamePlays:
+            return GamePlaysApiMapper(data_parser, util)
+        elif obj_type == GameRoster:
+            return GameRosterApiMapper(data_parser, util)
+        elif obj_type == GameScoreboard:
+            return GameScoreboardApiMapper(data_parser, util)
+        elif obj_type == GameSkaterStats:
+            return GameSkaterStatsApiMapper(data_parser, util)
+        elif obj_type == GameThreeStars:
+            return GameThreeStarsApiMapper(data_parser, util)
+        elif obj_type == PlayOnIce:
+            return PlayOnIceApiMapper(data_parser, util)
+        elif obj_type == PlayoffBracket:
+            return PlayoffBracketApiMapper(data_parser, util)
+        elif obj_type == PlayOutcomes:
+            return PlayOutcomesApiMapper(data_parser, util)
+        elif obj_type == PlayRoles:
+            return PlayRolesApiMapper(data_parser, util)
+        elif obj_type == Referees:
+            return RefereesApiMapper(data_parser, util)
+        elif obj_type == ShiftData:
+            return ShiftDataApiMapper(data_parser, util)
         else:
             raise ValueError(f"Unknown object type: {obj_type}")
         
@@ -5156,132 +5186,364 @@ class GamesApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
-        self.field_map = {}
+        self.field_map = {
+            "id": "game_id",
+            "season": "year",
+            "gameType": "game_type_id",
+            "gameDate": "game_date",
+            "venue": "venue_name", #double parse with default
+            "startTimeUTC": "start_time_utc",
+            "easternUTCOffset": "eastern_utc_offset",
+            "venueUTCOffset": "venue_utc_offset",
+            "venueTimezone": "venue_time_zone",
+            "gameState": "game_state",
+            "gameScheduleState": "game_schedule_state",
+            "awayTeam": "away_team_id", #double parse with id
+            "homeTeam": "home_team_id", #double parse with id
+            "shootoutInUse": "shootout_in_use",
+            "regPeriods": "regulation_periods",
+            "otInUse": "ot_in_use",
+            "tiesInUse": "ties_in_use",
+            "gameVideo": "video_3_min_recap_id", #double parse with threeMinRecap
+            "gameVideo": "video_condensed_game", #double parse with condensedGame
+        }
 
     def map(self, source: dict) -> object:
-        pass
-
+        game = Games(self.data_parser.parse(source, "id", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "venue_name":
+                value = self.data_parser.double_parse(source, "venue", "default", "none")
+            elif attr_name == "away_team_id":
+                value = self.data_parser.double_parse(source, "awayTeam", "id", "none")
+                if value == None:
+                    value = 0
+            elif attr_name == "home_team_id":
+                value = self.data_parser.double_parse(source, "homeTeam", "id", "none")
+                if value == None:
+                    value = 0
+            elif attr_name == "video_3_min_recap_id":
+                value = self.data_parser.double_parse(source, "gameVideo", "threeMinRecap", "none")
+            elif attr_name == "video_condensed_game":
+                value = self.data_parser.double_parse(source, "gameVideo", "condensedGame", "none")
+            setattr(game, attr_name, value)
+        return game
+        
 class GamesDatabaseMapper:
 
     @staticmethod
     def to_database_params(game: Games) -> tuple:
-        pass
+        return (
+            game.game_id,
+            game.year,
+            game.game_type_id,
+            game.game_date,
+            game.venue_name,
+            game.start_time_utc,
+            game.eastern_utc_offset,
+            game.venue_utc_offset,
+            game.venue_time_zone,
+            game.game_state,
+            game.game_schedule_state,
+            game.away_team_id,
+            game.home_team_id,
+            game.shootout_in_use,
+            game.regulation_periods,
+            game.ot_in_use,
+            game.ties_in_use,
+            game.video_3_min_recap_id,
+            game.video_condensed_game
+        )
 
     @staticmethod
     def create_insert_query() -> str:
-        pass
+        return """
+            INSERT INTO games (
+                game_id, year, game_type_id, game_date, venue_name, start_time_utc, eastern_utc_offset, venue_utc_offset,
+                venue_time_zone, game_state, game_schedule_state, away_team_id, home_team_id, shootout_in_use,
+                regulation_periods, ot_in_use, ties_in_use, video_3_min_recap_id, video_condensed_game
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
 
     @staticmethod
     def create_update_query() -> str:
-        pass
+        return """
+            UPDATE games SET
+                game_type_id = %s,
+                game_date = %s,
+                venue_name = %s,
+                start_time_utc = %s,
+                eastern_utc_offset = %s,
+                venue_utc_offset = %s,
+                venue_time_zone = %s,
+                game_state = %s,
+                game_schedule_state = %s,
+                away_team_id = %s,
+                home_team_id = %s,
+                shootout_in_use = %s,
+                regulation_periods = %s,
+                ot_in_use = %s,
+                ties_in_use = %s,
+                video_3_min_recap_id = %s,
+                video_condensed_game = %s
+            WHERE game_id = %s
+        """
 
     @staticmethod
     def create_check_existence_query() -> str:
-        pass
+        return "SELECT 1 FROM games WHERE game_id = %s"
 
-class GamesThreeStarsApiMapper(ApiMapper):
+class GameThreeStarsApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
-        self.field_map = {}
+        self.field_map = {
+            "id": "game_id",
+            "star1": "star_1",
+            "star2": "star_2",
+            "star3": "star_3"
+        }
 
     def map(self, source: dict) -> object:
-        pass
+        game_three_stars = GameThreeStars(self.data_parser.parse(source, "id", "none"))
+        star_json = self.data_parser.double_parse(source, "summary", "threeStars", "empty_list")
+        if len(star_json) == 0:
+            game_three_stars.star_1 = 0
+            game_three_stars.star_2 = 0
+            game_three_stars.star_3 = 0
+        else:
+            game_three_stars.star_1 = self.data_parser.parse(star_json[0], "playerId", "none")
+            game_three_stars.star_2 = self.data_parser.parse(star_json[1], "playerId", "none")
+            game_three_stars.star_3 = self.data_parser.parse(star_json[2], "playerId", "none")
+
+        return game_three_stars
 
 class GameThreeStarsDatabaseMapper:
     @staticmethod
     def to_database_params(game: GameThreeStars) -> tuple:
-        pass
+        return (
+            game.game_id,
+            game.star_1,
+            game.star_2,
+            game.star_3
+        )
 
     @staticmethod
     def create_insert_query() -> str:
-        pass
+        return """
+            INSERT INTO game_three_stars (
+                game_id, star_1, star_2, star_3
+            ) VALUES (%s, %s, %s, %s)
+        """
 
     @staticmethod
     def create_update_query() -> str:
-        pass
+        return """
+            UPDATE game_three_stars SET
+                star_1 = %s,
+                star_2 = %s,
+                star_3 = %s
+            WHERE game_id = %s
+        """
 
     @staticmethod
     def create_check_existence_query() -> str:
-        pass
+        return "SELECT 1 FROM game_three_stars WHERE game_id = %s"
 
 class GameSkaterStatsApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
-        self.field_map = {}
+        self.field_map = {
+            "gameId": "game_id",
+            "playerId": "player_id",
+            "teamId": "team_id",
+            "goals": "goals",
+            "assists": "assists",
+            "points": "points",
+            "plusMinus": "plus_minus",
+            "pim": "penalty_minutes",
+            "hits": "hits",
+            "powerPlayGoals": "power_play_goals",
+            "shots": "shots",
+            "faceoffWinningPctg": "faceoffs",
+            "toi": "time_on_ice",
+        }
 
     def map(self, source: dict) -> object:
-        pass
+        game_skater_stats = GameSkaterStats(self.data_parser.parse(source, "gameId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(game_skater_stats, attr_name, value)
+        return game_skater_stats
 
 class GameSkaterStatsDatabaseMapper:
     @staticmethod
     def to_database_params(game: GameSkaterStats) -> tuple:
-        pass
+        return (
+            game.game_id,
+            game.player_id,
+            game.team_id,
+            game.goals,
+            game.assists,
+            game.points,
+            game.plus_minus,
+            game.penalty_minutes,
+            game.hits,
+            game.power_play_goals,
+            game.shots,
+            game.faceoffs,
+            game.time_on_ice
+        )
 
     @staticmethod
     def create_insert_query() -> str:
-        pass
+        return """
+            INSERT INTO game_skater_stats (
+                game_id, player_id, team_id, goals, assists, points, plus_minus, penalty_minutes, hits,
+                power_play_goals, shots, faceoffs, time_on_ice
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
 
     @staticmethod
     def create_update_query() -> str:
-        pass
+        return """
+            UPDATE game_skater_stats SET
+                goals = %s,
+                assists = %s,
+                points = %s,
+                plus_minus = %s,
+                penalty_minutes = %s,
+                hits = %s,
+                power_play_goals = %s,
+                shots = %s,
+                faceoffs = %s,
+                time_on_ice = %s
+            WHERE game_id = %s AND player_id = %s
+        """
 
     @staticmethod
     def create_check_existence_query() -> str:
-        pass
+        return "SELECT 1 FROM game_skater_stats WHERE game_id = %s AND player_id = %s"
 
 class GameScoreboardApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
-        self.field_map = {}
+        self.field_map = {
+            "gameId": "game_id",
+            "homeScore": "home_score",
+            "awayScore": "away_score",
+            "homeShots": "home_shots",
+            "awayShots": "away_shots",
+            "timeRemaining": "time_remaining",
+            "period": "period",
+            "secondsRemaining": "seconds_remaining",
+            "running": "running",
+            "inIntermission": "in_intermission"
+        }
 
     def map(self, source: dict) -> object:
-        pass
+        game_scoreboard = GameScoreboard(self.data_parser.parse(source, "gameId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(game_scoreboard, attr_name, value)
+        return game_scoreboard
 
 class GameScoreboardDatabaseMapper:
     @staticmethod
     def to_database_params(game: GameScoreboard) -> tuple:
-        pass
+        return (
+            game.game_id,
+            game.home_score,
+            game.away_score,
+            game.home_shots,
+            game.away_shots,
+            game.time_remaining,
+            game.period,
+            game.seconds_remaining,
+            game.running,
+            game.in_intermission
+        )
 
     @staticmethod
     def create_insert_query() -> str:
-        pass
+        return """
+            INSERT INTO game_scoreboard (game_id, home_score, away_score, home_shots, away_shots,
+                time_remaining, period, seconds_remaining, running, in_intermission) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
 
     @staticmethod
     def create_update_query() -> str:
-        pass
+        return """
+            UPDATE game_scoreboard SET
+                home_score = %s,
+                away_score = %s,
+                home_shots = %s,
+                away_shots = %s,
+                time_remaining = %s,
+                period = %s,
+                seconds_remaining = %s,
+                running = %s,
+                in_intermission = %s
+            WHERE game_id = %s
+        """
 
     @staticmethod
     def create_check_existence_query() -> str:
-        pass
+        return "SELECT 1 FROM game_scoreboard WHERE game_id = %s"
 
 class GameRosterApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
-        self.field_map = {}
+        self.field_map = {
+            "gameId": "game_id",
+            "teamId": "team_id",
+            "playerId": "player_id",
+            "scratched": "scratched",
+            "starting": "starting",
+        }
 
     def map(self, source: dict) -> object:
-        pass
+        game_roster = GameRoster(self.data_parser.parse(source, "gameId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(game_roster, attr_name, value)
+        return game_roster
 
 class GameRosterDatabaseMapper:
     @staticmethod
     def to_database_params(game: GameRoster) -> tuple:
-        pass
+        return (
+            game.game_id,
+            game.team_id,
+            game.player_id,
+            game.scratched,
+            game.starting
+        )
 
     @staticmethod
     def create_insert_query() -> str:
-        pass
+        return """
+            INSERT INTO game_roster (
+                game_id, team_id, player_id, scratched, is_starting
+            ) VALUES (%s, %s, %s, %s, %s)
+        """
 
     @staticmethod
     def create_update_query() -> str:
-        pass
+        return """
+            UPDATE game_roster SET
+                scratched = %s,
+                is_starting = %s
+            WHERE game_id = %s AND team_id = %s AND player_id = %s
+        """
 
     @staticmethod
     def create_check_existence_query() -> str:
-        pass
+        return "SELECT 1 FROM game_roster WHERE game_id = %s AND team_id = %s AND player_id = %s"
 
 class GamePlaysApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
@@ -5339,53 +5601,180 @@ class GameGoalieStatsApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
-        self.field_map = {}
+        self.field_map = {
+            "gameId": "game_id",
+            "playerId": "player_id",
+            "teamId": "team_id",
+            "evenStrengthShotsAgainst": "even_strength_shots_against",
+            "powerPlayShotsAgainst": "power_play_shots_against",
+            "shorthandedShotsAgainst": "shorthanded_shots_against",
+            "saveShotsAgainst": "saves_shots_against",
+            "evenStrengthGoalsAgainst": "even_strength_goals_against",
+            "powerPlayGoalsAgainst": "power_play_goals_against",
+            "shorthandedGoalsAgainst": "shorthanded_goals_against",
+            "pim": "penalty_minutes",
+            "goalsAgainst": "goals_against",
+            "toi": "time_on_ice",
+            "starter": "starter",
+        }
 
     def map(self, source: dict) -> object:
-        pass
+        game_goalie_stats = GameGoalieStats(self.data_parser.parse(source, "gameId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(game_goalie_stats, attr_name, value)
+        return game_goalie_stats
 
 class GameGoalieStatsDatabaseMapper:
     @staticmethod
     def to_database_params(game: GameGoalieStats) -> tuple:
-        pass
+        return (
+            game.game_id,
+            game.player_id,
+            game.team_id,
+            game.even_strength_shots_against,
+            game.power_play_shots_against,
+            game.shorthanded_shots_against,
+            game.saves_shots_against,
+            game.even_strength_goals_against,
+            game.power_play_goals_against,
+            game.shorthanded_goals_against,
+            game.penalty_minutes,
+            game.goals_against,
+            game.time_on_ice,
+            game.starter
+        )
 
     @staticmethod
     def create_insert_query() -> str:
-        pass
+        return """
+            INSERT INTO game_goalie_stats (
+                game_id, player_id, team_id, even_strength_shots_against, power_play_shots_against, shorthanded_shots_against,
+                saves_shots_against, even_strength_goals_against, power_play_goals_against, shorthanded_goals_against,
+                penalty_minutes, goals_against, time_on_ice, starter
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
 
     @staticmethod
     def create_update_query() -> str:
-        pass
+        return """
+            UPDATE game_goalie_stats SET
+                even_strength_shots_against = %s,
+                power_play_shots_against = %s,
+                shorthanded_shots_against = %s,
+                saves_shots_against = %s,
+                even_strength_goals_against = %s,
+                power_play_goals_against = %s,
+                shorthanded_goals_against = %s,
+                penalty_minutes = %s,
+                goals_against = %s,
+                time_on_ice = %s,
+                starter = %s
+            WHERE game_id = %s AND player_id = %s
+        """
 
     @staticmethod
     def create_check_existence_query() -> str:
-        pass
+        return "SELECT 1 FROM game_goalie_stats WHERE game_id = %s AND player_id = %s"
 
 class GameBoxscoreApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
-        self.field_map = {}
+        self.field_map = {
+            "gameId": "game_id",
+            "awayTeamId": "away_team_id",
+            "awayGoals": "away_goals",
+            "awaysog": "away_shots",
+            "awayfaceoffWinningPctg": "away_faceoff_percent",
+            "awaypowerPlay": "away_power_play_conversions",
+            "awaypim": "away_penalty_minutes",
+            "awayhits": "away_hits",
+            "awayblockedShots": "away_blocked_shots",
+            "homeTeamId": "home_team_id",
+            "homeGoals": "home_goals",
+            "homesog": "home_shots",
+            "homefaceoffWinningPctg": "home_faceoff_percent",
+            "homeowerPlay": "home_power_play_conversions",
+            "homepim": "home_penalty_minutes",
+            "homehits": "home_hits",
+            "homeblockedShots": "home_blocked_shots",
+        }
 
     def map(self, source: dict) -> object:
-        pass
+        game_boxscore = GameBoxscore(self.data_parser.parse(source, "gameId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(game_boxscore, attr_name, value)
+        return game_boxscore
 
 class GameBoxscoreDatabaseMapper:
     @staticmethod
     def to_database_params(game: GameBoxscore) -> tuple:
-        pass
+        return (
+            game.game_id,
+            game.away_team_id,
+            game.away_goals,
+            game.away_shots,
+            game.away_faceoff_percent,
+            game.away_power_play_conversion,
+            game.away_penalty_minutes,
+            game.away_hits,
+            game.away_blocked_shots,
+            game.away_giveaways,
+            game.away_takeaways,
+            game.home_team_id,
+            game.home_goals,
+            game.home_shots,
+            game.home_faceoff_percent,
+            game.home_power_play_conversion,
+            game.home_penalty_minutes,
+            game.home_hits,
+            game.home_blocked_shots,
+            game.home_giveaways,
+            game.home_takeaways
+        )
 
     @staticmethod
     def create_insert_query() -> str:
-        pass
+        return """
+            INSERT INTO game_boxscore (
+                game_id, away_team_id, away_goals, away_shots, away_faceoff_percent, away_power_play_conversion,
+                away_penalty_minutes, away_hits, away_blocked_shots, away_giveaways, away_takeaways, home_team_id, home_goals, home_shots,
+                home_faceoff_percent, home_power_play_conversion, home_penalty_minutes, home_hits, home_blocked_shots, home_giveaways, home_takeaways
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
 
     @staticmethod
     def create_update_query() -> str:
-        pass
+        return """
+            UPDATE game_boxscore SET
+                away_team_id = %s,
+                away_goals = %s,
+                away_shots = %s,
+                away_faceoff_percent = %s,
+                away_power_play_conversion = %s,
+                away_penalty_minutes = %s,
+                away_hits = %s,
+                away_blocked_shots = %s,
+                away_giveaways = %s,
+                away_takeaways = %s,
+                home_team_id = %s,
+                home_goals = %s,
+                home_shots = %s,
+                home_faceoff_percent = %s,
+                home_power_play_conversion = %s,
+                home_penalty_minutes = %s,
+                home_hits = %s,
+                home_blocked_shots = %s
+                home_giveaways = %s,
+                home_takeaways = %s
+            WHERE game_id = %s
+        """
 
     @staticmethod
     def create_check_existence_query() -> str:
-        pass
+        return "SELECT 1 FROM game_boxscore WHERE game_id = %s"
 
 class PlayoffBracketApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
@@ -5495,27 +5884,54 @@ class RefereesApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
         self.data_parser = data_parser
         self.util = util
-        self.field_map = {}
+        self.field_map = {
+            "gameId": "game_id",
+            "referee1Name": "referee_1_name",
+            "referee2Name": "referee_2_name",
+            "linesman1Name": "linesman_1_name",
+            "linesman2Name": "linesman_2_name"
+        }
 
     def map(self, source: dict) -> object:
-        pass
+        referees = Referees(self.data_parser.parse(source, "gameId", "none"))
+        for json_key, attr_name in self.field_map.items():
+            value = self.data_parser.parse(source, json_key, "none")
+            setattr(referees, attr_name, value)
+        return referees
 
 class RefereesDatabaseMapper:
     @staticmethod
     def to_database_params(game: Referees) -> tuple:
-        pass
+        return (
+            game.game_id,
+            game.referee_1_name,
+            game.referee_2_name,
+            game.linesman_1_name,
+            game.linesman_2_name
+        )
 
     @staticmethod
     def create_insert_query() -> str:
-        pass
+        return """
+            INSERT INTO referees (
+                game_id, referee_1_name, referee_2_name, linesman_1_name, linesman_2_name
+            ) VALUES (%s, %s, %s, %s, %s)
+        """
 
     @staticmethod
     def create_update_query() -> str:
-        pass
+        return """
+            UPDATE referees SET
+                referee_1_name = %s,
+                referee_2_name = %s,
+                linesman_1_name = %s,
+                linesman_2_name = %s
+            WHERE game_id = %s
+        """
 
     @staticmethod
     def create_check_existence_query() -> str:
-        pass
+        return "SELECT 1 FROM referees WHERE game_id = %s"
 
 class ScheduleApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
@@ -5524,23 +5940,6 @@ class ScheduleApiMapper(ApiMapper):
         self.field_map = {}
 
     def map(self, source: dict) -> object:
-        pass
-
-class ScheduleDatabaseMapper:
-    @staticmethod
-    def to_database_params(game: Schedule) -> tuple:
-        pass
-
-    @staticmethod
-    def create_insert_query() -> str:
-        pass
-
-    @staticmethod
-    def create_update_query() -> str:
-        pass
-
-    @staticmethod
-    def create_check_existence_query() -> str:
         pass
 
 class ShiftDataApiMapper(ApiMapper):
