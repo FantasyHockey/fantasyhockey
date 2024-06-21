@@ -2635,8 +2635,6 @@ class SkaterAdvancedStatsTOIDatabaseMapper:
         """
         return "SELECT 1 FROM skater_advanced_stats_toi WHERE id = %s AND year = %s"
     
-# Make sure the json given here is with the player_id added and for a single award.
-
 class PlayersDatabaseMapper:
     """
     Maps Player objects to database rows and vice versa.
@@ -5153,3 +5151,423 @@ class TeamAdvancedStatsCorsiFenwickDatabaseMapper:
             str: The existence check query string.
         """
         return "SELECT 1 FROM team_advanced_stats_corsi_fenwick WHERE team_id = %s AND year = %s"
+    
+class GamesApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GamesDatabaseMapper:
+
+    @staticmethod
+    def to_database_params(game: Games) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class GamesThreeStarsApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GameThreeStarsDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: GameThreeStars) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class GameSkaterStatsApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GameSkaterStatsDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: GameSkaterStats) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class GameScoreboardApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GameScoreboardDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: GameScoreboard) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class GameRosterApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GameRosterDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: GameRoster) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class GamePlaysApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GamePlaysDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: GamePlays) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class GameGoalsApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GameGoalsDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: GameGoals) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class GameGoalieStatsApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GameGoalieStatsDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: GameGoalieStats) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class GameBoxscoreApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class GameBoxscoreDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: GameBoxscore) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class PlayoffBracketApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class PlayoffBracketDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: PlayoffBracket) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class PlayOnIceApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class PlayOnIceDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: PlayOnIce) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class PlayOutcomesApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class PlayOutcomesDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: PlayOutcomes) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class PlayRolesApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class PlayRolesDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: PlayRoles) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class RefereesApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class RefereesDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: Referees) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class ScheduleApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class ScheduleDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: Schedule) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+class ShiftDataApiMapper(ApiMapper):
+    def __init__(self, data_parser, util):
+        self.data_parser = data_parser
+        self.util = util
+        self.field_map = {}
+
+    def map(self, source: dict) -> object:
+        pass
+
+class ShiftDataDatabaseMapper:
+    @staticmethod
+    def to_database_params(game: ShiftData) -> tuple:
+        pass
+
+    @staticmethod
+    def create_insert_query() -> str:
+        pass
+
+    @staticmethod
+    def create_update_query() -> str:
+        pass
+
+    @staticmethod
+    def create_check_existence_query() -> str:
+        pass
+
+
+ 

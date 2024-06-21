@@ -660,3 +660,42 @@ class FetchGoalies(DataFetcher):
             advanced_stats_list.append(advanced_stats_obj)
   
         return advanced_stats_list
+
+class FetchGames(DataFetcher):
+    def __init__(self):
+        super().__init__()
+
+    def _get_items(self):
+        pass
+
+    def _get_data_by_item(self):
+        pass
+
+    def _process_data(self, data):
+        pass
+
+class FetchShiftData(DataFetcher):
+    def __init__(self):
+        super().__init__()
+
+    def _get_items(self):
+        pass
+
+    def _get_data_by_item(self):
+        pass
+
+    def _process_data(self, data):
+        pass
+
+class FetchPlayoffBracket(DataFetcher):
+    def __init__(self):
+        super().__init__()
+
+    def _get_items(self):
+        pass
+
+    def _get_data_by_item(self):
+        pass
+
+    def _process_data(self, data):
+        pass
