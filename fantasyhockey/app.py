@@ -39,7 +39,7 @@ def run():
     #fetch_skaters = FetchSkaters()
     #update_skaters = UpdateSkaters(database_operator, fetch_skaters)
 
-    fetch_goalies = FetchGoalies()
+    fetch_goalies = FetchGoalies(active_only=True)
     update_goalies = UpdateGoalies(database_operator, fetch_goalies)
     updater = CentralUpdater([update_goalies])
     updater.update_all()

@@ -379,10 +379,10 @@ class FetchPlayers(DataFetcher):
     def __init__(self, active_only=False):
         super().__init__()
         self.__player_ids = set()
-        self.active_only = active_only
+        self._active_only = active_only
 
     def _get_items(self):
-        if self.active_only:
+        if self._active_only:
             query = "SELECT p.id FROM players p JOIN player_details pd ON p.id = pd.id\
                      WHERE pd.position != 'G' AND p.is_active = 1;"
             res = self._database_operator.read(query)
@@ -486,10 +486,10 @@ class FetchPlayers(DataFetcher):
 class FetchSkaters(DataFetcher):
     def __init__(self, active_only=False):
         super().__init__()
-        self.active_only = active_only
+        self._active_only = active_only
 
     def _get_items(self):
-        if self.active_only:
+        if self._active_only:
             query = "SELECT p.id FROM players p JOIN player_details pd ON p.id = pd.id\
                      WHERE pd.position != 'G' AND p.is_active = 1;"
         else:
@@ -590,7 +590,7 @@ class FetchGoalies(DataFetcher):
         self._active_only = active_only
 
     def _get_items(self):
-        if self.active_only:
+        if self._active_only:
             query = "SELECT p.id FROM players p JOIN player_details pd ON p.id = pd.id\
                      WHERE pd.position = 'G' AND p.is_active = 1;"
         else:
