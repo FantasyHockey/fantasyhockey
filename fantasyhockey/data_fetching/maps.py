@@ -62,45 +62,45 @@ class ApiMapperFactory:
             return DraftRankingApiMapper()
 
         elif obj_type == GoalieAdvancedStatsDaysRest:
-            return GoalieAdvancedStatsDaysRestApiMapper()
+            return GoalieAdvancedStatsDaysRestApiMapper(data_parser, util)
         elif obj_type == GoalieAdvancedStatsPenaltyShots:
-            return GoalieAdvancedStatsPenaltyShotsApiMapper()
+            return GoalieAdvancedStatsPenaltyShotsApiMapper(data_parser, util)
         elif obj_type == GoalieAdvancedStatsSavesByStrength:
-            return GoalieAdvancedStatsSavesByStrengthApiMapper()
+            return GoalieAdvancedStatsSavesByStrengthApiMapper(data_parser, util)
         elif obj_type == GoalieAdvancedStatsStartRelieved:
-            return GoalieAdvancedStatsStartRelievedApiMapper()
+            return GoalieAdvancedStatsStartRelievedApiMapper(data_parser, util)
         elif obj_type == GoalieAdvancedStatsShootout:
-            return GoalieAdvancedStatsShootoutApiMapper()
+            return GoalieAdvancedStatsShootoutApiMapper(data_parser, util)
         elif obj_type == GoalieAdvancedStats:
-            return GoalieAdvancedStatsApiMapper()
+            return GoalieAdvancedStatsApiMapper(data_parser, util)
         elif obj_type == GoalieYouthStats:
-            return GoalieYouthStatsApiMapper()
+            return GoalieYouthStatsApiMapper(data_parser, util)
         elif obj_type == GoalieStats:
-            return GoalieStatsApiMapper()
+            return GoalieStatsApiMapper(data_parser, util)
         elif obj_type == SkaterStats:
-            return SkaterStatsApiMapper()
+            return SkaterStatsApiMapper(data_parser, util)
         elif obj_type == YouthSkaterStats:
-            return SkaterYouthStatsApiMapper()
+            return SkaterYouthStatsApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsCorsiFenwick:
-            return SkaterAdvancedStatsCorsiFenwickApiMapper()
+            return SkaterAdvancedStatsCorsiFenwickApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsFaceoffs:
-            return SkaterAdvancedStatsFaceoffsApiMapper()
+            return SkaterAdvancedStatsFaceoffsApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsGoals:
-            return SkaterAdvancedStatsGoalsApiMapper()
+            return SkaterAdvancedStatsGoalsApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsMisc:
-            return SkaterAdvancedStatsMiscApiMapper()
+            return SkaterAdvancedStatsMiscApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsPenalties:
-            return SkaterAdvancedStatsPenaltiesApiMapper()
+            return SkaterAdvancedStatsPenaltiesApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsPenaltyKill:
-            return SkaterAdvancedStatsPenaltyKillApiMapper()
+            return SkaterAdvancedStatsPenaltyKillApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsPowerplay:
-            return SkaterAdvancedStatsPowerplayApiMapper()
+            return SkaterAdvancedStatsPowerplayApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsScoring:
-            return SkaterAdvancedStatsScoringApiMapper()
+            return SkaterAdvancedStatsScoringApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsShootout:
-            return SkaterAdvancedStatsShootoutApiMapper()
+            return SkaterAdvancedStatsShootoutApiMapper(data_parser, util)
         elif obj_type == SkaterAdvancedStatsTOI:
-            return SkaterAdvancedStatsTOIApiMapper()
+            return SkaterAdvancedStatsTOIApiMapper(data_parser, util)
         elif obj_type == PlayerAwards:
             return PlayerAwardsApiMapper(data_parser)
         elif obj_type == PlayerDetails:
@@ -406,7 +406,6 @@ class GoalieAdvancedStatsDaysRestApiMapper(ApiMapper):
             "gamesPlayedDaysRest1": "games_played_days_rest_1",
             "gamesPlayedDaysRest2": "games_played_days_rest_2",
             "gamesPlayedDaysRest3": "games_played_days_rest_3",
-            "gamesPlayedDaysRest4": "games_played_days_rest_4",
             "gamesPlayedDaysRest4Plus": "games_played_days_rest_4_plus",
             "gamesStarted": "games_started",
             "losses": "losses",
@@ -416,7 +415,6 @@ class GoalieAdvancedStatsDaysRestApiMapper(ApiMapper):
             "savePctDaysRest1": "save_percent_days_rest_1",
             "savePctDaysRest2": "save_percent_days_rest_2",
             "savePctDaysRest3": "save_percent_days_rest_3",
-            "savePctDaysRest4": "save_percent_days_rest_4",
             "savePctDaysRest4Plus": "save_percent_days_rest_4_plus"
         }
 
@@ -431,11 +429,14 @@ class GoalieAdvancedStatsDaysRestApiMapper(ApiMapper):
             GoalieAdvancedStatsDaysRest: The mapped `GoalieAdvancedStatsDaysRest` object.
 
         """
-        goalie_stats = GoalieAdvancedStatsDaysRest()
+        player_id = self.data_parser.parse(source, "playerId", "none")
+        goalie_stats = GoalieAdvancedStatsDaysRest(player_id)
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(value)
+                if value is None:
+                    value = 0
             setattr(goalie_stats, attr_name, value)
         return goalie_stats
 
@@ -466,7 +467,6 @@ class GoalieAdvancedStatsDaysRestDatabaseMapper:
             season.games_played_days_rest_1,
             season.games_played_days_rest_2,
             season.games_played_days_rest_3,
-            season.games_played_days_rest_4,
             season.games_played_days_rest_4_plus,
             season.games_started,
             season.losses,
@@ -476,7 +476,6 @@ class GoalieAdvancedStatsDaysRestDatabaseMapper:
             season.save_percent_days_rest_1,
             season.save_percent_days_rest_2,
             season.save_percent_days_rest_3,
-            season.save_percent_days_rest_4,
             season.save_percent_days_rest_4_plus
         )
     
@@ -491,9 +490,9 @@ class GoalieAdvancedStatsDaysRestDatabaseMapper:
         """
         return """
             INSERT INTO goalie_advanced_stats_days_rest (id, year, team_id, games_played, games_played_days_rest_0, games_played_days_rest_1,\
-            games_played_days_rest_2, games_played_days_rest_3, games_played_days_rest_4, games_played_days_rest_4_plus, games_started, losses,\
+            games_played_days_rest_2, games_played_days_rest_3, games_played_days_rest_4_plus, games_started, losses,\
             ot_losses, save_percent, save_percent_days_rest_0, save_percent_days_rest_1, save_percent_days_rest_2, save_percent_days_rest_3,\
-            save_percent_days_rest_4, save_percent_days_rest_4_plus) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            save_percent_days_rest_4_plus) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
     
     @staticmethod
@@ -514,7 +513,6 @@ class GoalieAdvancedStatsDaysRestDatabaseMapper:
             games_played_days_rest_1 = %s,
             games_played_days_rest_2 = %s,
             games_played_days_rest_3 = %s,
-            games_played_days_rest_4 = %s,
             games_played_days_rest_4_plus = %s,
             games_started = %s,
             losses = %s,
@@ -524,7 +522,6 @@ class GoalieAdvancedStatsDaysRestDatabaseMapper:
             save_percent_days_rest_1 = %s,
             save_percent_days_rest_2 = %s,
             save_percent_days_rest_3 = %s,
-            save_percent_days_rest_4 = %s,
             save_percent_days_rest_4_plus = %s
             WHERE id = %s AND year = %s
             """
@@ -556,11 +553,14 @@ class GoalieAdvancedStatsPenaltyShotsApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        goalie_stats = GoalieAdvancedStatsPenaltyShots()
+        player_id = self.data_parser.parse(source, "playerId", "none")
+        goalie_stats = GoalieAdvancedStatsPenaltyShots(player_id)
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(value)
+                if value is None:
+                    value = 0
             setattr(goalie_stats, attr_name, value)
         return goalie_stats
     
@@ -625,11 +625,14 @@ class GoalieAdvancedStatsSavesByStrengthApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        goalie_stats = GoalieAdvancedStatsSavesByStrength()
+        player_id = self.data_parser.parse(source, "playerId", "none")
+        goalie_stats = GoalieAdvancedStatsSavesByStrength(player_id)
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(value)
+                if value is None:
+                    value = 0
             setattr(goalie_stats, attr_name, value)
         return goalie_stats
     
@@ -718,11 +721,14 @@ class GoalieAdvancedStatsStartRelievedApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        goalie_stats = GoalieAdvancedStatsStartRelieved()
+        player_id = self.data_parser.parse(source, "playerId", "none")
+        goalie_stats = GoalieAdvancedStatsStartRelieved(player_id)
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(value)
+                if value is None:
+                    value = 0
             setattr(goalie_stats, attr_name, value)
         return goalie_stats
 
@@ -811,6 +817,7 @@ class GoalieAdvancedStatsShootoutApiMapper(ApiMapper):
             "careerShootoutSavePct": "career_shootout_save_percent",
             "careerShootoutSaves": "career_shootout_saves",
             "careerShootoutShotsAgainst": "career_shootout_shots_against",
+            "careerShootoutWins": "career_shootout_wins",
             "shootoutGoalsAgainst": "shootout_goals_against",
             "shootoutLosses": "shootout_losses",
             "shootoutSavePct": "shootout_save_percent",
@@ -820,11 +827,14 @@ class GoalieAdvancedStatsShootoutApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        goalie_stats = GoalieAdvancedStatsShootout()
+        player_id = self.data_parser.parse(source, "playerId", "none")
+        goalie_stats = GoalieAdvancedStatsShootout(player_id)
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(value)
+                if value is None:
+                    value = 0
             setattr(goalie_stats, attr_name, value)
         return goalie_stats
     
@@ -842,6 +852,7 @@ class GoalieAdvancedStatsShootoutDatabaseMapper:
             season.career_shootout_save_percent,
             season.career_shootout_saves,
             season.career_shootout_shots_against,
+            season.career_shootout_wins,
             season.shootout_goals_against,
             season.shootout_losses,
             season.shootout_save_percent,
@@ -893,10 +904,11 @@ class GoalieAdvancedStatsApiMapper(ApiMapper):
         self.field_map = {
             "playerId": "player_id",
             "seasonId": "year",
-            "completeGamePctg": "complete_game_percent",
+            "teamAbbrevs": "team_id",
+            "completeGamePct": "complete_game_percentage",
             "completeGames": "complete_games",
             "gamesStarted": "games_started",
-            "goals_against": "goals_against",
+            "goalsAgainst": "goals_against",
             "goalsAgainstAverage": "goals_against_average",
             "goalsFor": "goals_for",
             "goalsForAverage": "goals_for_average",
@@ -908,9 +920,14 @@ class GoalieAdvancedStatsApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        goalie_stats = GoalieAdvancedStats()
+        player_id = self.data_parser.parse(source, "playerId", "none")
+        goalie_stats = GoalieAdvancedStats(player_id)
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                value = self.util.get_team_id_from_abbrev(value)
+                if value is None:
+                    value = 0
             setattr(goalie_stats, attr_name, value)
         return goalie_stats
     
@@ -921,7 +938,8 @@ class GoalieAdvancedStatsDatabaseMapper:
         return (
             season.player_id,
             season.year,
-            season.complete_game_percent,
+            season.team_id,
+            season.complete_game_percentage,
             season.complete_games,
             season.games_started,
             season.goals_against,
@@ -938,9 +956,9 @@ class GoalieAdvancedStatsDatabaseMapper:
     @staticmethod
     def create_insert_query() -> str:
         return """
-                INSERT INTO goalie_advanced_stats (id, year, team_id, complete_game_percent, complete_games, games_played,\
+                INSERT INTO goalie_advanced_stats (id, year, team_id, complete_game_percent, complete_games,\
                 games_started, goals_against, goals_against_average, goals_for, goals_for_average, incomplete_games, quality_start,\
-                quality_starts_percent, regulation_losses, regulation_wins) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                quality_starts_percent, regulation_losses, regulation_wins) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
     
     @staticmethod
@@ -951,7 +969,6 @@ class GoalieAdvancedStatsDatabaseMapper:
             team_id = %s,
             complete_game_percent = %s,
             complete_games = %s,
-            games_played = %s,
             games_started = %s,
             goals_against = %s,
             goals_against_average = %s,
@@ -977,7 +994,7 @@ class GoalieYouthStatsApiMapper(ApiMapper):
             "playerId": "player_id",
             "season": "year",
             "teamName": "team_name",
-            "leagueAbbrev": "league_abbrev",
+            "leagueAbbrev": "league_name",
             "gameTypeId": "game_type_id",
             "sequence": "sequence",
             "gamesPlayed": "games_played",
@@ -991,7 +1008,8 @@ class GoalieYouthStatsApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        goalie_stats = GoalieYouthStats()
+        player_id = self.data_parser.parse(source, "playerId", "none")
+        goalie_stats = GoalieYouthStats(player_id)
         for json_key, attr_name in self.field_map.items():
             if json_key == "teamName":
                 value = self.data_parser.double_parse(source, "teamName", "default", "none")
@@ -1079,11 +1097,14 @@ class GoalieStatsApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        goalie_stats = GoalieStats()
+        player_id = self.data_parser.parse(source, "playerId", "none")
+        goalie_stats = GoalieStats(player_id)
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_name(self.data_parser.double_parse(source, "teamName", "default", "none"))
+                if value == None:
+                    value = 0
             setattr(goalie_stats, attr_name, value)
         return goalie_stats
     
@@ -1116,9 +1137,9 @@ class GoalieStatsDatabaseMapper:
     @staticmethod
     def create_insert_query() -> str:
         return """
-                INSERT INTO goalie_stats (id, team_id, year, game_type_id, sequence, games_played, goals, assists, games_started,\
-                wins, losses, ot_losses, shots_against, goals_against, save_percent, shutouts, time_on_ice, goals_against_average,\
-                penalty_minutes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO goalie_stats (id, year, team_id, game_type_id, sequence, games_played, goals, assists, games_started,\
+                wins, losses, ot_losses, shots_against, goals_against, save_percent, shutouts, time_on_ice, penalty_minutes,\
+                goals_against_average) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
     
     @staticmethod
@@ -1126,7 +1147,6 @@ class GoalieStatsDatabaseMapper:
         return """
             UPDATE goalie_stats SET
             team_id = %s,
-            year = %s,
             game_type_id = %s,
             sequence = %s,
             games_played = %s,
@@ -1143,12 +1163,12 @@ class GoalieStatsDatabaseMapper:
             time_on_ice = %s,
             goals_against_average = %s,
             penalty_minutes = %s
-            WHERE id = %s AND team_id = %s AND year = %s AND game_type_id = %s AND sequence = %s
+            WHERE id = %s AND year = %s AND team_id = %s AND game_type_id = %s AND sequence = %s
             """
     
     @staticmethod
     def create_check_existence_query() -> str:
-        return "SELECT 1 FROM goalie_stats WHERE id = %s AND team_id = %s AND year = %s AND game_type_id = %s AND sequence = %s"
+        return "SELECT 1 FROM goalie_stats WHERE id = %s AND year = %s AND team_id = %s AND game_type_id = %s AND sequence = %s"
             
 class SkaterStatsApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
@@ -1179,11 +1199,13 @@ class SkaterStatsApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        skater_stats = SkaterStats()
+        skater_stats = SkaterStats(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_name(self.data_parser.double_parse(source, "teamName", "default", "none"))
+                if value == None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
@@ -1218,9 +1240,9 @@ class SkaterStatsDatabaseMapper:
         @staticmethod
         def create_insert_query() -> str:
             return """
-                    INSERT INTO skater_stats (id, team_id, games_played, goals, assists, points, plus_minus, penalty_minutes,\
+                    INSERT INTO skater_stats (id, year, team_id, games_played, goals, assists, points, plus_minus, penalty_minutes,\
                     game_winning_goals, ot_goals, power_play_goals, power_play_points, shooting_percent, shorthanded_goals, shorthanded_points,\
-                    shots, time_on_ice, game_type_id, year, sequence, faceoff_percent) VALUES (%s, %s, %s,\
+                    shots, time_on_ice, game_type_id, sequence, faceoff_percent) VALUES (%s, %s, %s,\
                     %s, %s, %s, %s, %s, %s, %s, %s,%s,%s, %s,%s, %s, %s, %s, %s, %s, %s)
                 """
         
@@ -1245,10 +1267,9 @@ class SkaterStatsDatabaseMapper:
                 shots = %s,
                 time_on_ice = %s,
                 game_type_id = %s,
-                year = %s,
                 sequence = %s,
                 faceoff_percent = %s
-                WHERE id = %s AND team_id = %s AND year = %s AND game_type_id = %s AND sequence = %s
+                WHERE id = %s AND year = %s AND team_id = %s AND game_type_id = %s AND sequence = %s
                 """
         
         @staticmethod
@@ -1263,7 +1284,7 @@ class SkaterYouthStatsApiMapper(ApiMapper):
             "playerId": "player_id",
             "season": "year",
             "teamName": "team_name",
-            "leagueAbbrev": "league_abbrev",
+            "leagueAbbrev": "league_name",
             "gameTypeId": "game_type_id",
             "sequence": "sequence",
             "gamesPlayed": "games_played",
@@ -1274,7 +1295,7 @@ class SkaterYouthStatsApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        skater_stats = GoalieYouthStats()
+        skater_stats = YouthSkaterStats(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             if json_key == "teamName":
                 value = self.data_parser.double_parse(source, "teamName", "default", "none")
@@ -1304,33 +1325,30 @@ class SkaterYouthStatsDatabaseMapper:
         @staticmethod
         def create_insert_query() -> str:
             return """
-                    INSERT INTO goalie_youth_stats (id, year, team_name, league_name, game_type_id, sequence, games_played, save_percent,\
-                    goals_against_average, goals_against, wins, losses, time_on_ice, ties) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO skater_youth_stats (id, year, team_name, league_name, game_type_id, sequence, games_played, goals, assists, points, pim) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
         
         @staticmethod
         def create_update_query() -> str:
             return """
-                UPDATE goalie_youth_stats SET
+                UPDATE skater_youth_stats SET
                 year = %s,
                 team_name = %s,
                 league_name = %s,
                 game_type_id = %s,
                 sequence = %s,
                 games_played = %s,
-                save_percent = %s,
-                goals_against_average = %s,
-                goals_against = %s,
-                wins = %s,
-                losses = %s,
-                time_on_ice = %s,
-                ties = %s
+                goals = %s,
+                assists = %s,
+                points = %s,
+                pim = %s
                 WHERE id = %s AND year = %s AND team_name = %s AND league_name = %s AND game_type_id = %s AND sequence = %s
                 """
         
         @staticmethod
         def create_check_existence_query() -> str:
-            return "SELECT 1 FROM goalie_youth_stats WHERE id = %s AND year = %s AND team_name = %s AND league_name = %s AND game_type_id = %s AND sequence = %s"
+            return "SELECT 1 FROM skater_youth_stats WHERE id = %s AND year = %s AND team_name = %s AND league_name = %s AND game_type_id = %s AND sequence = %s"
 
 class SkaterAdvancedStatsCorsiFenwickApiMapper(ApiMapper):
     def __init__(self, data_parser, util):
@@ -1355,38 +1373,46 @@ class SkaterAdvancedStatsCorsiFenwickApiMapper(ApiMapper):
             "usatClose": "fenwick_close",
             "usatFor": "fenwick_for",
             "usatTied": "fenwick_tied",
-            "usatTied": "fenwick_tied",
             "usatTotal": "fenwick_total",
             "usatRelative": "fenwick_relative",
             "timeOnIcePerGame5v5": "time_on_ice_per_game_5v5",
             "satPercentage": "corsi_percentage",
-            "satPercentageAhead": "corsi_percentage_ahead",
-            "satPercentageBehind": "corsi_percentage_behind",
-            "satPercentageClose": "corsi_percentage_close",
-            "satPercentageTied": "corsi_percentage_tied",
-            "shootingPct5v5": "shooting_percent_5v5",
-            "skaterSavePct5v5": "skater_save_percent_5v5",
-            "skaterShootingPlusSavePct5v5": "skater_shooting_plus_save_percent_5v5",
+            "satPercentageAhead": "corsi_ahead_percentage",
+            "satPercentageBehind": "corsi_behind_percentage",
+            "satPercentageClose": "corsi_close_percentage",
+            "satPercentageTied": "corsi_tied_percentage",
+            "shootingPct5v5": "shooting_percent_5on5",
+            "skaterSavePct5v5": "skater_save_percent_5on5",
+            "skaterShootingPlusSavePct5v5": "skater_shooting_plus_save_percent_5on5",
             "usatPercentage": "fenwick_percentage",
-            "usatPercentageAhead": "fenwick_percentage_ahead",
-            "usatPercentageBehind": "fenwick_percentage_behind",
-            "usatPrecentageClose": "fenwick_percentage_close",
-            "usatPercentageTied": "fenwick_percentage_tied",
-            "zoneStartPct5v5": "zone_start_percent_5v5",
-            "teamId": "team_id"
+            "usatPercentageAhead": "fenwick_ahead_percentage",
+            "usatPercentageBehind": "fenwick_behind_percentage",
+            "usatPrecentageClose": "fenwick_close_percentage",
+            "usatPercentageTied": "fenwick_tied_percentage",
+            "zoneStartPct5v5": "zone_start_5on5_percentage",
+            "teamAbbrevs": "team_id"
         }
 
     def map(self, source: dict) -> object:
-        skater_stats = SkaterAdvancedStatsCorsiFenwick()
+        skater_stats = SkaterAdvancedStatsCorsiFenwick(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
+            if attr_name == "team_id":
+                if type(value) == list:
+                    value = self.util.get_team_id_from_abbrev(value[-1])
+                else:
+                    value = self.util.get_team_id_from_abbrev(value)
+
+                if value is None:
+                    value = 0
+
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
 class SkaterAdvancedStatsCorsiFenwickDatabaseMapper:
         
     @staticmethod
-    def to_database_params(season: Season) -> tuple:
+    def to_database_params(season: SkaterAdvancedStatsCorsiFenwick) -> tuple:
         return (
             season.player_id,
             season.year,
@@ -1408,21 +1434,21 @@ class SkaterAdvancedStatsCorsiFenwickDatabaseMapper:
             season.fenwick_tied,
             season.fenwick_total,
             season.fenwick_relative,
-            season.time_on_ice_per_game_5v5,
+            season.time_on_ice_5on5_per_game,
             season.corsi_percentage,
-            season.corsi_percentage_ahead,
-            season.corsi_percentage_behind,
-            season.corsi_percentage_close,
-            season.corsi_percentage_tied,
-            season.shooting_percent_5v5,
-            season.skater_save_percent_5v5,
-            season.skater_shooting_plus_save_percent_5v5,
+            season.corsi_ahead_percentage,
+            season.corsi_behind_percentage,
+            season.corsi_close_percentage,
+            season.corsi_tied_percentage,
+            season.shooting_percent_5on5,
+            season.skater_save_percent_5on5,
+            season.skater_shooting_plus_save_percent_5on5,
             season.fenwick_percentage,
-            season.fenwick_percentage_ahead,
-            season.fenwick_percentage_behind,
-            season.fenwick_percentage_close,
-            season.fenwick_percentage_tied,
-            season.zone_start_percent_5v5
+            season.fenwick_ahead_percentage,
+            season.fenwick_behind_percentage,
+            season.fenwick_close_percentage,
+            season.fenwick_tied_percentage,
+            season.zone_start_5on5_percentage
         )
     
     @staticmethod
@@ -1514,21 +1540,24 @@ class SkaterAdvancedStatsFaceoffsApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        skater_stats = SkaterAdvancedStatsFaceoffs()
+        skater_stats = SkaterAdvancedStatsFaceoffs(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+                if value is None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
 class SkaterAdvancedStatsFaceoffsDatabaseMapper:
             
     @staticmethod
-    def to_database_params(season: Season) -> tuple:
+    def to_database_params(season: SkaterAdvancedStatsFaceoffs) -> tuple:
         return (
             season.player_id,
             season.year,
+            season.team_id,
             season.defensive_zone_faceoffs,
             season.defensive_zone_faceoffs_won,
             season.defensive_zone_faceoffs_lost,
@@ -1560,7 +1589,7 @@ class SkaterAdvancedStatsFaceoffsDatabaseMapper:
                 ev_faceoffs, ev_faceoffs_won, ev_faceoffs_lost, faceoff_percent, neutral_zone_faceoffs, neutral_zone_faceoffs_won, neutral_zone_faceoffs_lost,\
                 offensive_zone_faceoffs, offensive_zone_faceoffs_won, offensive_zone_faceoffs_lost, pp_faceoffs, pp_faceoffs_won, pp_faceoffs_lost, pk_faceoffs,\
                 pk_faceoffs_won, pk_faceoffs_lost, total_faceoffs, total_faceoffs_won, total_faceoffs_lost) VALUES (%s,%s, %s,%s, %s,%s,%s, %s,%s, %s,%s,%s, %s,%s, %s,\
-                %s,%s, %s,%s, %s,%s,%s, %s,%s, %s)
+                %s,%s, %s,%s, %s,%s,%s, %s, %s, %s)
                 """
     
     @staticmethod
@@ -1625,11 +1654,13 @@ class SkaterAdvancedStatsGoalsApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        skater_stats = SkaterAdvancedStatsGoals()
+        skater_stats = SkaterAdvancedStatsGoals(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+                if value is None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
@@ -1690,7 +1721,6 @@ class SkaterAdvancedStatsGoalsDatabaseMapper:
         """
         return """
             UPDATE skater_advanced_stats_goals SET
-                year = %s,
                 team_id = %s,
                 even_strength_goal_difference = %s,
                 even_strength_goals_against = %s,
@@ -1701,7 +1731,7 @@ class SkaterAdvancedStatsGoalsDatabaseMapper:
                 pp_goals_against = %s,
                 pk_goals_for = %s,
                 pk_goals_against = %s
-            WHERE id = %s
+            WHERE id = %s and year = %s
         """
 
     @staticmethod
@@ -1748,11 +1778,13 @@ class SkaterAdvancedStatsMiscApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        skater_stats = SkaterAdvancedStatsMisc()
+        skater_stats = SkaterAdvancedStatsMisc(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+                if value is None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
@@ -1821,7 +1853,6 @@ class SkaterAdvancedStatsMiscDatabaseMapper:
         """
         return """
             UPDATE skater_advanced_stats_misc SET
-                year = %s,
                 team_id = %s,
                 blocked_shots = %s,
                 empty_net_assists = %s,
@@ -1839,7 +1870,7 @@ class SkaterAdvancedStatsMiscDatabaseMapper:
                 ot_goals = %s,
                 takeaways = %s,
                 time_on_ice_per_game = %s
-            WHERE id = %s
+            WHERE id = %s AND year = %s
         """
 
     @staticmethod
@@ -1881,11 +1912,13 @@ class SkaterAdvancedStatsPenaltiesApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        skater_stats = SkaterAdvancedStatsPenalties()
+        skater_stats = SkaterAdvancedStatsPenalties(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+                if value is None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
@@ -1948,7 +1981,6 @@ class SkaterAdvancedStatsPenaltiesDatabaseMapper:
         """
         return """
             UPDATE skater_advanced_stats_penalties SET
-                year = %s,
                 team_id = %s,
                 game_misconduct_penalties = %s,
                 games_played = %s,
@@ -1961,7 +1993,7 @@ class SkaterAdvancedStatsPenaltiesDatabaseMapper:
                 penalties_drawn = %s,
                 penalty_minutes = %s,
                 time_on_ice_per_game = %s
-            WHERE id = %s
+            WHERE id = %s AND year = %s
         """
 
     @staticmethod
@@ -1990,10 +2022,10 @@ class SkaterAdvancedStatsPenaltyKillApiMapper(ApiMapper):
             "seasonId": "year",
             "shAssists": "pk_assists",
             "shGoals": "pk_goals",
-            "shIndividualSatAgainst": "pk_individual_corsi_against",
+            "shIndividualSatFor": "pk_individual_corsi_for",
             "shPrimaryAssists": "pk_primary_assists",
-            "stSecondaryAssists": "pk_secondary_assists",
-            "stShootingPct": "pk_shooting_percentage",
+            "shSecondaryAssists": "pk_secondary_assists",
+            "shShootingPct": "pk_shooting_percentage",
             "shShots": "pk_shots",
             "shTimeOnIce": "pk_time_on_ice",
             "shTimeOnIcePerGame": "pk_time_on_ice_per_game",
@@ -2002,11 +2034,13 @@ class SkaterAdvancedStatsPenaltyKillApiMapper(ApiMapper):
         }
 
     def map(self, source: dict) -> object:
-        skater_stats = SkaterAdvancedStatsPenaltyKill()
+        skater_stats = SkaterAdvancedStatsPenaltyKill(self.data_parser.parse(source, "playerId", "none"))
         for json_key, attr_name in self.field_map.items():
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+                if value is None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
@@ -2032,7 +2066,7 @@ class SkaterAdvancedStatsPenaltyKillDatabaseMapper:
             skater_advanced_stats_penalty_kill.team_id,
             skater_advanced_stats_penalty_kill.pk_assists,
             skater_advanced_stats_penalty_kill.pk_goals,
-            skater_advanced_stats_penalty_kill.pk_individual_corsi_against,
+            skater_advanced_stats_penalty_kill.pk_individual_corsi_for,
             skater_advanced_stats_penalty_kill.pk_primary_assists,
             skater_advanced_stats_penalty_kill.pk_secondary_assists,
             skater_advanced_stats_penalty_kill.pk_shooting_percentage,
@@ -2052,7 +2086,7 @@ class SkaterAdvancedStatsPenaltyKillDatabaseMapper:
         """
         return """
             INSERT INTO skater_advanced_stats_penalty_kill (
-                id, year, team_id, pk_assists, pk_goals, pk_individual_corsi_against, pk_primary_assists,
+                id, year, team_id, pk_assists, pk_goals, pk_individual_corsi_for, pk_primary_assists,
                 pk_secondary_assists, pk_shooting_percentage, pk_shots, pk_time_on_ice, pk_time_on_ice_per_game, pk_time_on_ice_percentage
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
@@ -2067,11 +2101,10 @@ class SkaterAdvancedStatsPenaltyKillDatabaseMapper:
         """
         return """
             UPDATE skater_advanced_stats_penalty_kill SET
-                year = %s,
                 team_id = %s,
                 pk_assists = %s,
                 pk_goals = %s,
-                pk_individual_corsi_against = %s,
+                pk_individual_corsi_for = %s,
                 pk_primary_assists = %s,
                 pk_secondary_assists = %s,
                 pk_shooting_percentage = %s,
@@ -2079,7 +2112,7 @@ class SkaterAdvancedStatsPenaltyKillDatabaseMapper:
                 pk_time_on_ice = %s,
                 pk_time_on_ice_per_game = %s,
                 pk_time_on_ice_percentage = %s
-            WHERE id = %s
+            WHERE id = %s AND year = %s
         """
 
     @staticmethod
@@ -2125,6 +2158,8 @@ class SkaterAdvancedStatsPowerplayApiMapper(ApiMapper):
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+                if value is None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
@@ -2146,8 +2181,8 @@ class SkaterAdvancedStatsPowerplayDatabaseMapper:
         """
         return (
             skater_advanced_stats_powerplay.player_id,
-            skater_advanced_stats_powerplay.team_id,
             skater_advanced_stats_powerplay.year,
+            skater_advanced_stats_powerplay.team_id,
             skater_advanced_stats_powerplay.pp_assists,
             skater_advanced_stats_powerplay.pp_goals,
             skater_advanced_stats_powerplay.pp_individual_corsi_for,
@@ -2170,7 +2205,7 @@ class SkaterAdvancedStatsPowerplayDatabaseMapper:
         """
         return """
             INSERT INTO skater_advanced_stats_powerplay (
-                id, team_id, year, pp_assists, pp_goals, pp_individual_corsi_for, pp_primary_assists,
+                id, year, team_id, pp_assists, pp_goals, pp_individual_corsi_for, pp_primary_assists,
                 pp_secondary_assists, pp_shooting_percentage, pp_shots, pp_time_on_ice, pp_time_on_ice_per_game, pp_time_on_ice_percentage
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
@@ -2186,7 +2221,6 @@ class SkaterAdvancedStatsPowerplayDatabaseMapper:
         return """
             UPDATE skater_advanced_stats_powerplay SET
                 team_id = %s,
-                year = %s,
                 pp_assists = %s,
                 pp_goals = %s,
                 pp_individual_corsi_for = %s,
@@ -2197,7 +2231,7 @@ class SkaterAdvancedStatsPowerplayDatabaseMapper:
                 pp_time_on_ice = %s,
                 pp_time_on_ice_per_game = %s,
                 pp_time_on_ice_percentage = %s
-            WHERE id = %s
+            WHERE id = %s AND year = %s AND team_id = %s
         """
 
     @staticmethod
@@ -2208,7 +2242,7 @@ class SkaterAdvancedStatsPowerplayDatabaseMapper:
         Returns:
             str: The existence check query string.
         """
-        return "SELECT 1 FROM skater_advanced_stats_powerplay WHERE id = %s AND year = %s"
+        return "SELECT 1 FROM skater_advanced_stats_powerplay WHERE id = %s AND year = %s AND team_id = %s"
     
 class SkaterAdvancedStatsScoringApiMapper(ApiMapper):
     """
@@ -2255,6 +2289,8 @@ class SkaterAdvancedStatsScoringApiMapper(ApiMapper):
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+                if value is None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
 
@@ -2329,7 +2365,6 @@ class SkaterAdvancedStatsScoringDatabaseMapper:
         """
         return """
             UPDATE skater_advanced_stats_scoring SET
-                year = %s,
                 team_id = %s,
                 goals_backhand = %s,
                 goals_bat = %s,
@@ -2399,6 +2434,8 @@ class SkaterAdvancedStatsShootoutApiMapper(ApiMapper):
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(self.data_parser.parse(source, "teamAbbrevs", "none"))
+                if value is None:
+                    value = 0
             setattr(skater_stats, attr_name, value)
         return skater_stats
     
@@ -2460,7 +2497,6 @@ class SkaterAdvancedStatsShootoutDatabaseMapper:
         """
         return """
             UPDATE skater_advanced_stats_shootout SET
-                year = %s,
                 team_id = %s,
                 career_shootout_game_deciding_goals = %s,
                 career_shootout_games_played = %s,
@@ -2503,7 +2539,7 @@ class SkaterAdvancedStatsTOIApiMapper(ApiMapper):
             "evTimeOnIce": "ev_time_on_ice",
             "gamesPlayed": "games_played",
             "otTimeOnIce": "ot_time_on_ice",
-            "otTimeOnIcePerOTGame": "ot_time_on_ice_per_ot_game",
+            "otTimeOnIcePerOtGame": "ot_time_on_ice_per_ot_game",
             "ppTimeOnIce": "pp_time_on_ice",
             "shTimeOnIce": "sh_time_on_ice",
             "shifts": "shifts",
@@ -2517,6 +2553,8 @@ class SkaterAdvancedStatsTOIApiMapper(ApiMapper):
             value = self.data_parser.parse(source, json_key, "none")
             if attr_name == "team_id":
                 value = self.util.get_team_id_from_abbrev(value)
+                if value is None:
+                    value = 0
             setattr(skater_toi, attr_name, value)
         return skater_toi
     
@@ -2538,8 +2576,8 @@ class SkaterAdvancedStatsTOIDatabaseMapper:
         """
         return (
             skater_advanced_stats_toi.player_id,
-            skater_advanced_stats_toi.team_id,
             skater_advanced_stats_toi.year,
+            skater_advanced_stats_toi.team_id,
             skater_advanced_stats_toi.ev_time_on_ice,
             skater_advanced_stats_toi.games_played,
             skater_advanced_stats_toi.ot_time_on_ice,
@@ -2560,7 +2598,7 @@ class SkaterAdvancedStatsTOIDatabaseMapper:
         """
         return """
             INSERT INTO skater_advanced_stats_toi (
-                id, team_id, year, ev_time_on_ice, games_played, ot_time_on_ice, ot_time_on_ice_per_ot_game,
+                id, year, team_id, ev_time_on_ice, games_played, ot_time_on_ice, ot_time_on_ice_per_ot_game,
                 pp_time_on_ice, sh_time_on_ice, shifts, time_on_ice
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
@@ -2576,7 +2614,6 @@ class SkaterAdvancedStatsTOIDatabaseMapper:
         return """
             UPDATE skater_advanced_stats_toi SET
                 team_id = %s,
-                year = %s,
                 ev_time_on_ice = %s,
                 games_played = %s,
                 ot_time_on_ice = %s,
@@ -2660,7 +2697,6 @@ class PlayersDatabaseMapper:
             str: The existence check query string.
         """
         return "SELECT 1 FROM players WHERE id = %s"
-
 
 class PlayerAwardsApiMapper(ApiMapper):
     """

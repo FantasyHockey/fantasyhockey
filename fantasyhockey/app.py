@@ -29,13 +29,19 @@ def run():
 
     #update_seasons = UpdateSeasons(database_operator, fetch_seasons)
     #update_draft_rankings = UpdateDraftRankings(database_operator, fetch_draft_rankings)
-    fetch_teams = FetchTeams()
-    update_teams = UpdateTeams(database_operator, fetch_teams)
+    #fetch_teams = FetchTeams()
+    #update_teams = UpdateTeams(database_operator, fetch_teams)
     #update_team_advanced_stats = UpdateTeamAdvancedStats(database_operator, fetch_team_advanced_stats)
 
     #fetch_players = FetchPlayers()
     #update_players = UpdatePlayers(database_operator, fetch_players)
-    updater = CentralUpdater([update_teams])
+
+    #fetch_skaters = FetchSkaters()
+    #update_skaters = UpdateSkaters(database_operator, fetch_skaters)
+
+    fetch_goalies = FetchGoalies()
+    update_goalies = UpdateGoalies(database_operator, fetch_goalies)
+    updater = CentralUpdater([update_goalies])
     updater.update_all()
 
 

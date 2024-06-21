@@ -273,6 +273,10 @@ class SkaterAdvancedStatsCorsiFenwick:
     @property
     def player_id(self):
         return self._player_id
+    
+    @player_id.setter
+    def player_id(self, value):
+        self._player_id = value
 
     @property
     def year(self):
@@ -320,7 +324,7 @@ class SkaterAdvancedStatsCorsiFenwick:
 
     @corsi_behind.setter
     def corsi_behind(self, value):
-        self.__corsi_behind = value
+        self._corsi_behind = value
 
     @property
     def corsi_close(self):
@@ -1199,7 +1203,7 @@ class SkaterAdvancedStatsPenaltyKill:
         self._team_id = None
         self._pk_assists = None
         self._pk_goals = None
-        self._pk_individual_corsi_against = None
+        self._pk_individual_corsi_for = None
         self._pk_primary_assists = None
         self._pk_secondary_assists = None
         self._pk_shooting_percentage = None
@@ -1249,12 +1253,12 @@ class SkaterAdvancedStatsPenaltyKill:
         self._pk_goals = value
 
     @property
-    def pk_individual_corsi_against(self):
-        return self._pk_individual_corsi_against
+    def pk_individual_corsi_for(self):
+        return self._pk_individual_corsi_for
     
-    @pk_individual_corsi_against.setter
-    def pk_individual_corsi_against(self, value):
-        self._pk_individual_corsi_against = value
+    @pk_individual_corsi_for.setter
+    def pk_individual_corsi_for(self, value):
+        self._pk_individual_corsi_for = value
 
     @property
     def pk_primary_assists(self):
@@ -2318,7 +2322,6 @@ class GoalieAdvancedStatsDaysRest:
         self._games_played_days_rest_1 = None
         self._games_played_days_rest_2 = None
         self._games_played_days_rest_3 = None
-        self._games_played_days_rest_4 = None
         self._games_played_days_rest_4_plus = None
         self._games_started = None
         self._losses = None
@@ -2328,7 +2331,6 @@ class GoalieAdvancedStatsDaysRest:
         self._save_percent_days_rest_1 = None
         self._save_percent_days_rest_2 = None
         self._save_percent_days_rest_3 = None
-        self._save_percent_days_rest_4 = None
         self._save_percent_days_rest_4_plus = None
 
     @property
@@ -2394,14 +2396,6 @@ class GoalieAdvancedStatsDaysRest:
     @games_played_days_rest_3.setter
     def games_played_days_rest_3(self, value):
         self._games_played_days_rest_3 = value
-
-    @property
-    def games_played_days_rest_4(self):
-        return self._games_played_days_rest_4
-    
-    @games_played_days_rest_4.setter
-    def games_played_days_rest_4(self, value):
-        self._games_played_days_rest_4 = value
 
     @property
     def games_played_days_rest_4_plus(self):
@@ -2476,14 +2470,6 @@ class GoalieAdvancedStatsDaysRest:
         self._save_percent_days_rest_3 = value
 
     @property
-    def save_percent_days_rest_4(self):
-        return self._save_percent_days_rest_4
-    
-    @save_percent_days_rest_4.setter
-    def save_percent_days_rest_4(self, value):
-        self._save_percent_days_rest_4 = value
-
-    @property
     def save_percent_days_rest_4_plus(self):
         return self._save_percent_days_rest_4_plus
     
@@ -2498,9 +2484,9 @@ class GoalieAdvancedStatsPenaltyShots:
         self._year = None
         self._team_id = None
         self._penalty_shot_save_percent = None
-        self._penalty_shot_against = None
-        self._penalty_shot_goals_against = None
-        self._penalty_shot_saves = None
+        self._penalty_shots_against = None
+        self._penalty_shots_goals_against = None
+        self._penalty_shots_saves = None
 
     @property
     def player_id(self):
@@ -2535,28 +2521,28 @@ class GoalieAdvancedStatsPenaltyShots:
         self._penalty_shot_save_percent = value
 
     @property
-    def penalty_shot_against(self):
-        return self._penalty_shot_against
+    def penalty_shots_against(self):
+        return self._penalty_shots_against
     
-    @penalty_shot_against.setter
-    def penalty_shot_against(self, value):
-        self._penalty_shot_against = value
+    @penalty_shots_against.setter
+    def penalty_shots_against(self, value):
+        self._penalty_shots_against = value
 
     @property
-    def penalty_shot_goals_against(self):
-        return self._penalty_shot_goals_against
+    def penalty_shots_goals_against(self):
+        return self._penalty_shots_goals_against
     
-    @penalty_shot_goals_against.setter
-    def penalty_shot_goals_against(self, value):
-        self._penalty_shot_goals_against = value
+    @penalty_shots_goals_against.setter
+    def penalty_shots_goals_against(self, value):
+        self._penalty_shots_goals_against = value
 
     @property
-    def penalty_shot_saves(self):
-        return self._penalty_shot_saves
+    def penalty_shots_saves(self):
+        return self._penalty_shots_saves
     
-    @penalty_shot_saves.setter
-    def penalty_shot_saves(self, value):
-        self._penalty_shot_saves = value
+    @penalty_shots_saves.setter
+    def penalty_shots_saves(self, value):
+        self._penalty_shots_saves = value
 
 class GoalieAdvancedStatsSavesByStrength:
     
@@ -2707,7 +2693,7 @@ class GoalieAdvancedStatsShootout:
         self._career_shootout_goals_allowed = None
         self._career_shootout_losses = None
         self._career_shootout_save_percent = None
-        self._career_shooutout_saves = None
+        self._career_shootout_saves = None
         self._career_shootout_shots_against = None
         self._career_shootout_wins = None
         self._shootout_goals_against = None
@@ -2774,12 +2760,12 @@ class GoalieAdvancedStatsShootout:
         self._career_shootout_save_percent = value
 
     @property
-    def career_shooutout_saves(self):
-        return self._career_shooutout_saves
+    def career_shootout_saves(self):
+        return self._career_shootout_saves
     
-    @career_shooutout_saves.setter
-    def career_shooutout_saves(self, value):
-        self._career_shooutout_saves = value
+    @career_shootout_saves.setter
+    def career_shootout_saves(self, value):
+        self._career_shootout_saves = value
 
     @property
     def career_shootout_shots_against(self):
@@ -3053,7 +3039,7 @@ class GoalieAdvancedStats:
         self._player_id = player_id
         self._year = None
         self._team_id = None
-        self._complete_game_percent = None
+        self._complete_game_percentage = None
         self._complete_games = None
         self._games_played = None
         self._games_started = None
@@ -3092,12 +3078,12 @@ class GoalieAdvancedStats:
         self._team_id = value
 
     @property
-    def complete_game_percent(self):
-        return self._complete_game_percent
+    def complete_game_percentage(self):
+        return self._complete_game_percentage
     
-    @complete_game_percent.setter
+    @complete_game_percentage.setter
     def complete_game_percentage(self, value):
-        self._complete_game_percent = value
+        self._complete_game_percentage = value
 
     @property
     def complete_games(self):
@@ -3499,7 +3485,6 @@ class GoalieYouthStats:
     @ties.setter
     def ties(self, value):
         self._ties = value
-
 
 class Goalie:
     def __init__(self, id):
@@ -5900,7 +5885,6 @@ class TeamAdvancedStatsMisc:
     def time_on_ice_per_game_5on5(self, value):
         self._time_on_ice_per_game_5on5 = value
 
-
 class TeamAdvancedStatsLeadingTrailing:
     def __init__(self, team_id):
         self._team_id = team_id
@@ -6137,7 +6121,6 @@ class TeamAdvancedStatsLeadingTrailing:
     @wins_trail_period_2.setter
     def wins_trail_period_2(self, value):
         self._wins_trail_period_2 = value
-
 
 class TeamAdvancedStatsGoalsByStrength:
 
@@ -7066,7 +7049,1573 @@ class TeamAdvancedStatsCorsiFenwick:
     def fenwick_percent(self, value):
         self._fenwick_percent = value
 
+class Games:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._year = None
+        self._game_type_id = None
+        self._venue_name = None
+        self._start_time_utc = None
+        self._eastern_utc_offset = None
+        self._venue_utc_offset = None
+        self._venue_time_zone = None
+        self._game_state = None
+        self._game_schedule_state = None
+        self._away_team_id = None
+        self._home_team_id = None
+        self._shootout_in_use = None
+        self._regulation_periods = None
+        self._ot_in_use = None
+        self._ties_in_use = None
+        self._video_3_min_recap_id = None
+        self._video_condensed_game = None
+
+    @property
+    def game_id(self):
+        return self._game_id
     
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def year(self):
+        return self._year
+    
+    @year.setter
+    def year(self, value):
+        self._year = value
+
+    @property
+    def game_type_id(self):
+        return self._game_type_id
+    
+    @game_type_id.setter
+    def game_type_id(self, value):
+        self._game_type_id = value
+
+    @property
+    def venue_name(self):
+        return self._venue_name
+    
+    @venue_name.setter
+    def venue_name(self, value):
+        self._venue_name = value
+
+    @property
+    def start_time_utc(self):
+        return self._start_time_utc
+    
+    @start_time_utc.setter
+    def start_time_utc(self, value):
+        self._start_time_utc = value
+
+    @property
+    def eastern_utc_offset(self):
+        return self._eastern_utc_offset
+    
+    @eastern_utc_offset.setter
+    def eastern_utc_offset(self, value):
+        self._eastern_utc_offset = value
+
+    @property
+    def venue_utc_offset(self):
+        return self._venue_utc_offset
+    
+    @venue_utc_offset.setter
+    def venue_utc_offset(self, value):
+        self._venue_utc_offset = value
+
+    @property
+    def venue_time_zone(self):
+        return self._venue_time_zone
+    
+    @venue_time_zone.setter
+    def venue_time_zone(self, value):
+        self._venue_time_zone = value
+
+    @property
+    def game_state(self):
+        return self._game_state
+    
+    @game_state.setter
+    def game_state(self, value):
+        self._game_state = value
+
+    @property
+    def game_schedule_state(self):
+        return self._game_schedule_state
+    
+    @game_schedule_state.setter
+    def game_schedule_state(self, value):
+        self._game_schedule_state = value
+
+    @property
+    def away_team_id(self):
+        return self._away_team_id
+    
+    @away_team_id.setter
+    def away_team_id(self, value):
+        self._away_team_id = value
+
+    @property
+    def home_team_id(self):
+        return self._home_team_id
+    
+    @home_team_id.setter
+    def home_team_id(self, value):
+        self._home_team_id = value
+
+    @property
+    def shootout_in_use(self):
+        return self._shootout_in_use
+    
+    @shootout_in_use.setter
+    def shootout_in_use(self, value):
+        self._shootout_in_use = value
+
+    @property
+    def regulation_periods(self):
+        return self._regulation_periods
+
+    @regulation_periods.setter
+    def regulation_periods(self, value):
+        self._regulation_periods = value
+
+    @property
+    def ot_in_use(self):
+        return self._ot_in_use
+    
+    @ot_in_use.setter
+    def ot_in_use(self, value):
+        self._ot_in_use = value
+
+    @property
+    def ties_in_use(self):
+        return self._ties_in_use
+
+    @ties_in_use.setter
+    def ties_in_use(self, value):
+        self._ties_in_use = value
+
+    @property
+    def video_3_min_recap_id(self):
+        return self._video_3_min_recap_id
+    
+    @video_3_min_recap_id.setter
+    def video_3_min_recap_id(self, value):
+        self._video_3_min_recap_id = value
+
+    @property
+    def video_condensed_game(self):
+        return self._video_condensed_game
+    
+    @video_condensed_game.setter
+    def video_condensed_game(self, value):
+        self._video_condensed_game = value
+
+class GameThreeStars:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._star_1 = None
+        self._star_2 = None
+        self._star_3 = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def star_1(self):
+        return self._star_1
+    
+    @star_1.setter
+    def star_1(self, value):
+        self._star_1 = value
+
+    @property
+    def star_2(self):
+        return self._star_2
+    
+    @star_2.setter
+    def star_2(self, value):
+        self._star_2 = value
+
+    @property
+    def star_3(self):
+        return self._star_3
+    
+    @star_3.setter
+    def star_3(self, value):
+        self._star_3 = value
+
+class GameSkaterStats:
+    def __init__(self, game_id, player_id):
+        self._game_id = game_id
+        self._player_id = player_id
+        self._team_id = None
+        self._goals = None
+        self._assists = None
+        self._points = None
+        self._plus_minus = None
+        self._penalty_minutes = None
+        self._hits = None
+        self._blocks = None
+        self._power_play_goals = None
+        self._power_play_points = None
+        self._shorthanded_goals = None
+        self._shorthanded_points = None
+        self._shots = None
+        self._faceoffs = None
+        self._time_on_ice = None
+        self._power_play_time_on_ice = None
+        self._shorthanded_time_on_ice = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def player_id(self):
+        return self._player_id
+    
+    @player_id.setter
+    def player_id(self, value):
+        self._player_id = value
+
+    @property
+    def team_id(self):
+        return self._team_id
+    
+    @team_id.setter
+    def team_id(self, value):
+        self._team_id = value
+
+    @property
+    def goals(self):
+        return self._goals
+    
+    @goals.setter
+    def goals(self, value):
+        self._goals = value
+
+    @property
+    def assists(self):
+        return self._assists
+
+    @assists.setter
+    def assists(self, value):
+        self._assists = value
+
+    @property
+    def points(self):
+        return self._points
+
+    @points.setter
+    def points(self, value):
+        self._points = value
+
+    @property
+    def plus_minus(self):
+        return self._plus_minus
+    
+    @plus_minus.setter
+    def plus_minus(self, value):
+        self._plus_minus = value
+
+    @property
+    def penalty_minutes(self):
+        return self._penalty_minutes
+    
+    @penalty_minutes.setter
+    def penalty_minutes(self, value):
+        self._penalty_minutes = value
+
+    @property
+    def hits(self):
+        return self._hits
+
+    @hits.setter
+    def hits(self, value):
+        self._hits = value
+
+    @property
+    def blocks(self):
+        return self._blocks
+    
+    @blocks.setter
+    def blocks(self, value):
+        self._blocks = value
+
+    @property
+    def power_play_goals(self):
+        return self._power_play_goals
+    
+    @power_play_goals.setter
+    def power_play_goals(self, value):
+        self._power_play_goals = value
+
+    @property
+    def power_play_points(self):
+        return self._power_play_points
+    
+    @power_play_points.setter
+    def power_play_points(self, value):
+        self._power_play_points = value
+
+    @property
+    def shorthanded_goals(self):
+        return self._shorthanded_goals
+    
+    @shorthanded_goals.setter
+    def shorthanded_goals(self, value):
+        self._shorthanded_goals = value
+
+    @property
+    def shorthanded_points(self):
+        return self._shorthanded_points
+    
+    @shorthanded_points.setter
+    def shorthanded_points(self, value):
+        self._shorthanded_points = value
+
+    @property
+    def shots(self):
+        return self._shots
+    
+    @shots.setter
+    def shots(self, value):
+        self._shots = value
+
+    @property
+    def faceoffs(self):
+        return self._faceoffs
+    
+    @faceoffs.setter
+    def faceoffs(self, value):
+        self._faceoffs = value
+
+    @property
+    def time_on_ice(self):
+        return self._time_on_ice
+    
+    @time_on_ice.setter
+    def time_on_ice(self, value):
+        self._time_on_ice = value
+
+    @property
+    def power_play_time_on_ice(self):
+        return self._power_play_time_on_ice
+    
+    @power_play_time_on_ice.setter
+    def power_play_time_on_ice(self, value):
+        self._power_play_time_on_ice = value
+
+    @property
+    def shorthanded_time_on_ice(self):
+        return self._shorthanded_time_on_ice
+    
+    @shorthanded_time_on_ice.setter
+    def shorthanded_time_on_ice(self, value):
+        self._shorthanded_time_on_ice = value
+
+class GameScoreboard:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._home_score = None
+        self._away_score = None
+        self._home_shots = None
+        self._away_shots = None
+        self._time_remaining = None
+        self._period = None
+        self._seconds_remaining = None
+        self._running = None
+        self._in_intermission = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def home_score(self):
+        return self._home_score
+    
+    @home_score.setter
+    def home_score(self, value):
+        self._home_score = value
+
+    @property
+    def away_score(self):
+        return self._away_score
+    
+    @away_score.setter
+    def away_score(self, value):
+        self._away_score = value
+
+    @property
+    def home_shots(self):
+        return self._home_shots
+    
+    @home_shots.setter
+    def home_shots(self, value):
+        self._home_shots = value
+
+    @property
+    def away_shots(self):
+        return self._away_shots
+    
+    @away_shots.setter
+    def away_shots(self, value):
+        self._away_shots = value
+
+    @property
+    def time_remaining(self):
+        return self._time_remaining
+    
+    @time_remaining.setter
+    def time_remaining(self, value):
+        self._time_remaining = value
+
+    @property
+    def period(self):
+        return self._period
+    
+    @period.setter
+    def period(self, value):
+        self._period = value
+
+    @property
+    def seconds_remaining(self):
+        return self._seconds_remaining
+    
+    @seconds_remaining.setter
+    def seconds_remaining(self, value):
+        self._seconds_remaining = value
+
+    @property
+    def running(self):
+        return self._running
+    
+    @running.setter
+    def running(self, value):
+        self._running = value
+
+    @property
+    def in_intermission(self):
+        return self._in_intermission
+    
+    @in_intermission.setter
+    def in_intermission(self, value):
+        self._in_intermission = value
+
+class GameRoster:
+    def __init__(self, game_id, player_id, team_id):
+        self._game_id = game_id
+        self._team_id = team_id
+        self._player_id = player_id
+        self._scratched = None
+        self._starting = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def team_id(self):
+        return self._team_id
+    
+    @team_id.setter
+    def team_id(self, value):
+        self._team_id = value
+
+    @property
+    def player_id(self):
+        return self._player_id
+    
+    @player_id.setter
+    def player_id(self, value):
+        self._player_id = value
+
+    @property
+    def scratched(self):
+        return self._scratched
+    
+    @scratched.setter
+    def scratched(self, value):
+        self._scratched = value
+
+    @property
+    def starting(self):
+        return self._starting
+
+    @starting.setter
+    def starting(self, value):
+        self._starting = value
+
+class GamePlays:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._play_id = None
+        self._event_id = None
+        self._period_number = None
+        self._period_type = None
+        self._time_in_period = None
+        self._time_remaining = None
+        self._situation_code = None
+        self._home_team_defending_side = None
+        self._type_code = None
+        self._type_description_key = None
+        self._sort_order = None
+        self._x_coord = None
+        self._y_coord = None
+        self._zone_code = None
+        self._shot_type = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def play_id(self):
+        return self._play_id
+    
+    @play_id.setter
+    def play_id(self, value):
+        self._play_id = value
+
+    @property
+    def event_id(self):
+        return self._event_id
+    
+    @event_id.setter
+    def event_id(self, value):
+        self._event_id = value
+
+    @property
+    def period_number(self):
+        return self._period_number
+    
+    @period_number.setter
+    def period_number(self, value):
+        self._period_number = value
+
+    @property
+    def period_type(self):
+        return self._period_type
+
+    @period_type.setter
+    def period_type(self, value):
+        self._period_type = value
+
+    @property
+    def time_in_period(self):
+        return self._time_in_period
+    
+    @time_in_period.setter
+    def time_in_period(self, value):
+        self._time_in_period = value
+
+    @property
+    def time_remaining(self):
+        return self._time_remaining
+    
+    @time_remaining.setter
+    def time_remaining(self, value):
+        self._time_remaining = value
+
+    @property
+    def situation_code(self):
+        return self._situation_code
+    
+    @situation_code.setter
+    def situation_code(self, value):
+        self._situation_code = value
+
+    @property
+    def home_team_defending_side(self):
+        return self._home_team_defending_side
+    
+    @home_team_defending_side.setter
+    def home_team_defending_side(self, value):
+        self._home_team_defending_side = value
+
+    @property
+    def type_code(self):
+        return self._type_code
+    
+    @type_code.setter
+    def type_code(self, value):
+        self._type_code = value
+
+    @property
+    def type_description_key(self):
+        return self._type_description_key
+    
+    @type_description_key.setter
+    def type_description_key(self, value):
+        self._type_description_key = value
+
+    @property
+    def sort_order(self):
+        return self._sort_order
+    
+    @sort_order.setter
+    def sort_order(self, value):
+        self._sort_order = value
+
+    @property
+    def x_coord(self):
+        return self._x_coord
+    
+    @x_coord.setter
+    def x_coord(self, value):
+        self._x_coord = value
+
+    @property
+    def y_coord(self):
+        return self._y_coord
+    
+    @y_coord.setter
+    def y_coord(self, value):
+        self._y_coord = value
+
+    @property
+    def zone_code(self):
+        return self._zone_code
+    
+    @zone_code.setter
+    def zone_code(self, value):
+        self._zone_code = value
+
+    @property
+    def shot_type(self):
+        return self._shot_type
+    
+    @shot_type.setter
+    def shot_type(self, value):
+        self._shot_type = value
+
+class GameGoals:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._situation_code = None
+        self._strength = None
+        self._player_id = None
+        self._highlight_clip_id = None
+        self._goals_to_date = None
+        self._away_score = None
+        self._home_score = None
+        self._leading_team_id = None
+        self._time_in_period = None
+        self._shot_type = None
+        self._goal_modifier = None
+        self._assist_1_player_id = None
+        self._assist_2_player_id = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def situation_code(self):
+        return self._situation_code
+    
+    @situation_code.setter
+    def situation_code(self, value):
+        self._situation_code = value
+
+    @property
+    def strength(self):
+        return self._strength
+    
+    @strength.setter
+    def strength(self, value):
+        self._strength = value
+
+    @property
+    def player_id(self):
+        return self._player_id
+    
+    @player_id.setter
+    def player_id(self, value):
+        self._player_id = value
+
+    @property
+    def highlight_clip_id(self):
+        return self._highlight_clip_id
+    
+    @highlight_clip_id.setter
+    def highlight_clip_id(self, value):
+        self._highlight_clip_id = value
+
+    @property
+    def goals_to_date(self):
+        return self._goals_to_date
+    
+    @goals_to_date.setter
+    def goals_to_date(self, value):
+        self._goals_to_date = value
+
+    @property
+    def away_score(self):
+        return self._away_score
+    
+    @away_score.setter
+    def away_score(self, value):
+        self._away_score = value
+
+    @property
+    def home_score(self):
+        return self._home_score
+    
+    @home_score.setter
+    def home_score(self, value):
+        self._home_score = value
+
+    @property
+    def leading_team_id(self):
+        return self._leading_team_id
+    
+    @leading_team_id.setter
+    def leading_team_id(self, value):
+        self._leading_team_id = value
+
+    @property
+    def time_in_period(self):
+        return self._time_in_period
+    
+    @time_in_period.setter
+    def time_in_period(self, value):
+        self._time_in_period = value
+
+    @property
+    def shot_type(self):
+        return self._shot_type
+    
+    @shot_type.setter
+    def shot_type(self, value):
+        self._shot_type = value
+
+    @property
+    def goal_modifier(self):
+        return self._goal_modifier
+    
+    @goal_modifier.setter
+    def goal_modifier(self, value):
+        self._goal_modifier = value
+
+    @property
+    def assist_1_player_id(self):
+        return self._assist_1_player_id
+
+    @assist_1_player_id.setter
+    def assist_1_player_id(self, value):
+        self._assist_1_player_id = value
+
+    @property
+    def assist_2_player_id(self):
+        return self._assist_2_player_id
+    
+    @assist_2_player_id.setter
+    def assist_2_player_id(self, value):
+        self._assist_2_player_id = value
+
+class GameGoalieStats:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._player_id = None
+        self._team_id = None
+        self._even_strength_shots_against = None
+        self._power_play_shots_against = None
+        self._shorthanded_shots_against = None
+        self._saves_shots_against = None
+        self._even_strength_goals_against = None
+        self._power_play_goals_against = None
+        self._shorthanded_goals_against = None
+        self._penalty_minutes = None
+        self._goals_against = None
+        self._time_on_ice = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def player_id(self):
+        return self._player_id
+    
+    @player_id.setter
+    def player_id(self, value):
+        self._player_id = value
+
+    @property
+    def team_id(self):
+        return self._team_id
+    
+    @team_id.setter
+    def team_id(self, value):
+        self._team_id = value
+
+    @property
+    def even_strength_shots_against(self):
+        return self._even_strength_shots_against
+    
+    @even_strength_shots_against.setter
+    def even_strength_shots_against(self, value):
+        self._even_strength_shots_against = value
+
+    @property
+    def power_play_shots_against(self):
+        return self._power_play_shots_against
+
+    @power_play_shots_against.setter
+    def power_play_shots_against(self, value):
+        self._power_play_shots_against = value
+
+    @property
+    def shorthanded_shots_against(self):
+        return self._shorthanded_shots_against
+    
+    @shorthanded_shots_against.setter
+    def shorthanded_shots_against(self, value):
+        self._shorthanded_shots_against = value
+
+    @property
+    def saves_shots_against(self):
+        return self._saves_shots_against
+    
+    @saves_shots_against.setter
+    def saves_shots_against(self, value):
+        self._saves_shots_against = value
+
+    @property
+    def even_strength_goals_against(self):
+        return self._even_strength_goals_against
+    
+    @even_strength_goals_against.setter
+    def even_strength_goals_against(self, value):
+        self._even_strength_goals_against = value
+
+    @property
+    def power_play_goals_against(self):
+        return self._power_play_goals_against
+    
+    @power_play_goals_against.setter
+    def power_play_goals_against(self, value):
+        self._power_play_goals_against = value
+
+    @property
+    def shorthanded_goals_against(self):
+        return self._shorthanded_goals_against
+    
+    @shorthanded_goals_against.setter
+    def shorthanded_goals_against(self, value):
+        self._shorthanded_goals_against = value
+
+    @property
+    def penalty_minutes(self):
+        return self._penalty_minutes
+    
+    @penalty_minutes.setter
+    def penalty_minutes(self, value):
+        self._penalty_minutes = value
+
+    @property
+    def goals_against(self):
+        return self._goals_against
+    
+    @goals_against.setter
+    def goals_against(self, value):
+        self._goals_against = value
+
+    @property
+    def time_on_ice(self):
+        return self._time_on_ice
+    
+    @time_on_ice.setter
+    def time_on_ice(self, value):
+        self._time_on_ice = value
+
+class GameBoxscore:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._away_team_id = None
+        self._away_goals = None
+        self._away_score = None
+        self._away_shots = None
+        self._away_faceoff_percent = None
+        self._away_power_play_conversion = None
+        self._away_penalty_minutes = None
+        self._away_hits = None
+        self._away_blocked_shots = None
+        self._home_team_id = None
+        self._home_goals = None
+        self._home_score = None
+        self._home_shots = None
+        self._home_faceoff_percent = None
+        self._home_power_play_conversion = None
+        self._home_penalty_minutes = None
+        self._home_hits = None
+        self._home_blocked_shots = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def away_team_id(self):
+        return self._away_team_id
+
+    @away_team_id.setter
+    def away_team_id(self, value):
+        self._away_team_id = value
+
+    @property
+    def away_goals(self):
+        return self._away_goals
+    
+    @away_goals.setter
+    def away_goals(self, value):
+        self._away_goals = value
+
+    @property
+    def away_score(self):
+        return self._away_score
+    
+    @away_score.setter
+    def away_score(self, value):
+        self._away_score = value
+
+    @property
+    def away_shots(self):
+        return self._away_shots
+
+    @away_shots.setter
+    def away_shots(self, value):
+        self._away_shots = value
+
+    @property
+    def away_faceoff_percent(self):
+        return self._away_faceoff_percent
+
+    @away_faceoff_percent.setter
+    def away_faceoff_percent(self, value):
+        self._away_faceoff_percent = value
+
+    @property
+    def away_power_play_conversion(self):
+        return self._away_power_play_conversion
+    
+    @away_power_play_conversion.setter
+    def away_power_play_conversion(self, value):
+        self._away_power_play_conversion = value
+
+    @property
+    def away_penalty_minutes(self):
+        return self._away_penalty_minutes
+    
+    @away_penalty_minutes.setter
+    def away_penalty_minutes(self, value):
+        self._away_penalty_minutes = value
+
+    @property
+    def away_hits(self):
+        return self._away_hits
+    
+    @away_hits.setter
+    def away_hits(self, value):
+        self._away_hits = value
+
+    @property
+    def away_blocked_shots(self):
+        return self._away_blocked_shots
+
+    @away_blocked_shots.setter
+    def away_blocked_shots(self, value):
+        self._away_blocked_shots = value
+
+    @property
+    def home_team_id(self):
+        return self._home_team_id
+    
+    @home_team_id.setter
+    def home_team_id(self, value):
+        self._home_team_id = value
+
+    @property
+    def home_goals(self):
+        return self._home_goals
+    
+    @home_goals.setter
+    def home_goals(self, value):
+        self._home_goals = value
+
+    @property
+    def home_score(self):
+        return self._home_score
+    
+    @home_score.setter
+    def home_score(self, value):
+        self._home_score = value
+
+    @property
+    def home_shots(self):
+        return self._home_shots
+    
+    @home_shots.setter
+    def home_shots(self, value):
+        self._home_shots = value
+
+    @property
+    def home_faceoff_percent(self):
+        return self._home_faceoff_percent
+    
+    @home_faceoff_percent.setter
+    def home_faceoff_percent(self, value):
+        self._home_faceoff_percent = value
+
+    @property
+    def home_power_play_conversion(self):
+        return self._home_power_play_conversion
+    
+    @home_power_play_conversion.setter
+    def home_power_play_conversion(self, value):
+        self._home_power_play_conversion = value
+
+    @property
+    def home_penalty_minutes(self):
+        return self._home_penalty_minutes
+    
+    @home_penalty_minutes.setter
+    def home_penalty_minutes(self, value):
+        self._home_penalty_minutes = value
+
+    @property
+    def home_hits(self):
+        return self._home_hits
+    
+    @home_hits.setter
+    def home_hits(self, value):
+        self._home_hits = value
+
+    @property
+    def home_blocked_shots(self):
+        return self._home_blocked_shots
+
+    @home_blocked_shots.setter
+    def home_blocked_shots(self, value):
+        self._home_blocked_shots = value
+
+class PlayoffBracket:
+    def __init__(self, year):
+        self._year = year
+        self._round = round
+        self._top_seed_rank = None
+        self._top_seed_wins = None
+        self._top_seed_team_id = None
+        self._series_title = None
+        self._bottom_seed_rank = None
+        self._bottom_seed_wins = None
+        self._bottom_seed_team_id = None
+        self._winning_team_id = None
+        self._losing_team_id = None
+
+    @property
+    def year(self):
+        return self._year
+
+    @year.setter
+    def year(self, value):
+        self._year = value
+
+    @property
+    def round(self):
+        return self._round
+    
+    @round.setter
+    def round(self, value):
+        self._round = value
+
+    @property
+    def top_seed_rank(self):
+        return self._top_seed_rank
+    
+    @top_seed_rank.setter
+    def top_seed_rank(self, value):
+        self._top_seed_rank = value
+
+    @property
+    def top_seed_wins(self):
+        return self._top_seed_wins
+    
+    @top_seed_wins.setter
+    def top_seed_wins(self, value):
+        self._top_seed_wins = value
+
+    @property
+    def top_seed_team_id(self):
+        return self._top_seed_team_id
+    
+    @top_seed_team_id.setter
+    def top_seed_team_id(self, value):
+        self._top_seed_team_id = value
+
+    @property
+    def series_title(self):
+        return self._series_title
+    
+    @series_title.setter
+    def series_title(self, value):
+        self._series_title = value
+
+    @property
+    def bottom_seed_rank(self):
+        return self._bottom_seed_rank
+    
+    @bottom_seed_rank.setter
+    def bottom_seed_rank(self, value):
+        self._bottom_seed_rank = value
+
+    @property
+    def bottom_seed_wins(self):
+        return self._bottom_seed_wins
+    
+    @bottom_seed_wins.setter
+    def bottom_seed_wins(self, value):
+        self._bottom_seed_wins = value
+
+    @property
+    def bottom_seed_team_id(self):
+        return self._bottom_seed_team_id
+    
+    @bottom_seed_team_id.setter
+    def bottom_seed_team_id(self, value):
+        self._bottom_seed_team_id = value
+
+    @property
+    def winning_team_id(self):
+        return self._winning_team_id
+
+    @winning_team_id.setter
+    def winning_team_id(self, value):
+        self._winning_team_id = value
+
+    @property
+    def losing_team_id(self):
+        return self._losing_team_id
+    
+    @losing_team_id.setter
+    def losing_team_id(self, value):
+        self._losing_team_id = value
+
+class PlayOnIce:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._play_id = None
+        self._player_id = None
+        self._team_id = None
+        self._home = None
+        self._away = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def play_id(self):
+        return self._play_id
+    
+    @play_id.setter
+    def play_id(self, value):
+        self._play_id = value
+
+    @property
+    def player_id(self):
+        return self._player_id
+    
+    @player_id.setter
+    def player_id(self, value):
+        self._player_id = value
+
+    @property
+    def team_id(self):
+        return self._team_id
+    
+    @team_id.setter
+    def team_id(self, value):
+        self._team_id = value
+
+    @property
+    def home(self):
+        return self._home
+    
+    @home.setter
+    def home(self, value):
+        self._home = value
+
+    @property
+    def away(self):
+        return self._away
+    
+    @away.setter
+    def away(self, value):
+        self._away = value
+
+class PlayOutcomes:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._play_id = None
+        self._away_score = None
+        self._home_score = None
+        self._duration = None
+        self._reason = None
+        self._secondary_reason = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def play_id(self):
+        return self._play_id
+    
+    @play_id.setter
+    def play_id(self, value):
+        self._play_id = value
+
+    @property
+    def away_score(self):
+        return self._away_score
+    
+    @away_score.setter
+    def away_score(self, value):
+        self._away_score = value
+
+    @property
+    def home_score(self):
+        return self._home_score
+    
+    @home_score.setter
+    def home_score(self, value):
+        self._home_score = value
+
+    @property
+    def duration(self):
+        return self._duration
+    
+    @duration.setter
+    def duration(self, value):
+        self._duration = value
+
+    @property
+    def reason(self):
+        return self._reason
+    
+    @reason.setter
+    def reason(self, value):
+        self._reason = value
+
+    @property
+    def secondary_reason(self):
+        return self._secondary_reason
+    
+    @secondary_reason.setter
+    def secondary_reason(self, value):
+        self._secondary_reason = value
+
+class PlayRoles:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._play_id = None
+        self._player_id = None
+        self._role_code = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def play_id(self):
+        return self._play_id
+    
+    @play_id.setter
+    def play_id(self, value):
+        self._play_id = value
+
+    @property
+    def player_id(self):
+        return self._player_id
+
+    @player_id.setter
+    def player_id(self, value):
+        self._player_id = value
+
+    @property
+    def role_code(self):
+        return self._role_code
+    
+    @role_code.setter
+    def role_code(self, value):
+        self._role_code = value
+
+class Referees:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._referee_1_name = None
+        self._referee_2_name = None
+        self._linesman_1_name = None
+        self._linesman_2_name = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def referee_1_name(self):
+        return self._referee_1_name
+    
+    @referee_1_name.setter
+    def referee_1_name(self, value):
+        self._referee_1_name = value
+
+    @property
+    def referee_2_name(self):
+        return self._referee_2_name
+    
+    @referee_2_name.setter
+    def referee_2_name(self, value):
+        self._referee_2_name = value
+
+    @property
+    def linesman_1_name(self):
+        return self._linesman_1_name
+
+    @linesman_1_name.setter
+    def linesman_1_name(self, value):
+        self._linesman_1_name = value
+
+    @property
+    def linesman_2_name(self):
+        return self._linesman_2_name
+    
+    @linesman_2_name.setter
+    def linesman_2_name(self, value):
+        self._linesman_2_name = value
+
+class Schedule:
+    def __init__(self, game_id):
+        self._game_id = game_id
+        self._home_team_id = None
+        self._away_team_id = None
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def home_team_id(self):
+        return self._home_team_id
+    
+    @home_team_id.setter
+    def home_team_id(self, value):
+        self._home_team_id = value
+
+    @property
+    def away_team_id(self):
+        return self._away_team_id
+    
+    @away_team_id.setter
+    def away_team_id(self, value):
+        self._away_team_id = value
+
+class ShiftData:
+    def __init__(self, shift_id):
+        self._shift_id = shift_id
+        self._game_id = None
+        self._player_id = None
+        self._detail_code = None
+        self._duration = None
+        self._end_time = None
+        self._start_time = None
+        self._event_description = None
+        self._event_details = None
+        self._event_number = None
+        self._period_number = None
+        self._shift_number = None
+        self._type_code = None
+
+    @property
+    def shift_id(self):
+        return self._shift_id
+
+    @shift_id.setter
+    def shift_id(self, value):
+        self._shift_id = value
+
+    @property
+    def game_id(self):
+        return self._game_id
+    
+    @game_id.setter
+    def game_id(self, value):
+        self._game_id = value
+
+    @property
+    def player_id(self):
+        return self._player_id
+    
+    @player_id.setter
+    def player_id(self, value):
+        self._player_id = value
+
+    @property
+    def detail_code(self):
+        return self._detail_code
+    
+    @detail_code.setter
+    def detail_code(self, value):
+        self._detail_code = value
+
+    @property
+    def duration(self):
+        return self._duration
+    
+    @duration.setter
+    def duration(self, value):
+        self._duration = value
+
+    @property
+    def end_time(self):
+        return self._end_time
+    
+    @end_time.setter
+    def end_time(self, value):
+        self._end_time = value
+
+    @property
+    def start_time(self):
+        return self._start_time
+    
+    @start_time.setter
+    def start_time(self, value):
+        self._start_time = value
+
+    @property
+    def event_description(self):
+        return self._event_description
+    
+    @event_description.setter
+    def event_description(self, value):
+        self._event_description = value
+
+    @property
+    def event_details(self):
+        return self._event_details
+    
+    @event_details.setter
+    def event_details(self, value):
+        self._event_details = value
+
+    @property
+    def event_number(self):
+        return self._event_number
+    
+    @event_number.setter
+    def event_number(self, value):
+        self._event_number = value
+
+    @property
+    def period_number(self):
+        return self._period_number
+    
+    @period_number.setter
+    def period_number(self, value):
+        self._period_number = value
+
+    @property
+    def shift_number(self):
+        return self._shift_number
+    
+    @shift_number.setter
+    def shift_number(self, value):
+        self._shift_number = value
+
+    @property
+    def type_code(self):
+        return self._type_code
+    
+    @type_code.setter
+    def type_code(self, value):
+        self._type_code = value
+
+        
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
 
 
 

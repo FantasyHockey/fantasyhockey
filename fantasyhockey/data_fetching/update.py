@@ -923,4 +923,526 @@ class UpdatePlayers(AbstractUpdater):
                 params = self.to_database_params(player.player_draft, 'player_draft')
                 self.database_operator.write(query, params)
 
-    
+class UpdateSkaters(AbstractUpdater):
+    """
+    A class to update the player details and team stats tables in the database.
+    """
+
+    def __init__(self, database_operator: DatabaseOperator, fetch_skaters: FetchSkaters):
+        """
+        Initializes the UpdatePlayers instance.
+        
+        Parameters
+        ----------
+        database_operator : DatabaseOperator
+            An instance of the DatabaseOperator class to interact with the database.
+
+        fetch_players : FetchPlayers
+            An instance of the FetchPlayers class to fetch the players data from the NHL API.
+        """
+        super().__init__(database_operator)
+        self.fetch_skaters = fetch_skaters
+
+    def fetch_entities(self):
+        """
+        Fetches the players to be updated.
+        
+        Returns:
+            list: A list of Player objects to be updated.
+        """
+        return self.fetch_skaters.get_data()
+
+    def entity_exists(self, entity, table: str) -> bool:
+        """
+        Checks if a player, player details, player awards, or player draft entry exists in the respective table.
+        
+        Parameters
+        ----------
+        entity : object
+            The entity object to check (Player, PlayerDetails, PlayerAward, PlayerDraft).
+        table : str
+            The table name to check ('players', 'player_details', 'player_awards', 'player_draft').
+
+        Returns:
+            bool: True if the entity exists, False otherwise.
+        """
+        if table == 'skater_stats':
+            query = SkaterStatsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.team_id, entity.year, entity.game_type_id, entity.sequence))
+        elif table == 'skater_youth_stats':
+            query = SkaterYouthStatsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year, entity.team_name, entity.league_name, entity.game_type_id, entity.sequence))
+        elif table == 'skater_advanced_stats_corsi_fenwick':
+            query = SkaterAdvancedStatsCorsiFenwickDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'skater_advanced_stats_faceoffs':
+            query = SkaterAdvancedStatsFaceoffsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'skater_advanced_stats_goals':
+            query = SkaterAdvancedStatsGoalsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'skater_advanced_stats_misc':
+            query = SkaterAdvancedStatsMiscDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'skater_advanced_stats_penalties':
+            query = SkaterAdvancedStatsPenaltiesDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'skater_advanced_stats_penalty_kill':
+            query = SkaterAdvancedStatsPenaltyKillDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'skater_advanced_stats_powerplay':
+            query = SkaterAdvancedStatsPowerplayDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year, entity.team_id))
+        elif table == 'skater_advanced_stats_scoring':
+            query = SkaterAdvancedStatsScoringDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'skater_advanced_stats_shootout':
+            query = SkaterAdvancedStatsShootoutDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'skater_advanced_stats_toi':
+            query = SkaterAdvancedStatsTOIDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+
+        return bool(result)
+
+    def create_insert_query(self, table: str) -> str:
+        """
+        Creates an insert query for the respective table.
+        
+        Parameters
+        ----------
+        table : str
+            The table name ('players', 'player_details', 'player_awards', 'player_draft').
+
+        Returns:
+            str: The insert query string.
+        """
+        if table == 'skater_stats':
+            return SkaterStatsDatabaseMapper.create_insert_query()
+        elif table == 'skater_youth_stats':
+            return SkaterYouthStatsDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_corsi_fenwick':
+            return SkaterAdvancedStatsCorsiFenwickDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_faceoffs':
+            return SkaterAdvancedStatsFaceoffsDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_goals':
+            return SkaterAdvancedStatsGoalsDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_misc':
+            return SkaterAdvancedStatsMiscDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_penalties':
+            return SkaterAdvancedStatsPenaltiesDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_penalty_kill':
+            return SkaterAdvancedStatsPenaltyKillDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_powerplay':
+            return SkaterAdvancedStatsPowerplayDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_scoring':
+            return SkaterAdvancedStatsScoringDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_shootout':
+            return SkaterAdvancedStatsShootoutDatabaseMapper.create_insert_query()
+        elif table == 'skater_advanced_stats_toi':
+            return SkaterAdvancedStatsTOIDatabaseMapper.create_insert_query()
+
+    def create_update_query(self, table: str) -> str:
+        """
+        Creates an update query for the respective table.
+        
+        Parameters
+        ----------
+        table : str
+            The table name ('players', 'player_details', 'player_awards', 'player_draft').
+
+        Returns:
+            str: The update query string.
+        """
+        if table == 'skater_stats':
+            return SkaterStatsDatabaseMapper.create_update_query()
+        elif table == 'skater_youth_stats':
+            return SkaterYouthStatsDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_corsi_fenwick':
+            return SkaterAdvancedStatsCorsiFenwickDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_faceoffs':
+            return SkaterAdvancedStatsFaceoffsDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_goals':
+            return SkaterAdvancedStatsGoalsDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_misc':
+            return SkaterAdvancedStatsMiscDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_penalties':
+            return SkaterAdvancedStatsPenaltiesDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_penalty_kill':
+            return SkaterAdvancedStatsPenaltyKillDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_powerplay':
+            return SkaterAdvancedStatsPowerplayDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_scoring':
+            return SkaterAdvancedStatsScoringDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_shootout':
+            return SkaterAdvancedStatsShootoutDatabaseMapper.create_update_query()
+        elif table == 'skater_advanced_stats_toi':
+            return SkaterAdvancedStatsTOIDatabaseMapper.create_update_query()
+
+    def to_database_params(self, entity, table: str) -> tuple:
+        """
+        Maps a Player object to a tuple of parameters for database operations.
+        
+        Parameters
+        ----------
+        entity : object
+            The entity object to be mapped (Player, PlayerDetails, PlayerAward, PlayerDraft).
+        table : str
+            The table name ('players', 'player_details', 'player_awards', 'player_draft').
+
+        Returns:
+            tuple: The tuple of parameters for database operations.
+        """
+        if table == 'skater_stats':
+            return SkaterStatsDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_youth_stats':
+            return SkaterYouthStatsDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_corsi_fenwick':
+            return SkaterAdvancedStatsCorsiFenwickDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_faceoffs':
+            return SkaterAdvancedStatsFaceoffsDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_goals':
+            return SkaterAdvancedStatsGoalsDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_misc':
+            return SkaterAdvancedStatsMiscDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_penalties':
+            return SkaterAdvancedStatsPenaltiesDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_penalty_kill':
+            return SkaterAdvancedStatsPenaltyKillDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_powerplay':
+            return SkaterAdvancedStatsPowerplayDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_scoring':
+            return SkaterAdvancedStatsScoringDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_shootout':
+            return SkaterAdvancedStatsShootoutDatabaseMapper.to_database_params(entity)
+        elif table == 'skater_advanced_stats_toi':
+            return SkaterAdvancedStatsTOIDatabaseMapper.to_database_params(entity)
+
+    def update_in_db(self):
+        """
+        Fetches the data and updates the corresponding tables in the database.
+        """
+        skaters = self.fetch_entities()
+        for skater in skaters:
+            for skater_stats in skater.skater_stats:
+                if self.entity_exists(skater_stats, 'skater_stats'):
+                    query = self.create_update_query('skater_stats')
+                    params = self.to_database_params(skater_stats, 'skater_stats')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1], params[2], params[18], params[19]))
+                else:
+                    query = self.create_insert_query('skater_stats')
+                    params = self.to_database_params(skater_stats, 'skater_stats')
+                    self.database_operator.write(query, params)
+
+            for skater_youth_stats in skater.youth_stats:
+                if self.entity_exists(skater_youth_stats, 'skater_youth_stats'):
+                    query = self.create_update_query('skater_youth_stats')
+                    params = self.to_database_params(skater_youth_stats, 'skater_youth_stats')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1], params[2], params[3], params[4], params[5]))
+                else:
+                    query = self.create_insert_query('skater_youth_stats')
+                    params = self.to_database_params(skater_youth_stats, 'skater_youth_stats')
+                    self.database_operator.write(query, params)
+            
+            for corsi_fenwick in skater.advanced_stats_corsi_fenwick:
+                if self.entity_exists(corsi_fenwick, 'skater_advanced_stats_corsi_fenwick'):
+                    query = self.create_update_query('skater_advanced_stats_corsi_fenwick')
+                    params = self.to_database_params(corsi_fenwick, 'skater_advanced_stats_corsi_fenwick')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_corsi_fenwick')
+                    params = self.to_database_params(corsi_fenwick, 'skater_advanced_stats_corsi_fenwick')
+                    self.database_operator.write(query, params)
+            
+            for faceoffs in skater.advanced_stats_faceoffs:
+                if self.entity_exists(faceoffs, 'skater_advanced_stats_faceoffs'):
+                    query = self.create_update_query('skater_advanced_stats_faceoffs')
+                    params = self.to_database_params(faceoffs, 'skater_advanced_stats_faceoffs')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_faceoffs')
+                    params = self.to_database_params(faceoffs, 'skater_advanced_stats_faceoffs')
+                    self.database_operator.write(query, params)
+            
+            for goals in skater.advanced_stats_goals:
+                if self.entity_exists(goals, 'skater_advanced_stats_goals'):
+                    query = self.create_update_query('skater_advanced_stats_goals')
+                    params = self.to_database_params(goals, 'skater_advanced_stats_goals')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_goals')
+                    params = self.to_database_params(goals, 'skater_advanced_stats_goals')
+                    self.database_operator.write(query, params)
+
+            
+            for misc in skater.advanced_stats_misc:
+                if self.entity_exists(misc, 'skater_advanced_stats_misc'):
+                    query = self.create_update_query('skater_advanced_stats_misc')
+                    params = self.to_database_params(misc, 'skater_advanced_stats_misc')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_misc')
+                    params = self.to_database_params(misc, 'skater_advanced_stats_misc')
+                    self.database_operator.write(query, params)
+
+            for penalties in skater.advanced_stats_penalties:
+                if self.entity_exists(penalties, 'skater_advanced_stats_penalties'):
+                    query = self.create_update_query('skater_advanced_stats_penalties')
+                    params = self.to_database_params(penalties, 'skater_advanced_stats_penalties')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_penalties')
+                    params = self.to_database_params(penalties, 'skater_advanced_stats_penalties')
+                    self.database_operator.write(query, params)
+
+            for penalty_kill in skater.advanced_stats_penalty_kill:
+                if self.entity_exists(penalty_kill, 'skater_advanced_stats_penalty_kill'):
+                    query = self.create_update_query('skater_advanced_stats_penalty_kill')
+                    params = self.to_database_params(penalty_kill, 'skater_advanced_stats_penalty_kill')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_penalty_kill')
+                    params = self.to_database_params(penalty_kill, 'skater_advanced_stats_penalty_kill')
+                    self.database_operator.write(query, params)
+
+            for powerplay in skater.advanced_stats_powerplay:
+                if self.entity_exists(powerplay, 'skater_advanced_stats_powerplay'):
+                    query = self.create_update_query('skater_advanced_stats_powerplay')
+                    params = self.to_database_params(powerplay, 'skater_advanced_stats_powerplay')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1], params[2]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_powerplay')
+                    params = self.to_database_params(powerplay, 'skater_advanced_stats_powerplay')
+                    self.database_operator.write(query, params)
+
+            for scoring in skater.advanced_stats_scoring:
+                if self.entity_exists(scoring, 'skater_advanced_stats_scoring'):
+                    query = self.create_update_query('skater_advanced_stats_scoring')
+                    params = self.to_database_params(scoring, 'skater_advanced_stats_scoring')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_scoring')
+                    params = self.to_database_params(scoring, 'skater_advanced_stats_scoring')
+                    self.database_operator.write(query, params)
+            
+            for shootout in skater.advanced_stats_shootout:
+                if self.entity_exists(shootout, 'skater_advanced_stats_shootout'):
+                    query = self.create_update_query('skater_advanced_stats_shootout')
+                    params = self.to_database_params(shootout, 'skater_advanced_stats_shootout')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_shootout')
+                    params = self.to_database_params(shootout, 'skater_advanced_stats_shootout')
+                    self.database_operator.write(query, params)
+
+            for toi in skater.advanced_stats_toi:
+                if self.entity_exists(toi, 'skater_advanced_stats_toi'):
+                    query = self.create_update_query('skater_advanced_stats_toi')
+                    params = self.to_database_params(toi, 'skater_advanced_stats_toi')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('skater_advanced_stats_toi')
+                    params = self.to_database_params(toi, 'skater_advanced_stats_toi')
+                    self.database_operator.write(query, params)
+
+class UpdateGoalies(AbstractUpdater):
+    """
+    A class to update the player details and team stats tables in the database.
+    """
+
+    def __init__(self, database_operator: DatabaseOperator, fetch_goalies: FetchGoalies):
+        """
+        Initializes the UpdatePlayers instance.
+        
+        Parameters
+        ----------
+        database_operator : DatabaseOperator
+            An instance of the DatabaseOperator class to interact
+            with the database.
+
+        fetch_players : FetchPlayers
+            An instance of the FetchPlayers class to fetch the
+            players data from the NHL API.
+        """
+        super().__init__(database_operator)
+        self.fetch_goalies = fetch_goalies
+
+    def fetch_entities(self):
+        """
+        Fetches the players to be updated.
+        
+        Returns:
+            list: A list of Player objects to be updated.
+        """
+        return self.fetch_goalies.get_data()
+
+    def entity_exists(self, entity, table: str) -> bool:
+        if table == 'goalie_stats':
+            query = GoalieStatsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year, entity.team_id, entity.game_type_id, entity.sequence))
+        elif table == 'goalie_youth_stats':
+            query = GoalieYouthStatsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year, entity.team_name, entity.league_name, entity.game_type_id, entity.sequence))
+        elif table == 'goalie_advanced_stats':
+            query = GoalieAdvancedStatsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'goalie_advanced_stats_days_rest':
+            query = GoalieAdvancedStatsDaysRestDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'goalie_advanced_stats_penalty_shots':
+            query = GoalieAdvancedStatsPenaltyShotsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'goalie_advanced_stats_saves_by_strength':
+            query = GoalieAdvancedStatsSavesByStrengthDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'goalie_advanced_stats_shootout':
+            query = GoalieAdvancedStatsShootoutDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+        elif table == 'goalie_advanced_stats_start_relieved':
+            query = GoalieAdvancedStatsStartRelievedDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.player_id, entity.year))
+
+        return bool(result)
+
+
+    def create_insert_query(self, table: str) -> str:
+        if table == 'goalie_stats':
+            return GoalieStatsDatabaseMapper.create_insert_query()
+        elif table == 'goalie_youth_stats':
+            return GoalieYouthStatsDatabaseMapper.create_insert_query()
+        elif table == 'goalie_advanced_stats':
+            return GoalieAdvancedStatsDatabaseMapper.create_insert_query()
+        elif table == 'goalie_advanced_stats_days_rest':
+            return GoalieAdvancedStatsDaysRestDatabaseMapper.create_insert_query()
+        elif table == 'goalie_advanced_stats_penalty_shots':
+            return GoalieAdvancedStatsPenaltyShotsDatabaseMapper.create_insert_query()
+        elif table == 'goalie_advanced_stats_saves_by_strength':
+            return GoalieAdvancedStatsSavesByStrengthDatabaseMapper.create_insert_query()
+        elif table == 'goalie_advanced_stats_shootout':
+            return GoalieAdvancedStatsShootoutDatabaseMapper.create_insert_query()
+        elif table == 'goalie_advanced_stats_start_relieved':
+            return GoalieAdvancedStatsStartRelievedDatabaseMapper.create_insert_query()
+        
+
+    def create_update_query(self, table: str) -> str:
+        if table == 'goalie_stats':
+            return GoalieStatsDatabaseMapper.create_update_query()
+        elif table == 'goalie_youth_stats':
+            return GoalieYouthStatsDatabaseMapper.create_update_query()
+        elif table == 'goalie_advanced_stats':
+            return GoalieAdvancedStatsDatabaseMapper.create_update_query()
+        elif table == 'goalie_advanced_stats_days_rest':
+            return GoalieAdvancedStatsDaysRestDatabaseMapper.create_update_query()
+        elif table == 'goalie_advanced_stats_penalty_shots':
+            return GoalieAdvancedStatsPenaltyShotsDatabaseMapper.create_update_query()
+        elif table == 'goalie_advanced_stats_saves_by_strength':
+            return GoalieAdvancedStatsSavesByStrengthDatabaseMapper.create_update_query()
+        elif table == 'goalie_advanced_stats_shootout':
+            return GoalieAdvancedStatsShootoutDatabaseMapper.create_update_query()
+        elif table == 'goalie_advanced_stats_start_relieved':
+            return GoalieAdvancedStatsStartRelievedDatabaseMapper.create_update_query()
+
+    def to_database_params(self, entity, table: str) -> tuple:
+        if table == 'goalie_stats':
+            return GoalieStatsDatabaseMapper.to_database_params(entity)
+        elif table == 'goalie_youth_stats':
+            return GoalieYouthStatsDatabaseMapper.to_database_params(entity)
+        elif table == 'goalie_advanced_stats':
+            return GoalieAdvancedStatsDatabaseMapper.to_database_params(entity)
+        elif table == 'goalie_advanced_stats_days_rest':
+            return GoalieAdvancedStatsDaysRestDatabaseMapper.to_database_params(entity)
+        elif table == 'goalie_advanced_stats_penalty_shots':
+            return GoalieAdvancedStatsPenaltyShotsDatabaseMapper.to_database_params(entity)
+        elif table == 'goalie_advanced_stats_saves_by_strength':
+            return GoalieAdvancedStatsSavesByStrengthDatabaseMapper.to_database_params(entity)
+        elif table == 'goalie_advanced_stats_shootout':
+            return GoalieAdvancedStatsShootoutDatabaseMapper.to_database_params(entity)
+        elif table == 'goalie_advanced_stats_start_relieved':
+            return GoalieAdvancedStatsStartRelievedDatabaseMapper.to_database_params(entity)
+
+    def update_in_db(self):
+        goalies = self.fetch_entities()
+        for goalie in goalies:
+            for goalie_stats in goalie.goalie_stats:
+                if self.entity_exists(goalie_stats, 'goalie_stats'):
+                    query = self.create_update_query('goalie_stats')
+                    params = self.to_database_params(goalie_stats, 'goalie_stats')
+                    self.database_operator.write(query, params[2:] + (params[0], params[1], params[2], params[3], params[4]))
+                else:
+                    query = self.create_insert_query('goalie_stats')
+                    params = self.to_database_params(goalie_stats, 'goalie_stats')
+                    self.database_operator.write(query, params)
+
+            for goalie_youth_stats in goalie.goalie_youth_stats:
+                if self.entity_exists(goalie_youth_stats, 'goalie_youth_stats'):
+                    query = self.create_update_query('goalie_youth_stats')
+                    params = self.to_database_params(goalie_youth_stats, 'goalie_youth_stats')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1], params[2], params[3], params[4], params[5]))
+                else:
+                    query = self.create_insert_query('goalie_youth_stats')
+                    params = self.to_database_params(goalie_youth_stats, 'goalie_youth_stats')
+                    self.database_operator.write(query, params)
+            
+            for advanced_stats in goalie.goalie_advanced_stats:
+                if self.entity_exists(advanced_stats, 'goalie_advanced_stats'):
+                    query = self.create_update_query('goalie_advanced_stats')
+                    params = self.to_database_params(advanced_stats, 'goalie_advanced_stats')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('goalie_advanced_stats')
+                    params = self.to_database_params(advanced_stats, 'goalie_advanced_stats')
+                    self.database_operator.write(query, params)
+            
+            for days_rest in goalie.goalie_advanced_stats_days_rest:
+                if self.entity_exists(days_rest, 'goalie_advanced_stats_days_rest'):
+                    query = self.create_update_query('goalie_advanced_stats_days_rest')
+                    params = self.to_database_params(days_rest, 'goalie_advanced_stats_days_rest')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('goalie_advanced_stats_days_rest')
+                    params = self.to_database_params(days_rest, 'goalie_advanced_stats_days_rest')
+                    self.database_operator.write(query, params)
+
+            for penalty_shots in goalie.goalie_advanced_stats_penalty_shots:
+                if self.entity_exists(penalty_shots, 'goalie_advanced_stats_penalty_shots'):
+                    query = self.create_update_query('goalie_advanced_stats_penalty_shots')
+                    params = self.to_database_params(penalty_shots, 'goalie_advanced_stats_penalty_shots')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('goalie_advanced_stats_penalty_shots')
+                    params = self.to_database_params(penalty_shots, 'goalie_advanced_stats_penalty_shots')
+                    self.database_operator.write(query, params)
+
+            for saves_by_strength in goalie.goalie_advanced_stats_saves_by_strength:
+                if self.entity_exists(saves_by_strength, 'goalie_advanced_stats_saves_by_strength'):
+                    query = self.create_update_query('goalie_advanced_stats_saves_by_strength')
+                    params = self.to_database_params(saves_by_strength, 'goalie_advanced_stats_saves_by_strength')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('goalie_advanced_stats_saves_by_strength')
+                    params = self.to_database_params(saves_by_strength, 'goalie_advanced_stats_saves_by_strength')
+                    self.database_operator.write(query, params)
+
+            for shootout in goalie.goalie_advanced_stats_shootout:
+                if self.entity_exists(shootout, 'goalie_advanced_stats_shootout'):
+                    query = self.create_update_query('goalie_advanced_stats_shootout')
+                    params = self.to_database_params(shootout, 'goalie_advanced_stats_shootout')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('goalie_advanced_stats_shootout')
+                    params = self.to_database_params(shootout, 'goalie_advanced_stats_shootout')
+                    self.database_operator.write(query, params)
+
+            for start_relieved in goalie.goalie_advanced_stats_start_relieved:
+                if self.entity_exists(start_relieved, 'goalie_advanced_stats_start_relieved'):
+                    query = self.create_update_query('goalie_advanced_stats_start_relieved')
+                    params = self.to_database_params(start_relieved, 'goalie_advanced_stats_start_relieved')
+                    self.database_operator.write(query, params[1:] + (params[0], params[1]))
+                else:
+                    query = self.create_insert_query('goalie_advanced_stats_start_relieved')
+                    params = self.to_database_params(start_relieved, 'goalie_advanced_stats_start_relieved')
+                    self.database_operator.write(query, params)
+
+            
+            
+            

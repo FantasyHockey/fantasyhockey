@@ -476,39 +476,91 @@ class FetchSkaters(DataFetcher):
     def __init__(self):
         super().__init__()
 
+
     def _get_items(self):
-        for player_id in self._get_player_ids():
-            json = self._api_connector.get_json(f"https://api-web.nhle.com/v1/player/{player_id}/landing")
-            if self._data_parser.parse(json, "position") != "G":
-                self._items.append(player_id)
-
-    def _get_data_by_item(self):
-        for skater_id in self._items:
-            skater = Skater(skater_id)
-            skater_stats = self._data_parser(self._api_connector.get_json(f"https://api-web.nhle.com/v1/player/{skater_id}/landing"), "seasonsTotals", "empty_list")
-            nhl_seasons, youth_seasons = self._parse_skater_stats(skater_stats)
-            skater.skater_stats = nhl_seasons
-            skater.youth_stats = youth_seasons
-
-            skater
-
-    def _process_data(self, data):
-        pass
-
-    def _get_player_ids(self):
-        query = "SELECT id FROM players;"
+        query = "SELECT id FROM player_details WHERE position <> 'G';"
         res = self._database_operator.read(query)
         ids = []
         for row in res:
             ids.append(row[0])
 
-        return list(set(ids))
-    
-    def _parse_skater_stats(self, skater_stats):
+
+        self._items = ids
+            
+
+    def _get_data_by_item(self):
+        count = 0
+        for skater_id in self._items:
+            count += 1
+            print(f"Fetching skater {skater_id} - {count} of {len(self._items)}")
+            skater = Skater(skater_id)
+            skater_stats = self._data_parser.parse(self._api_connector.get_json(f"https://api-web.nhle.com/v1/player/{skater_id}/landing"), "seasonTotals", "empty_list")
+            nhl_seasons, youth_seasons = self._parse_skater_stats(skater_stats, skater_id)
+            skater.skater_stats = nhl_seasons
+            skater.youth_stats = youth_seasons
+
+            faceoff_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/faceoffwins?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsFaceoffs)
+            skater.advanced_stats_faceoffs = faceoff_list
+
+            goals_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/goalsForAgainst?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsGoals)
+            skater.advanced_stats_goals = goals_list
+
+            misc_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/realtime?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsMisc)
+            skater.advanced_stats_misc = misc_list
+
+            penalties_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/penalties?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsPenalties)
+            skater.advanced_stats_penalties = penalties_list
+
+            penalty_kill_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/penaltykill?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsPenaltyKill)
+            skater.advanced_stats_penalty_kill = penalty_kill_list
+
+            powerplay_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/powerplay?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsPowerplay)
+            skater.advanced_stats_powerplay = powerplay_list
+
+            scoring_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/shottype?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsScoring)
+            skater.advanced_stats_scoring = scoring_list
+
+            shootout_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/shootout?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsShootout)
+            skater.advanced_stats_shootout = shootout_list
+
+            toi_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/skater/timeonice?cayenneExp=playerId={skater_id}", SkaterAdvancedStatsTOI)
+            skater.advanced_stats_toi = toi_list
+
+            corsi_fenwick_counts = self._fetch_paginated_data(f"https://api.nhle.com/stats/rest/en/skater/summaryshooting?cayenneExp=playerId={skater_id}")
+            corsi_fenwick_percents = self._fetch_paginated_data(f"https://api.nhle.com/stats/rest/en/skater/percentages?cayenneExp=playerId={skater_id}")
+
+            if len(corsi_fenwick_counts) != len(corsi_fenwick_percents):
+                raise ValueError("The lengths of corsi_fenwick_counts and corsi_fenwick_percents do not match.")
+            corsi_fenwick_data = zip(corsi_fenwick_counts, corsi_fenwick_percents)
+            corsi_fenwick_list = []
+
+            for counts, percents in corsi_fenwick_data:
+                merged_data = {**counts, **percents}
+                corsi_fenwick_obj = self._serializer.deserialize(merged_data, SkaterAdvancedStatsCorsiFenwick)
+                corsi_fenwick_list.append(corsi_fenwick_obj)
+
+            skater.advanced_stats_corsi_fenwick = corsi_fenwick_list
+
+            self._data.append(skater)
+
+    def _process_data(self, data):
+        pass
+
+    def _process_advanced_stats_obj(self, url, obj):
+        advanced_stats_list = []
+        data = self._fetch_paginated_data(url)
+        for advanced_stats in data:
+            advanced_stats_obj = self._serializer.deserialize(advanced_stats, obj)
+            advanced_stats_list.append(advanced_stats_obj)
+  
+        return advanced_stats_list
+        
+    def _parse_skater_stats(self, skater_stats, player_id):
         stat_seasons = []
         youth_seasons = []
 
         for season in skater_stats:
+            season["playerId"] = player_id
             if season["leagueAbbrev"] != "NHL":
                 youth_season = self._serializer.deserialize(season, YouthSkaterStats)
                 youth_seasons.append(youth_season)
@@ -517,5 +569,78 @@ class FetchSkaters(DataFetcher):
                 stat_seasons.append(nhl_season)
 
         return stat_seasons, youth_seasons
+
+class FetchGoalies(DataFetcher):
+    def __init__(self):
+        super().__init__()
+
+    def _get_items(self):
+        query = "SELECT id FROM player_details WHERE position = 'G';"
+        res = self._database_operator.read(query)
+        ids = []
+        for row in res:
+            ids.append(row[0])
+
+        self._items = ids
+
+    def _get_data_by_item(self):
+        count = 0
+        for goalie_id in self._items:
+            count += 1
+            print(f"Fetching goalie {goalie_id} - {count} of {len(self._items)}")
+            goalie = Goalie(goalie_id)
+            goalie_stats = self._data_parser.parse(self._api_connector.get_json(f"https://api-web.nhle.com/v1/player/{goalie_id}/landing"), "seasonTotals", "empty_list")
+            nhl_seasons, youth_seasons = self._parse_goalie_stats(goalie_stats, goalie_id)
+            goalie.goalie_stats = nhl_seasons
+            goalie.goalie_youth_stats = youth_seasons
+
+            days_rest_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/goalie/daysrest?cayenneExp=playerId={goalie_id}", GoalieAdvancedStatsDaysRest)
+            goalie.goalie_advanced_stats_days_rest = days_rest_list
+
+            advanced_stats_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/goalie/advanced?cayenneExp=playerId={goalie_id}", GoalieAdvancedStats)
+            goalie.goalie_advanced_stats = advanced_stats_list
+
+            start_relieved_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/goalie/startedVsRelieved?cayenneExp=playerId={goalie_id}", GoalieAdvancedStatsStartRelieved)
+            goalie.goalie_advanced_stats_start_relieved = start_relieved_list
+
+            shootout_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/goalie/shootout?cayenneExp=playerId={goalie_id}", GoalieAdvancedStatsShootout)
+            goalie.goalie_advanced_stats_shootout = shootout_list
+
+            saves_by_strength = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/goalie/savesByStrength?cayenneExp=playerId={goalie_id}", GoalieAdvancedStatsSavesByStrength)
+            goalie.goalie_advanced_stats_saves_by_strength = saves_by_strength
+
+            penalty_shots_list = self._process_advanced_stats_obj(f"https://api.nhle.com/stats/rest/en/goalie/penaltyShots?cayenneExp=playerId={goalie_id}", GoalieAdvancedStatsPenaltyShots)
+            goalie.goalie_advanced_stats_penalty_shots = penalty_shots_list
+
+            self._data.append(goalie)
+
+
+    def _process_data(self, data):
+        pass
+
+    def _parse_goalie_stats(self, goalie_stats, player_id):
+        stat_seasons = []
+        youth_seasons = []
+
+        for season in goalie_stats:
+            season["playerId"] = player_id
+            if season["leagueAbbrev"] != "NHL":
+                youth_season = self._serializer.deserialize(season, GoalieYouthStats)
+                youth_seasons.append(youth_season)
+            else:
+                nhl_season = self._serializer.deserialize(season, GoalieStats)
+                stat_seasons.append(nhl_season)
+
+        return stat_seasons, youth_seasons
+    
+    def _process_advanced_stats_obj(self, url, obj):
+        advanced_stats_list = []
+        data = self._fetch_paginated_data(url)
+        for advanced_stats in data:
+            advanced_stats_obj = self._serializer.deserialize(advanced_stats, obj)
+            advanced_stats_list.append(advanced_stats_obj)
+  
+        return advanced_stats_list
+
 
 

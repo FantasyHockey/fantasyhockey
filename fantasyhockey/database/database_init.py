@@ -39,11 +39,9 @@ class DatabaseInitializer:
         db_operator.write(self.__intialize_team_advanced_stats_faceoff_percent())
 
         # Player Stats
-        db_operator.write(self.__initialize_skater_current_stats())
         
         db_operator.write(self.__initialize_skater_stats())
         db_operator.write(self.__initialize_skater_youth_stats())
-        db_operator.write(self.__initialize_goalie_current_stats())
         db_operator.write(self.__initialize_goalie_stats())
         db_operator.write(self.__initialize_goalie_youth_stats())
 
@@ -119,11 +117,8 @@ class DatabaseInitializer:
         db_operator.write(self.__delete_team_advanced_stats_faceoff_percent())
         
 
-
-        db_operator.write(self.__delete_skater_current_stats())
         db_operator.write(self.__delete_skater_stats())
         db_operator.write(self.__delete_skater_youth_stats())
-        db_operator.write(self.__delete_goalie_current_stats())
         db_operator.write(self.__delete_goalie_stats())
         db_operator.write(self.__delete_goalie_youth_stats())
 
@@ -230,25 +225,6 @@ class DatabaseInitializer:
         return "DROP TABLE IF EXISTS player_awards"
 
 # SKATER EXCLUSIVE TABLES   
-    def __initialize_skater_current_stats(self):
-        """
-        Initializes the current_skater_stats table in the database.
-
-        Primary Key - id, year, sequence, game_type_id
-
-        Need blocks, hits, primary and secondary assists from other source
-        """
-        return "CREATE TABLE IF NOT EXISTS current_skater_stats\
-                (id INT, team_id INT, games_played INT, goals INT, assists INT, points INT, plus_minus INT, penalty_minutes INT,\
-                game_winning_goals INT, ot_goals INT, power_play_goals INT, power_play_points INT, shooting_percent FLOAT,\
-                shorthanded_goals INT, shorthanded_points INT, shots INT, time_on_ice VARCHAR(255), game_type_id INT, year INT,\
-                sequence INT, faceoff_percent FLOAT, league_id INT, blocks INT, hits INT, primary_assists INT, secondary_assists INT,\
-                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES players(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
-                PRIMARY KEY (id, year, sequence, game_type_id));"
-
-    def __delete_skater_current_stats(self):
-        return "DROP TABLE IF EXISTS current_skater_stats"
-
     def __initialize_skater_stats(self):
         """
         Initializes the skater_stats table in the database.
@@ -256,11 +232,11 @@ class DatabaseInitializer:
         Need blocks, hits, primary and secondary assists from other source
         """
         return "CREATE TABLE IF NOT EXISTS skater_stats \
-                (id INT, team_id INT, games_played INT, goals INT, assists INT, points INT, plus_minus INT, penalty_minutes INT,\
+                (id INT, year INT, team_id INT, games_played INT, goals INT, assists INT, points INT, plus_minus INT, penalty_minutes INT,\
                 game_winning_goals INT, ot_goals INT, power_play_goals INT, power_play_points INT, shooting_percent FLOAT,\
-                shorthanded_goals INT, shorthanded_points INT, shots INT, time_on_ice VARCHAR(255), game_type_id INT, year INT,\
-                sequence INT, faceoff_percent FLOAT, league_id INT, blocks INT, hits INT, primary_assists INT, secondary_assists INT,\
-                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES players(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
+                shorthanded_goals INT, shorthanded_points INT, shots INT, time_on_ice VARCHAR(255), game_type_id INT,\
+                sequence INT, faceoff_percent FLOAT, league_id INT, blocks INT, hits INT,\
+                FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
                 PRIMARY KEY (id, year, sequence, game_type_id));"
 
     def __delete_skater_stats(self):
@@ -335,8 +311,8 @@ class DatabaseInitializer:
         """
         return "CREATE TABLE IF NOT EXISTS skater_advanced_stats_powerplay \
                 (id INT, year INT, team_id INT, pp_assists INT, pp_goals INT, pp_individual_corsi_for INT, pp_primary_assists INT,\
-                pp_secondary_assists INT, pp_shooting_percent FLOAT, pp_shots INT, pp_time_on_ice FLOAT, pp_time_on_ice_per_game FLOAT,\
-                pp_time_on_ice_percent FLOAT,\
+                pp_secondary_assists INT, pp_shooting_percentage FLOAT, pp_shots INT, pp_time_on_ice FLOAT, pp_time_on_ice_per_game FLOAT,\
+                pp_time_on_ice_percentage FLOAT,\
                 FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
                 PRIMARY KEY (id, year, team_id));"
     
@@ -348,9 +324,9 @@ class DatabaseInitializer:
         Initializes the skater_advanced_stats_penalty_kill table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS skater_advanced_stats_penalty_kill \
-                (id INT, year INT, team_id INT, pk_assists INT, pk_goals INT, pk_individual_corsi_against INT, pk_primary_assists INT,\
-                pk_secondary_assists INT, pk_shooting_percent FLOAT, pk_shots INT, pk_time_on_ice FLOAT, pk_time_on_ice_per_game FLOAT,\
-                pk_time_on_ice_percent FLOAT,\
+                (id INT, year INT, team_id INT, pk_assists INT, pk_goals INT, pk_individual_corsi_for INT, pk_primary_assists INT,\
+                pk_secondary_assists INT, pk_shooting_percentage FLOAT, pk_shots INT, pk_time_on_ice FLOAT, pk_time_on_ice_per_game FLOAT,\
+                pk_time_on_ice_percentage FLOAT,\
                 FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
                 PRIMARY KEY (id, year, team_id));"
 
@@ -424,27 +400,12 @@ class DatabaseInitializer:
                 (id INT, year INT, team_name VARCHAR(255), league_name VARCHAR(255), game_type_id INT, sequence INT, games_played INT,\
                 goals INT, assists INT, points INT, pim INT,\
                 FOREIGN KEY (id) REFERENCES players(id),\
-                FOREIGN KEY (year) REFERENCES seasons(year), PRIMARY KEY (id, year, team_name, league_name, game_type_id, sequence));"
+                PRIMARY KEY (id, year, team_name, league_name, game_type_id, sequence));"
 
     def __delete_skater_youth_stats(self):
         return "DROP TABLE IF EXISTS skater_youth_stats"
 
 # GOALIE EXCLUSIVE TABLES
-
-    def __initialize_goalie_current_stats(self):
-        """
-        Initializes the goalie_current_stats table in the database.
-        """
-        return "CREATE TABLE IF NOT EXISTS goalie_current_stats \
-                (id INT, team_id INT, year INT, game_type_id INT, league_id INT, sequence INT, games_played INT, goals INT, assists INT,\
-                    games_started INT, wins INT, losses INT, ot_losses INT, shots_against INT, goals_against INT, save_percent FLOAT,\
-                    shutouts INT, time_on_ice VARCHAR (100), goals_against_average FLOAT, pim INT,\
-                    FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
-                    PRIMARY KEY (id, year, team_id, game_type_id, sequence));"
-
-    def __delete_goalie_current_stats(self):
-        return "DROP TABLE IF EXISTS goalie_current_stats"
-
     def __initialize_goalie_stats(self):
         """
         Initializes the goalie_stats table in the database.
@@ -464,7 +425,7 @@ class DatabaseInitializer:
         Initializes the goalie_advanced_stats table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS goalie_advanced_stats\
-                (id INT, year INT, team_id INT, complete_game_percent FLOAT, complete_games INT, games_played INT, games_started INT,\
+                (id INT, year INT, team_id INT, complete_game_percent FLOAT, complete_games INT, games_started INT,\
                 goals_against INT, goals_against_average FLOAT, goals_for INT, goals_for_average FLOAT, incomplete_games INT, quality_start INT,\
                 quality_starts_percent FLOAT, regulation_losses INT, regulation_wins INT,\
                 FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
@@ -482,7 +443,7 @@ class DatabaseInitializer:
                 save_percent FLOAT, goals_against_average FLOAT, goals_against INT, wins INT, losses INT, time_on_ice VARCHAR(100),\
                 ties INT,\
                 FOREIGN KEY (id) REFERENCES players(id),\
-                FOREIGN KEY (year) REFERENCES seasons(year), PRIMARY KEY (id, year, team_name, league_name, game_type_id, sequence));" 
+                PRIMARY KEY (id, year, team_name, league_name, game_type_id, sequence));" 
 
     def __delete_goalie_youth_stats(self):
         return "DROP TABLE IF EXISTS goalie_youth_stats"
@@ -493,9 +454,9 @@ class DatabaseInitializer:
         """
         return "CREATE TABLE IF NOT EXISTS goalie_advanced_stats_days_rest\
                 (id INT, year INT, team_id INT, games_played INT, games_played_days_rest_0 INT, games_played_days_rest_1 INT,\
-                games_played_days_rest_2 INT, games_played_days_rest_3 INT, games_played_days_rest_4 INT, games_played_days_rest_4_plus INT,\
+                games_played_days_rest_2 INT, games_played_days_rest_3 INT, games_played_days_rest_4_plus INT,\
                 games_started INT, losses INT, ot_losses INT, save_percent FLOAT, save_percent_days_rest_0 FLOAT, save_percent_days_rest_1 FLOAT,\
-                save_percent_days_rest_2 FLOAT, save_percent_days_rest_3 FLOAT, save_percent_days_rest_4 FLOAT, save_percent_days_rest_4_plus FLOAT,\
+                save_percent_days_rest_2 FLOAT, save_percent_days_rest_3 FLOAT, save_percent_days_rest_4_plus FLOAT,\
                 FOREIGN KEY (id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (year) REFERENCES seasons(year),\
                 PRIMARY KEY (id, year, team_id));"
 

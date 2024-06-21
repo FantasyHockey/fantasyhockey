@@ -12,7 +12,7 @@ class Util:
         if team_abbrev is None:
             return None
         if "," in team_abbrev:
-            team_abbrev = team_abbrev.split(",")[1] 
+            team_abbrev = team_abbrev.split(",")[0] 
         query = "SELECT team_id FROM teams WHERE team_abbreviation = %s"
         params = (team_abbrev,)
         res = self.db_operator.read(query, params)
