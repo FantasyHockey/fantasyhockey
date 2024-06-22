@@ -31,6 +31,7 @@ class DataFetcher(ABC):
         self._data = []
         self._items = []
         self._data_parser = DataParser()
+        self._util = Util()
         self._database_operator = DatabaseOperator()
         self._api_connector = APIConnector()
         self._serializer = SerializerFactory.get_serializer("json")
@@ -676,9 +677,8 @@ class FetchGames(DataFetcher):
         abbrevs = self._get_team_abbrevs()
         game_ids = []
 
-        for team_abbrev, year in abbrevs[:1]:
+        for team_abbrev, year in abbrevs:
             url = f"https://api-web.nhle.com/v1/club-schedule-season/{team_abbrev}/{year}"
-            print(url)
             data = self._api_connector.get_json(url)
             if "currentSeason" not in data:
                 continue
@@ -694,20 +694,19 @@ class FetchGames(DataFetcher):
         for game_id in self._items:
             count += 1
             print(f"Fetching game {game_id} - {count} of {len(self._items)}")
-            game_json = self._api_connector.get_json(f"https://api-web.nhle.com/v1/gamecenter/{game_id}/landing")
-            game = self._serializer.deserialize(game_json, Games)
+            play_by_play_json = self._api_connector.get_json(f"https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play")
+            landing_json = self._api_connector.get_json(f"https://api-web.nhle.com/v1/gamecenter/{game_id}/landing")
+            
+            game = self._serializer.deserialize(play_by_play_json, Games)
 
-            star_obj = self._serializer.deserialize(game_json, GameThreeStars)
+            star_obj = self._serializer.deserialize(play_by_play_json, GameThreeStars)
             game.game_three_stars = star_obj
 
-            boxscore_json = self._api_connector.get_json(f"https://api-web.nhle.com/v1/gamecenter/{game_id}/boxscore")
-            skater_stats_list, goalie_stats_list = self._process_player_stats(boxscore_json)
+            skater_stats_list, goalie_stats_list = self._process_player_stats(play_by_play_json)
 
             game.game_skater_stats = skater_stats_list
             game.game_goalie_stats = goalie_stats_list
 
-
-            play_by_play_json = self._api_connector.get_json(f"https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play")
             game_roster_obj = self._process_roster(play_by_play_json)
             game.game_roster = game_roster_obj
 
@@ -717,16 +716,26 @@ class FetchGames(DataFetcher):
             scoreboard_obj = self._process_scoreboard(play_by_play_json)
             game.game_scoreboard = scoreboard_obj
 
-            boxscore_obj = self._serializer.deserialize(boxscore_json, GameBoxscore)
+            boxscore_obj = self._process_boxscore(play_by_play_json)
             game.game_boxscore = boxscore_obj
+
+            game_goal_list = self._process_goals(landing_json)
+            game.game_goals = game_goal_list
+
+            plays_list = self._process_plays(play_by_play_json)
+            game.game_plays = plays_list
+
+            shift_json = self._api_connector.get_json(f"https://api.nhle.com/stats/rest/en/shiftcharts?cayenneExp=gameId={game_id}")
+            shifts_list = self._process_shifts(shift_json, game_id)
+            game.game_shifts = shifts_list
 
             self._data.append(game)
 
     def _process_player_stats(self, boxscore_json):
         teams = self._data_parser.parse(boxscore_json, "playerByGameStats", "empty_list")
-        game_id = self._data_parser.parse(boxscore_json, "id")
-        home_id = self._data_parser.double_parse(boxscore_json, "homeTeam", "id")
-        away_id = self._data_parser.double_parse(boxscore_json, "awayTeam", "id")
+        game_id = self._data_parser.parse(boxscore_json, "id", "none")
+        home_id = self._data_parser.double_parse(boxscore_json, "homeTeam", "id", "none")
+        away_id = self._data_parser.double_parse(boxscore_json, "awayTeam", "id", "none")
 
         skater_stats = []
         goalie_stats = []
@@ -772,7 +781,7 @@ class FetchGames(DataFetcher):
     def _process_roster(self, play_by_play_json):
         roster = []
         for roster_spot in self._data_parser.parse(play_by_play_json, "rosterSpots", "empty_list"):
-            game_id = self._data_parser.parse(play_by_play_json, "id")
+            game_id = self._data_parser.parse(play_by_play_json, "id", "none")
             roster_spot["gameId"] = game_id
             roster_obj = self._serializer.deserialize(roster_spot, GameRoster)
             roster.append(roster_obj)
@@ -784,21 +793,27 @@ class FetchGames(DataFetcher):
         game_info = self._data_parser.double_parse(play_by_play_json, "summary", "gameInfo", "empty_dict")
         referees = self._data_parser.parse(game_info, "referees", "empty_list")
         linesmen = self._data_parser.parse(game_info, "linesmen", "empty_list")
-        game_id = self._data_parser.parse(play_by_play_json, "id")
+        game_id = self._data_parser.parse(play_by_play_json, "id", "none")
         refs["gameId"] = game_id
-        if len(referees) != 2:
-            refs["referee1Name"] = referees[0]["default"]
-            refs["referee2Name"] = None
-        else:
-            refs["referee1Name"] = referees[0]["default"]
-            refs["referee2Name"] = referees[1]["default"]
+        try:
+            if len(referees) == 1:
+                refs["referee1Name"] = referees[0]["default"]
+                refs["referee2Name"] = None
+            elif len(referees) == 2:
+                refs["referee1Name"] = referees[0]["default"]
+                refs["referee2Name"] = referees[1]["default"]
 
-        if len(linesmen) != 2:
-            refs["linesman1Name"] = linesmen[0]["default"]
+            if len(linesmen) == 1:
+                refs["linesman1Name"] = linesmen[0]["default"]
+                refs["linesman2Name"] = None
+            elif len(referees) == 2:
+                refs["linesman1Name"] = linesmen[0]["default"]
+                refs["linesman2Name"] = linesmen[1]["default"]
+        except IndexError: 
+            refs["referee1Name"] = None
+            refs["referee2Name"] = None
+            refs["linesman1Name"] = None
             refs["linesman2Name"] = None
-        else:
-            refs["linesman1Name"] = linesmen[0]["default"]
-            refs["linesman2Name"] = linesmen[1]["default"]
 
         refs_obj = self._serializer.deserialize(refs, Referees)
         return refs_obj
@@ -809,36 +824,35 @@ class FetchGames(DataFetcher):
         clock = self._data_parser.parse(play_by_play_json, "clock", "empty_dict")
         home_team = self._data_parser.parse(play_by_play_json, "homeTeam", "empty_dict")
         away_team = self._data_parser.parse(play_by_play_json, "awayTeam", "empty_dict")
-        period = self._data_parser.double_parse(play_by_play_json, "periodDescriptor", "number")
-        scoreboard_json['timeRemaining'] = self._data_parser.parse(clock, "timeRemaining")
-        scoreboard_json['secondsRemaining'] = self._data_parser.parse(clock, "secondsRemaining")
-        scoreboard_json['running'] = self._data_parser.parse(clock, "running")
-        scoreboard_json['inIntermission'] = self._data_parser.parse(clock, "inIntermission")
+        period = self._data_parser.double_parse(play_by_play_json, "periodDescriptor", "number", "none")
+        scoreboard_json['timeRemaining'] = self._data_parser.parse(clock, "timeRemaining", "none")
+        scoreboard_json['secondsRemaining'] = self._data_parser.parse(clock, "secondsRemaining", "none")
+        scoreboard_json['running'] = self._data_parser.parse(clock, "running", "none")
+        scoreboard_json['inIntermission'] = self._data_parser.parse(clock, "inIntermission", "none")
         scoreboard_json['gameId'] = game_id
-        scoreboard_json['homeScore'] = self._data_parser.parse(home_team, "score")
-        scoreboard_json['awayScore'] = self._data_parser.parse(away_team, "score")
-        scoreboard_json['homeShots'] = self._data_parser.parse(home_team, "sog")
-        scoreboard_json['awayShots'] = self._data_parser.parse(away_team, "sog")
+        scoreboard_json['homeScore'] = self._data_parser.parse(home_team, "score", "none")
+        scoreboard_json['awayScore'] = self._data_parser.parse(away_team, "score", "none")
+        scoreboard_json['homeShots'] = self._data_parser.parse(home_team, "sog", "none")
+        scoreboard_json['awayShots'] = self._data_parser.parse(away_team, "sog", "none")
         scoreboard_json['period'] = period
 
         scoreboard_obj = self._serializer.deserialize(scoreboard_json, GameScoreboard)
         return scoreboard_obj
 
-    def _process_boxscore(self, boxscore_json):
-        game_id = self._data_parser.parse(boxscore_json, "id")
-        home_team_id = self._data_parser.double_parse(boxscore_json, "homeTeam", "id")
-        home_score = self._data_parser.double_parse(boxscore_json, "homeTeam", "score")
-        away_team_id = self._data_parser.double_parse(boxscore_json, "awayTeam", "id")
-        away_score = self._data_parser.double_parse(boxscore_json, "awayTeam", "score")
+    def _process_boxscore(self, data):
+        game_id = self._data_parser.parse(data, "id")
+        home_team_id = self._data_parser.double_parse(data, "homeTeam", "id", "none")
+        home_score = self._data_parser.double_parse(data, "homeTeam", "score", "none")
+        away_team_id = self._data_parser.double_parse(data, "awayTeam", "id", "none")
+        away_score = self._data_parser.double_parse(data, "awayTeam", "score", "none")
         boxscore_json = {}
         boxscore_json["gameId"] = game_id
         boxscore_json["homeTeamId"] = home_team_id
-        boxscore_json["homeScore"] = home_score
+        boxscore_json["homeGoals"] = home_score
         boxscore_json["awayTeamId"] = away_team_id
-        boxscore_json["awayScore"] = away_score
+        boxscore_json["awayGoals"] = away_score
 
-
-        for stat in self._data_parser.parse(boxscore_json, "teamGameStats", "empty_list"):
+        for stat in self._data_parser.double_parse(data, "summary", "teamGameStats", "empty_list"):
             dict_key = stat["category"]
             boxscore_json["home" + dict_key] = stat["homeValue"]
             boxscore_json["away" + dict_key] = stat["awayValue"]
@@ -846,13 +860,108 @@ class FetchGames(DataFetcher):
         boxscore_obj = self._serializer.deserialize(boxscore_json, GameBoxscore)
         return boxscore_obj
     
+    def _process_plays(self, play_by_play_json):
+        plays = []
+        game_id = self._data_parser.parse(play_by_play_json, "id")
+        for play in self._data_parser.parse(play_by_play_json, "plays", "empty_list"):
+            play["gameId"] = game_id
+            play["periodNumber"] = self._data_parser.double_parse(play, "periodDescriptor", "number", "none")
+            play["periodType"] = self._data_parser.double_parse(play, "periodDescriptor", "periodType", "none")
+            play["xCoord"] = self._data_parser.double_parse(play, "details", "xCoord", "none")
+            play["yCoord"] = self._data_parser.double_parse(play, "details", "yCoord", "none")
+            play["zoneCode"] = self._data_parser.double_parse(play, "details", "zoneCode", "none")
+            play["shotType"] = self._data_parser.double_parse(play, "details", "shotType", "none")
+            play["reason"] = self._data_parser.double_parse(play, "details", "reason", "none")
+            play["teamId"] = self._data_parser.double_parse(play, "details", "eventOwnerTeamId", "none")
+            play["descKey"] = self._data_parser.double_parse(play, "details", "descKey", "none")
+            play["duration"] = self._data_parser.double_parse(play, "details", "duration", "none")
 
+            play_key = play["typeDescKey"]
+            owner_player_id = None
+            receiving_player_id = None
+            assist_1_player_id = None
+            assist_2_player_id = None
+            if play_key == "faceoff":
+                owner_player_id = self._data_parser.double_parse(play, "details", "winningPlayerId", "none")
+                receiving_player_id = self._data_parser.double_parse(play, "details", "losingPlayerId", "none")
+            elif play_key == "hit":
+                owner_player_id = self._data_parser.double_parse(play, "details", "hittingPlayerId", "none")
+                receiving_player_id = self._data_parser.double_parse(play, "details", "hitteePlayerId", "none")
+            elif play_key == "blocked-shot":
+                owner_player_id = self._data_parser.double_parse(play, "details", "blockingPlayerId", "none")
+                receiving_player_id = self._data_parser.double_parse(play, "details", "shootingPlayerId", "none")
+            elif play_key == "takeaway":
+                owner_player_id = self._data_parser.double_parse(play, "details", "playerId", "none")
+                receiving_player_id = None
+            elif play_key == "giveaway":
+                owner_player_id = self._data_parser.double_parse(play, "details", "playerId", "none")
+                receiving_player_id = None
+            elif play_key == "shot-on-goal" or play_key == "missed-shot":
+                owner_player_id = self._data_parser.double_parse(play, "details", "shootingPlayerId", "none")
+                receiving_player_id = self._data_parser.double_parse(play, "details", "goalieInNetId", "none")
+            elif play_key == "penalty":
+                owner_player_id = self._data_parser.double_parse(play, "details", "committedByPlayerId", "none")
+                receiving_player_id = self._data_parser.double_parse(play, "details", "drawnByPlayerId", "none")
+            elif play_key == "goal":
+                owner_player_id = self._data_parser.double_parse(play, "details", "scoringPlayerId", "none")
+                receiving_player_id = self._data_parser.double_parse(play, "details", "goalieInNetId", "none")
+                assist_1_player_id = self._data_parser.double_parse(play, "details", "assist1PlayerId", "none")
+                assist_2_player_id = self._data_parser.double_parse(play, "details", "assist2PlayerId", "none")
 
+            play["ownerPlayerId"] = owner_player_id
+            play["receivingPlayerId"] = receiving_player_id
+            play["assist1PlayerId"] = assist_1_player_id
+            play["assist2PlayerId"] = assist_2_player_id
 
+            play_obj = self._serializer.deserialize(play, GamePlays)
 
+            plays.append(play_obj)
+
+        return plays
+    
+    def _process_shifts(self, shift_json, game_id):
+        shifts = []
+        for shift in shift_json['data']:
+            shift["gameId"] = game_id
+            shift_obj = self._serializer.deserialize(shift, ShiftData)
+            shifts.append(shift_obj)
+
+        return shifts
             
     def _process_data(self, data):
         pass
+
+    def _process_goals(self, data):
+        goals = []
+        game_id = self._data_parser.parse(data, "id")
+        goals_json = self._data_parser.double_parse(data, "summary", "scoring", "empty_list")
+        for period_num in range(len(self._data_parser.double_parse(data, "summary", "scoring", "empty_list"))):
+            period = goals_json[period_num]["periodDescriptor"]["number"]
+            period_goals = goals_json[period_num]
+            for goal in period_goals["goals"]:
+                goal["gameId"] = game_id
+                goal["period"] = period
+                team_abbrev = self._data_parser.double_parse(goal, "teamAbbrev", "default", "none")
+                leading_team_abbrev = self._data_parser.double_parse(goal, "leadingTeamAbbrev", "default", "none")
+                goal["teamId"] = self._util.get_team_id_from_abbrev(team_abbrev)
+                goal["leadingTeamId"] = self._util.get_team_id_from_abbrev(leading_team_abbrev)
+                assist1 = None
+                assist2 = None
+                if len(goal["assists"]) == 2:
+                    assist1 = goal["assists"][0]["playerId"]
+                    assist2 = goal["assists"][1]["playerId"]
+                elif len(goal["assists"]) == 1:
+                    assist1 = goal["assists"][0]["playerId"]
+
+                goal["assist1PlayerId"] = assist1
+                goal["assist2PlayerId"] = assist2
+
+                goal_obj = self._serializer.deserialize(goal, GameGoals)    
+
+                goals.append(goal_obj)
+
+        return goals
+
 
     def _get_team_abbrevs(self):
         query = """SELECT team_abbreviation, year FROM teams;"""
@@ -866,29 +975,3 @@ class FetchGames(DataFetcher):
             abbrevs.append((row[0], row[1]))
 
         return abbrevs
-
-class FetchShiftData(DataFetcher):
-    def __init__(self):
-        super().__init__()
-
-    def _get_items(self):
-        pass
-
-    def _get_data_by_item(self):
-        pass
-
-    def _process_data(self, data):
-        pass
-
-class FetchPlayoffBracket(DataFetcher):
-    def __init__(self):
-        super().__init__()
-
-    def _get_items(self):
-        pass
-
-    def _get_data_by_item(self):
-        pass
-
-    def _process_data(self, data):
-        pass

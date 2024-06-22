@@ -7077,6 +7077,9 @@ class Games:
         self._game_referees: list[Referees] = None
         self._game_scoreboard: GameScoreboard = None
         self._game_boxscore: GameBoxscore = None
+        self._game_plays = None
+        self._game_shifts = None
+        self._game_goals = None
 
     @property
     def game_id(self):
@@ -7285,6 +7288,30 @@ class Games:
     @game_boxscore.setter
     def game_boxscore(self, value):
         self._game_boxscore = value
+
+    @property
+    def game_plays(self):
+        return self._game_plays
+    
+    @game_plays.setter
+    def game_plays(self, value):
+        self._game_plays = value
+
+    @property
+    def game_shifts(self):
+        return self._game_shifts
+    
+    @game_shifts.setter
+    def game_shifts(self, value):
+        self._game_shifts = value
+
+    @property
+    def game_goals(self):
+        return self._game_goals
+
+    @game_goals.setter
+    def game_goals(self, value):
+        self._game_goals = value
 
         
 class GameThreeStars:
@@ -7644,8 +7671,12 @@ class GameRoster:
 class GamePlays:
     def __init__(self, game_id):
         self._game_id = game_id
-        self._play_id = None
         self._event_id = None
+        self._team_id = None
+        self._owner_player_id = None
+        self._receiving_player_id = None
+        self._assist_1_player_id = None
+        self._assist_2_player_id = None
         self._period_number = None
         self._period_type = None
         self._time_in_period = None
@@ -7654,11 +7685,14 @@ class GamePlays:
         self._home_team_defending_side = None
         self._type_code = None
         self._type_description_key = None
+        self._desc_key = None
+        self._duration = None
         self._sort_order = None
         self._x_coord = None
         self._y_coord = None
         self._zone_code = None
         self._shot_type = None
+        self._reason = None
 
     @property
     def game_id(self):
@@ -7669,20 +7703,52 @@ class GamePlays:
         self._game_id = value
 
     @property
-    def play_id(self):
-        return self._play_id
-    
-    @play_id.setter
-    def play_id(self, value):
-        self._play_id = value
-
-    @property
     def event_id(self):
         return self._event_id
     
     @event_id.setter
     def event_id(self, value):
         self._event_id = value
+
+    @property
+    def team_id(self):
+        return self._team_id
+    
+    @team_id.setter
+    def team_id(self, value):
+        self._team_id = value
+
+    @property
+    def owner_player_id(self):
+        return self._owner_player_id
+    
+    @owner_player_id.setter
+    def owner_player_id(self, value):
+        self._owner_player_id = value
+
+    @property
+    def receiving_player_id(self):
+        return self._receiving_player_id
+    
+    @receiving_player_id.setter
+    def receiving_player_id(self, value):
+        self._receiving_player_id = value
+
+    @property
+    def assist_1_player_id(self):
+        return self._assist_1_player_id
+    
+    @assist_1_player_id.setter
+    def assist_1_player_id(self, value):
+        self._assist_1_player_id = value
+
+    @property
+    def assist_2_player_id(self):
+        return self._assist_2_player_id
+    
+    @assist_2_player_id.setter
+    def assist_2_player_id(self, value):
+        self._assist_2_player_id = value
 
     @property
     def period_number(self):
@@ -7749,6 +7815,22 @@ class GamePlays:
         self._type_description_key = value
 
     @property
+    def desc_key(self):
+        return self._desc_key
+    
+    @desc_key.setter
+    def desc_key(self, value):
+        self._desc_key = value
+    
+    @property
+    def duration(self):
+        return self._duration
+    
+    @duration.setter
+    def duration(self, value):
+        self._duration = value
+
+    @property
     def sort_order(self):
         return self._sort_order
     
@@ -7788,18 +7870,28 @@ class GamePlays:
     def shot_type(self, value):
         self._shot_type = value
 
+    @property
+    def reason(self):
+        return self._reason
+    
+    @reason.setter
+    def reason(self, value):
+        self._reason = value
+
 class GameGoals:
     def __init__(self, game_id):
         self._game_id = game_id
         self._situation_code = None
         self._strength = None
         self._player_id = None
+        self._team_id = None
         self._highlight_clip_id = None
         self._goals_to_date = None
         self._away_score = None
         self._home_score = None
         self._leading_team_id = None
         self._time_in_period = None
+        self._period = None
         self._shot_type = None
         self._goal_modifier = None
         self._assist_1_player_id = None
@@ -7836,6 +7928,14 @@ class GameGoals:
     @player_id.setter
     def player_id(self, value):
         self._player_id = value
+
+    @property
+    def team_id(self):
+        return self._team_id
+    
+    @team_id.setter
+    def team_id(self, value):
+        self._team_id = value
 
     @property
     def highlight_clip_id(self):
@@ -7884,6 +7984,14 @@ class GameGoals:
     @time_in_period.setter
     def time_in_period(self, value):
         self._time_in_period = value
+
+    @property
+    def period(self):
+        return self._period
+    
+    @period.setter
+    def period(self, value):
+        self._period = value
 
     @property
     def shot_type(self):
@@ -8051,7 +8159,6 @@ class GameBoxscore:
         self._game_id = game_id
         self._away_team_id = None
         self._away_goals = None
-        self._away_score = None
         self._away_shots = None
         self._away_faceoff_percent = None
         self._away_power_play_conversion = None
@@ -8062,7 +8169,6 @@ class GameBoxscore:
         self._away_takeaways = None
         self._home_team_id = None
         self._home_goals = None
-        self._home_score = None
         self._home_shots = None
         self._home_faceoff_percent = None
         self._home_power_play_conversion = None
@@ -8573,6 +8679,7 @@ class ShiftData:
         self._shift_id = shift_id
         self._game_id = None
         self._player_id = None
+        self._team_id = None
         self._detail_code = None
         self._duration = None
         self._end_time = None
@@ -8607,6 +8714,14 @@ class ShiftData:
     @player_id.setter
     def player_id(self, value):
         self._player_id = value
+
+    @property
+    def team_id(self):
+        return self._team_id
+    
+    @team_id.setter
+    def team_id(self, value):
+        self._team_id = value
 
     @property
     def detail_code(self):

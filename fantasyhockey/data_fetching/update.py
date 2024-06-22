@@ -1500,9 +1500,18 @@ class UpdateGames(AbstractUpdater):
         elif table == 'game_boxscore':
             query = GameBoxscoreDatabaseMapper.create_check_existence_query()
             result = self.database_operator.read(query, (entity.game_id,))
+        elif table == 'game_plays':
+            query = GamePlaysDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id, entity.event_id))
+        elif table == 'shift_data':
+            query = ShiftDataDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.shift_id,))
+        elif table == "game_goals":
+            query = GameGoalsDatabaseMapper.create_check_existence_query()
+            result = self.database_operator.read(query, (entity.game_id, entity.away_score, entity.home_score))
+
         return bool(result)
         
-    
     def create_insert_query(self, table: str) -> str:
         if table == 'games':
             return GamesDatabaseMapper.create_insert_query()
@@ -1520,8 +1529,13 @@ class UpdateGames(AbstractUpdater):
             return GameScoreboardDatabaseMapper.create_insert_query()
         elif table == 'game_boxscore':
             return GameBoxscoreDatabaseMapper.create_insert_query()
-
-        
+        elif table == 'game_plays':
+            return GamePlaysDatabaseMapper.create_insert_query()
+        elif table == 'shift_data':
+            return ShiftDataDatabaseMapper.create_insert_query()
+        elif table == "game_goals":
+            return GameGoalsDatabaseMapper.create_insert_query()
+   
     def create_update_query(self, table: str) -> str:
         if table == 'games':
             return GamesDatabaseMapper.create_update_query()
@@ -1539,7 +1553,12 @@ class UpdateGames(AbstractUpdater):
             return GameScoreboardDatabaseMapper.create_update_query()
         elif table == 'game_boxscore':
             return GameBoxscoreDatabaseMapper.create_update_query()
-        
+        elif table == 'game_plays':
+            return GamePlaysDatabaseMapper.create_update_query()
+        elif table == 'shift_data':
+            return ShiftDataDatabaseMapper.create_update_query()
+        elif table == "game_goals":
+            return GameGoalsDatabaseMapper.create_update_query()
         
     def to_database_params(self, entity, table: str) -> tuple:
         if table == 'games':
@@ -1558,10 +1577,19 @@ class UpdateGames(AbstractUpdater):
             return GameScoreboardDatabaseMapper.to_database_params(entity)
         elif table == 'game_boxscore':
             return GameBoxscoreDatabaseMapper.to_database_params(entity)
+        elif table == 'game_plays':
+            return GamePlaysDatabaseMapper.to_database_params(entity)
+        elif table == 'shift_data':
+            return ShiftDataDatabaseMapper.to_database_params(entity)
+        elif table == "game_goals":
+            return GameGoalsDatabaseMapper.to_database_params(entity)
         
     def update_in_db(self):
+        count = 0
         games = self.fetch_entities()
         for game in games:
+            count += 1
+            print(f"Updating game {count} of {len(games)}")
             if self.entity_exists(game, 'games'):
                 query = self.create_update_query('games')
                 params = self.to_database_params(game, 'games')
@@ -1570,7 +1598,6 @@ class UpdateGames(AbstractUpdater):
                 query = self.create_insert_query('games')
                 params = self.to_database_params(game, 'games')
                 self.database_operator.write(query, params)
-
             
             if self.entity_exists(game, 'game_three_stars'):
                 query = self.create_update_query('game_three_stars')
@@ -1579,8 +1606,6 @@ class UpdateGames(AbstractUpdater):
             else:
                 query = self.create_insert_query('game_three_stars')
                 params = self.to_database_params(game.game_three_stars, 'game_three_stars')
-                print(query)
-                print(params)
                 self.database_operator.write(query, params)
 
             for skater_stat in game.game_skater_stats:
@@ -1642,3 +1667,33 @@ class UpdateGames(AbstractUpdater):
                 query = GameBoxscoreDatabaseMapper.create_insert_query()
                 params = GameBoxscoreDatabaseMapper.to_database_params(boxscore_obj)
                 self.database_operator.write(query, params)
+
+            for play in game.game_plays:
+                if self.entity_exists(play, 'game_plays'):
+                    query = GamePlaysDatabaseMapper.create_update_query()
+                    params = GamePlaysDatabaseMapper.to_database_params(play)
+                    self.database_operator.write(query, params[2:] + (params[0], params[1]))
+                else:
+                    query = GamePlaysDatabaseMapper.create_insert_query()
+                    params = GamePlaysDatabaseMapper.to_database_params(play)
+                    self.database_operator.write(query, params)
+
+            for shift in game.game_shifts:
+                if self.entity_exists(shift, 'shift_data'):
+                    query = ShiftDataDatabaseMapper.create_update_query()
+                    params = ShiftDataDatabaseMapper.to_database_params(shift)
+                    self.database_operator.write(query, params[2:] + (params[0],))
+                else:
+                    query = ShiftDataDatabaseMapper.create_insert_query()
+                    params = ShiftDataDatabaseMapper.to_database_params(shift)
+                    self.database_operator.write(query, params)
+
+            for goal in game.game_goals:
+                if self.entity_exists(goal, 'game_goals'):
+                    query = GameGoalsDatabaseMapper.create_update_query()
+                    params = GameGoalsDatabaseMapper.to_database_params(goal)
+                    self.database_operator.write(query, params[1:] + (params[0], params[7], params[8]))
+                else:
+                    query = GameGoalsDatabaseMapper.create_insert_query()
+                    params = GameGoalsDatabaseMapper.to_database_params(goal)
+                    self.database_operator.write(query, params)

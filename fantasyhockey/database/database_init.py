@@ -76,9 +76,9 @@ class DatabaseInitializer:
         db_operator.write(self.__initialize_game_goals())
         db_operator.write(self.__initialize_game_three_stars())
         db_operator.write(self.__initialize_game_plays())
-        db_operator.write(self.__initialize_play_outcomes())
-        db_operator.write(self.__initialize_play_roles())
-        db_operator.write(self.__initialize_play_on_ice())
+        #db_operator.write(self.__initialize_play_outcomes())
+        #db_operator.write(self.__initialize_play_roles())
+        #db_operator.write(self.__initialize_play_on_ice())
 
         # Referees and Playoffs
         db_operator.write(self.__initialize_referees())
@@ -788,8 +788,8 @@ class DatabaseInitializer:
         Initializes the game_boxscore table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS game_boxscore\
-                (game_id INT, away_team_id INT, away_goals INT, away_score INT, away_shots INT, away_faceoff_percent FLOAT, away_power_play_conversion VARCHAR(25),\
-                away_penalty_minutes INT, away_hits INT, away_blocked_shots INT, away_giveaways INT, away_takeaways INT, home_team_id INT, home_goals INT, home_score INT, home_shots INT,\
+                (game_id INT, away_team_id INT, away_goals INT, away_shots INT, away_faceoff_percent FLOAT, away_power_play_conversion VARCHAR(25),\
+                away_penalty_minutes INT, away_hits INT, away_blocked_shots INT, away_giveaways INT, away_takeaways INT, home_team_id INT, home_goals INT, home_shots INT,\
                 home_faceoff_percent FLOAT, home_power_play_conversion VARCHAR(25), home_penalty_minutes INT, home_hits INT, home_blocked_shots INT, home_giveaways INT, home_takeaways INT,\
                 FOREIGN KEY (game_id) REFERENCES games(game_id), FOREIGN KEY (away_team_id) REFERENCES teams(team_id), FOREIGN KEY (home_team_id) REFERENCES teams(team_id),\
                 PRIMARY KEY (game_id)\
@@ -873,11 +873,18 @@ class DatabaseInitializer:
         This table holds the common details about each play.
         """
         return """CREATE TABLE IF NOT EXISTS game_plays (
-                    game_id INT, play_id INT, event_id INT, period_number INT, period_type VARCHAR(25), time_in_period VARCHAR(25),\
+                    game_id INT, event_id INT, team_id INT, owner_player_id INT, receiving_player_id INT, assist_1_player_id INT, assist_2_player_id INT, period_number INT,  
+                    period_type VARCHAR(25), time_in_period VARCHAR(25),\
                     time_remaining VARCHAR(25), situation_code VARCHAR(25), home_team_defending_side VARCHAR(25), type_code VARCHAR(25),\
-                    type_description_key VARCHAR(50), sort_order INT, x_coord INT, y_coord INT, zone_code VARCHAR(25), shot_type VARCHAR(50),\
+                    type_description_key VARCHAR(50), desc_key VARCHAR(50), duration INT, sort_order INT, x_coord INT, y_coord INT, zone_code VARCHAR(25), shot_type VARCHAR(50),\
+                    reason VARCHAR(255),\
                     FOREIGN KEY (game_id) REFERENCES games(game_id),\
-                    PRIMARY KEY (game_id, play_id)\
+                    FOREIGN KEY (team_id) REFERENCES teams(team_id),\
+                    FOREIGN KEY (owner_player_id) REFERENCES players(id),\
+                    FOREIGN KEY (receiving_player_id) REFERENCES players(id),\
+                    FOREIGN KEY (assist_1_player_id) REFERENCES players(id),\
+                    FOREIGN KEY (assist_2_player_id) REFERENCES players(id),\
+                    PRIMARY KEY (game_id, event_id)\
                 );"""
     
     def __delete_game_plays(self):
@@ -946,11 +953,11 @@ class DatabaseInitializer:
         Initializes the game_goals table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS game_goals \
-                (game_id INT, situation_code VARCHAR(25), strength VARCHAR(25), player_id INT, highlight_clip_id BIGINT, goals_to_date INT,\
-                away_score INT, home_score INT, leading_team_id INT, time_in_period VARCHAR(25), shot_type VARCHAR(25), goal_modifier VARCHAR(25),\
+                (game_id INT, situation_code VARCHAR(25), strength VARCHAR(25), player_id INT, team_id INT, highlight_clip_id BIGINT, goals_to_date INT,\
+                away_score INT, home_score INT, leading_team_id INT, time_in_period VARCHAR(25), period INT, shot_type VARCHAR(25), goal_modifier VARCHAR(25),\
                 assist_1_player_id INT, assist_2_player_id INT,\
                 FOREIGN KEY (game_id) REFERENCES games(game_id), FOREIGN KEY (player_id) REFERENCES players(id),\
-                FOREIGN KEY (leading_team_id) REFERENCES teams(team_id), FOREIGN KEY (assist_1_player_id) REFERENCES players(id),\
+                FOREIGN KEY (leading_team_id) REFERENCES teams(team_id), FOREIGN KEY (team_id) REFERENCES teams(team_id), FOREIGN KEY (assist_1_player_id) REFERENCES players(id),\
                 FOREIGN KEY (assist_2_player_id) REFERENCES players(id), PRIMARY KEY (game_id, home_score, away_score));"
 
     def __delete_game_goals(self):
@@ -961,9 +968,9 @@ class DatabaseInitializer:
         Initializes the shift_data table in the database.
         """
         return "CREATE TABLE IF NOT EXISTS shift_data \
-                (shift_id INT, game_id INT, player_id INT, detail_code INT, duration VARCHAR(25), end_time VARCHAR(25), start_time VARCHAR(25),\
-                event_description VARCHAR(25), event_details VARCHAR(25), event_number INT, period_number INT, shift_number INT, type_code INT,\
-                FOREIGN KEY (game_id) REFERENCES games(game_id), FOREIGN KEY (player_id) REFERENCES players(id), PRIMARY KEY (shift_id));"
+                (shift_id INT, game_id INT, player_id INT, team_id INT, detail_code INT, duration VARCHAR(25), end_time VARCHAR(25), start_time VARCHAR(25),\
+                event_description VARCHAR(25), event_details VARCHAR(25), event_number INT, period INT, shift_number INT, type_code INT,\
+                FOREIGN KEY (game_id) REFERENCES games(game_id), FOREIGN KEY (player_id) REFERENCES players(id), FOREIGN KEY (team_id) REFERENCES teams(team_id), PRIMARY KEY (shift_id));"
     
     def __delete_shift_data(self):
         return "DROP TABLE IF EXISTS shift_data"
