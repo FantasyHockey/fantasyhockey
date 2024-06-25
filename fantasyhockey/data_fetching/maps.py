@@ -389,7 +389,7 @@ class DraftRankingDatabaseMapper:
                 birth_country = %s,
                 midterm_rank = %s,
                 final_rank = %s
-            WHERE year = %s AND first_name = %s AND last_name = %s
+            WHERE year = %s AND first_name = %s AND last_name = %s AND position_code = %s
         """
     
     @staticmethod

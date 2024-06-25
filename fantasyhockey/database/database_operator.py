@@ -91,3 +91,29 @@ class DatabaseOperator:
             if connection.is_connected():
                 cursor.close()
                 self.db_connection.close_connection(connection)
+
+    def batch_write(self, query, params_list):
+        """
+        Executes a batch of INSERT, UPDATE, or DELETE SQL queries using the provided query and parameters list.
+
+        Parameters
+        ----------
+        query : str
+            The SQL query to execute.
+        params_list : list of tuples
+            A list of tuples of parameters to use with the SQL query.
+        """
+        try:
+            connection = self.db_connection.open_connection()
+            if connection is not None:
+                cursor = connection.cursor()
+                cursor.executemany(query, params_list)
+                connection.commit()
+        except Exception as e:
+            print(f"An error occurred during batch write: {e}")
+            connection.rollback()
+            raise e
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                self.db_connection.close_connection(connection)
